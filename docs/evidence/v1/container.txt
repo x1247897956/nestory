@@ -1,0 +1,4 @@
+image=sha256:3c84dfb17b8b123463e6afe6c1e088e2703424da8116632e2a9d2404ee8215ad running=true user=noteapp revision=7a922d6-stage5
+uid=10001(noteapp) gid=10001(noteapp) groups=10001(noteapp)
+drwxr-xr-x    3 noteapp  noteapp       4096 Oct 23 21:25 /data
+drwxr-xr-x    2 noteapp  noteapp       4096 Oct 23 21:25 /data/assets

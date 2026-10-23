@@ -1,0 +1,17 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test acceptance-v1.spec.ts
+
+(node:65476) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:65477) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65477) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:65477) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/acceptance-v1.spec.ts:224:3 › restored v1 data, relations, Markdown and attachments remain usable (532ms)
+
+  1 passed (1.1s)

@@ -13,6 +13,10 @@ export function ProjectForm({
   ) => Promise<void>;
   onClose: () => void;
 }) {
+  const [initial] = useState({
+    title: project?.title ?? "",
+    description: project?.description ?? "",
+  });
   const [version] = useState(project?.version);
   const [title, setTitle] = useState(project?.title ?? "");
   const [description, setDescription] = useState(project?.description ?? "");
@@ -28,6 +32,11 @@ export function ProjectForm({
       >
         <h2>{project ? "修改项目" : "新建项目"}</h2>
         <form
+          data-dirty={
+            title !== initial.title ||
+            description !== initial.description ||
+            busy
+          }
           onSubmit={async (e) => {
             e.preventDefault();
             setBusy(true);
@@ -44,6 +53,7 @@ export function ProjectForm({
             项目名称
             <input
               autoFocus
+              disabled={busy}
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -52,6 +62,7 @@ export function ProjectForm({
           <label>
             项目说明
             <textarea
+              disabled={busy}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -62,7 +73,18 @@ export function ProjectForm({
             </p>
           )}
           <footer>
-            <button type="button" onClick={onClose} disabled={busy}>
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  (title === initial.title &&
+                    description === initial.description) ||
+                  confirm("放弃未保存的项目草稿？")
+                )
+                  onClose();
+              }}
+              disabled={busy}
+            >
               取消
             </button>
             <button className="primary" disabled={busy || !title.trim()}>

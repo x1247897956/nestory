@@ -1,3 +1,4 @@
+import { flushSync } from "react-dom";
 import { Workspace } from "../features/workspace/Workspace";
 import { Search } from "../features/search/Search";
 import { Trash } from "../features/trash/Trash";
@@ -61,6 +62,20 @@ export function App() {
     enabled: !!taskId,
   });
   const path = useLocation().pathname;
+  useEffect(() => {
+    setNewTitle("");
+    setNewParent("");
+  }, [path]);
+  useEffect(() => {
+    const protect = (event: BeforeUnloadEvent) => {
+      if (document.querySelector('[data-dirty="true"]')) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", protect);
+    return () => window.removeEventListener("beforeunload", protect);
+  }, []);
   const notes = path.includes("/pages");
   const calendar = path.includes("/events");
   useEffect(() => {
@@ -412,6 +427,7 @@ export function App() {
                   {!readOnly && (
                     <form
                       className="new-task"
+                      data-dirty={!!newTitle.trim() || !!newParent || creating}
                       onSubmit={async (e) => {
                         e.preventDefault();
                         setCreating(true);
@@ -422,8 +438,11 @@ export function App() {
                             "POST",
                             { title: newTitle, parent_id: newParent || null },
                           );
-                          setNewTitle("");
-                          setNewParent("");
+                          flushSync(() => {
+                            setNewTitle("");
+                            setNewParent("");
+                            setCreating(false);
+                          });
                           if (t.parent_id)
                             setExpanded((old) =>
                               new Set(old).add(t.parent_id!),
@@ -440,6 +459,7 @@ export function App() {
                       }}
                     >
                       <input
+                        disabled={creating}
                         aria-label="新任务标题"
                         placeholder="＋ 添加一个新任务…"
                         value={newTitle}
@@ -447,6 +467,7 @@ export function App() {
                         required
                       />
                       <select
+                        disabled={creating}
                         aria-label="父任务"
                         value={newParent}
                         onChange={(e) => setNewParent(e.target.value)}

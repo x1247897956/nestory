@@ -1,0 +1,18 @@
+{
+  "project_id": "8064f60715393c1cf8493a8297ad8402",
+  "page_id": "af25102a0220779c8cc5cc956cf12663",
+  "parent_id": "fc63259558e8a22bc0d0f44a66e00f73",
+  "task_id": "2d7973832a5646b05af72548691fb560",
+  "event_id": "104f226503f8df840241757fa2b5c89a",
+  "title": "V1完整验收 1792790673598",
+  "assets": [
+    {
+      "id": "d15add2e44fa27bcda269b9c0270e725",
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "d890678093ea71b374f14dfb8c0d168d",
+      "sha256": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776"
+    }
+  ]
+}

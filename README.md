@@ -1,6 +1,8 @@
 # Noteapp
 
-单人、本地或受信任局域网使用的项目、任务与笔记软件。已提供项目归档、五阶段任务及一层子任务、无限层级页面树、共享 Markdown 源码/预览/分屏、检查项、800ms 串行自动保存和安全附件上传下载。日历、关联、删除和回收站留待后续阶段。
+单人、本地或受信任局域网使用的项目、任务与笔记软件。第一版提供五阶段任务与一层子任务、多层笔记、共享 Markdown 编辑与安全附件、独立日历、三组双向关联、今日工作台、搜索、项目归档和按批次删除恢复。SQLite与附件在同一数据卷持久化，无登录或团队协作。
+
+实际验收与限制见 [第一版验收](docs/acceptance-v1.md)，安装、升级、备份恢复见 [运维手册](docs/operations.md)。
 
 ## 开发
 
@@ -27,6 +29,9 @@ go run ./cmd/noteapp
 | APP_DEV_ORIGIN | 空 | 额外允许的开发浏览器 Origin |
 | APP_BIND | 127.0.0.1 | Compose 端口绑定 |
 | APP_PORT | 8080 | Compose 主机端口 |
+| APP_IMAGE | noteapp:local | 构建/启动的镜像引用 |
+| APP_VERSION | development | 镜像中的源码版本标签，发布时设为commit |
+| APP_VOLUME_NAME | noteapp_noteapp-data | 显式真实命名卷，升级须沿用旧卷 |
 
 若安装多个 Go 版本后出现 `compile: version ... does not match go tool version ...`，检查 `go env GOROOT` 和 `go tool compile -V`；本次环境残留 goenv 的 GOROOT，使用 `env -u GOROOT go test ./...` 可恢复工具链一致性，无需修改用户全局配置。受限环境可把 `GOPATH`、`GOCACHE`、`GOMODCACHE` 和 `npm_config_cache` 指向可写目录。
 
@@ -34,10 +39,11 @@ go run ./cmd/noteapp
 
 ```sh
 cp .env.example .env
-docker compose up -d --build
+APP_VERSION=$(git rev-parse HEAD) docker compose up -d --build
+scripts/smoke.sh --url http://127.0.0.1:8080
 ```
 
-单容器提供 API 和静态前端，非 root UID/GID 10001 运行；命名卷 `noteapp-data` 持久化整个 `/data`。固定镜像标签与 digest 见 Dockerfile。默认仅本机可访问；受信任局域网部署可显式修改 APP_BIND。当前没有身份验证。
+单容器提供 API 和静态前端，非 root UID/GID 10001 运行；默认真实命名卷 `noteapp_noteapp-data`（APP_VOLUME_NAME） 持久化整个 `/data`。固定镜像标签与 digest 见 Dockerfile。默认仅本机可访问；受信任局域网部署可显式修改 APP_BIND。当前没有身份验证。
 
 更新/重建：`docker compose up -d --build --force-recreate`。停止：`docker compose down`。不要执行 `docker compose down -v`，那会删除数据卷。
 
@@ -45,6 +51,7 @@ docker compose up -d --build
 
 ```sh
 go test ./...
+go test -race ./...
 go vet ./...
 cd web
 npm run typecheck
@@ -53,24 +60,32 @@ npm run build
 npx playwright install chromium
 # 或使用现有 Chromium：
 # PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/path/to/chromium" npm run e2e
-npm run e2e -- tasks.spec.ts notes.spec.ts
+npm run e2e
+cd ..
+python3 -m unittest scripts.tests.test_archive
+# 本机已有最终Docker镜像时，另验证备份恢复与容器错误边界：
+python3 -m unittest scripts.tests.test_backup_restore scripts.tests.test_runtime
 ```
 
 Playwright 默认启动 Go 后端并使用 `/tmp/noteapp-e2e-data` 临时数据库和 18080 端口；可用 `E2E_BASE_URL=http://127.0.0.1:8080 npm run e2e` 对已运行实例验证。测试会创建带时间戳项目，建议使用测试实例。
 
-所有 HTTP JSON 接口位于 `/api/v1`：`/healthz` 检查进程、`/readyz` 检查数据库、`/config` 提供时区和阶段元数据；项目、任务、页面与附件接口见技术设计。PATCH 与 move 必须提交 version。400 为参数错误，404 为不存在，409 为版本/归档/父级冲突，500 不暴露数据库详情。任务和页面正文在停止输入 800ms 后自动保存，每个对象串行发送快照；保留显式保存按钮。失败和 409 会保留草稿，可复制、重试或确认后重新载入。关闭标签页和应用内路由离开会提示未保存内容。
+所有 HTTP JSON 接口位于 `/api/v1`：`/healthz` 检查进程、`/readyz` 检查数据库、`/config` 提供时区和阶段元数据；项目、任务、页面、日程、双向关联、工作台、搜索及回收站接口见技术设计。PATCH 与 move 必须提交 version。400 为参数错误，404 为不存在，409 为版本/归档/父级冲突，500 不暴露数据库详情。任务和页面正文在停止输入 800ms 后自动保存，每个对象串行发送快照；保留显式保存按钮。失败和 409 会保留草稿，可复制、重试或确认后重新载入。关闭标签页和应用内路由离开会提示未保存内容。
 
 ## 停机一致性备份与恢复
 
-先停止服务，再完整备份数据目录（包括存在的 WAL/SHM 和 assets）。不要运行中仅复制主数据库。
+运维脚本要求主机 Python 3.9+（含标准库sqlite3）和Docker。脚本只接受明确命名卷、容器及镜像；备份整个 `/data`，包括存在的WAL/SHM和附件，生成版本、SQL对象/关系计数、文件及附件SHA清单，最后自动尝试恢复原容器运行状态。不要运行中只复制数据库主文件。
 
 ```sh
-docker compose stop
-docker run --rm --volumes-from "$(docker compose ps -aq noteapp)" -v "$PWD:/backup" alpine:3.22.2 tar czf /backup/noteapp-backup.tar.gz -C /data .
-shasum -a 256 noteapp-backup.tar.gz > noteapp-backup.tar.gz.sha256
-docker compose start
+mkdir -p backups
+scripts/backup.sh --container noteapp-noteapp-1 \
+  --volume noteapp_noteapp-data --image noteapp:local \
+  --app-version "$(git rev-parse HEAD)" --output "$PWD/backups/noteapp-v1"
+
+docker volume create noteapp-restored
+scripts/restore.sh --volume noteapp-restored \
+  --image <manifest.json中的image_id> --backup "$PWD/backups/noteapp-v1"
 ```
 
-记录应用 commit、schema 版本（阶段 1 为 1）与校验和。恢复到空的命名卷：停止服务，用临时容器把归档解压至该卷的 `/data`，确认目录归属 UID/GID 10001，再以相同应用版本启动。检查 `/readyz`、项目与任务数量、正文和父子关系；后续阶段含附件时一同验证附件。升级迁移前采用同样备份，当前不承诺自动降级。
+恢复只写预先创建的空卷，禁止覆盖；先使用清单里的同一image ID。脚本先核对SHA与只读SQLite完整性/外键/计数，再恢复并重新读取目标核对正文所在文件、所有关系计数和每个附件SHA。保留原卷，不要覆盖源数据。按 [运维手册](docs/operations.md) 启动恢复检查实例并验证浏览器，再切换正式卷。升级前备份；不承诺自动schema降级。
 
-本次开发环境的正式多阶段镜像基础层下载较慢，阶段 1 另外通过了“本机交叉编译二进制 + 相同 Alpine 运行层”的容器重建持久化检查；该替代路径只用于开发验证，不是常规交付构建命令。正式 `docker build` 的最终结果以实施报告及后续交付检查为准。
+[最终验收记录](docs/acceptance-v1.md) 区分正式多阶段构建与早期开发替代验证，附实际命令、镜像版本和证据。当前前端大包约1.65MB（gzip526KB），首次加载性能仍可优化。

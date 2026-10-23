@@ -1,0 +1,34 @@
+name: noteapp
+services:
+  noteapp:
+    restart: unless-stopped
+    environment:
+      APP_DATA_DIR: /data
+      APP_TIMEZONE: Asia/Shanghai
+      APP_UPLOAD_LIMIT: "20971520"
+    image: noteapp:local
+    networks:
+      default: null
+    stop_grace_period: 15s
+    volumes:
+      - type: volume
+        source: noteapp-data
+        target: /data
+        volume: {}
+    build:
+      context: /Users/seyr1n/01-Project/noteapp
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: development
+    ports:
+      - mode: ingress
+        host_ip: 127.0.0.1
+        target: 8080
+        published: "8080"
+        protocol: tcp
+networks:
+  default:
+    name: noteapp_default
+volumes:
+  noteapp-data:
+    name: noteapp_noteapp-data

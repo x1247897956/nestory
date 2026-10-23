@@ -1,0 +1,112 @@
+ Image noteapp:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 583B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.21kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/golang:1.27.1-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414
+#4 DONE 0.9s
+
+#5 [internal] load metadata for docker.io/library/alpine:3.22.2@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+#5 DONE 1.1s
+
+#3 [internal] load metadata for docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#3 DONE 1.1s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 115B done
+#6 DONE 0.0s
+
+#7 [stage-2 1/3] FROM docker.io/library/alpine:3.22.2@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+#7 resolve docker.io/library/alpine:3.22.2@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412 done
+#7 DONE 0.0s
+
+#8 [backend 1/7] FROM docker.io/library/golang:1.27.1-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414
+#8 resolve docker.io/library/golang:1.27.1-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414 0.0s done
+#8 DONE 0.0s
+
+#9 [frontend 1/6] FROM docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#9 resolve docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070 done
+#9 DONE 0.0s
+
+#10 [internal] load build context
+#10 transferring context: 111.88kB done
+#10 DONE 0.0s
+
+#11 [frontend 2/6] WORKDIR /src/web
+#11 CACHED
+
+#12 [frontend 3/6] COPY web/package*.json ./
+#12 CACHED
+
+#13 [frontend 4/6] RUN npm ci
+#13 CACHED
+
+#14 [backend 3/7] COPY go.mod go.sum ./
+#14 CACHED
+
+#15 [backend 2/7] WORKDIR /src
+#15 CACHED
+
+#16 [backend 4/7] RUN go mod download
+#16 CACHED
+
+#17 [frontend 5/6] COPY web/ ./
+#17 DONE 0.0s
+
+#18 [backend 5/7] COPY . .
+#18 DONE 0.0s
+
+#19 [frontend 6/6] RUN npm run build
+#19 0.189 
+#19 0.189 > noteapp-web@0.1.0 build
+#19 0.189 > tsc -b && vite build
+#19 0.189 
+#19 1.677 vite v7.3.7 building client environment for production...
+#19 1.704 transforming...
+#19 3.176 ✓ 614 modules transformed.
+#19 3.506 rendering chunks...
+#19 3.516 computing gzip size...
+#19 3.541 dist/index.html                     0.37 kB │ gzip:   0.30 kB
+#19 3.541 dist/assets/index-C1Zmnpde.css     11.62 kB │ gzip:   3.54 kB
+#19 3.541 dist/assets/index-CNBrmjQH.js   1,652.54 kB │ gzip: 529.45 kB
+#19 3.541 
+#19 3.541 (!) Some chunks are larger than 500 kB after minification. Consider:
+#19 3.541 - Using dynamic import() to code-split the application
+#19 3.541 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#19 3.541 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#19 3.541 ✓ built in 1.85s
+#19 DONE 3.6s
+
+#20 [backend 6/7] COPY --from=frontend /src/web/dist ./web/dist
+#20 DONE 0.0s
+
+#21 [backend 7/7] RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /noteapp ./cmd/noteapp
+#21 DONE 5.8s
+
+#22 [stage-2 2/3] RUN apk add --no-cache ca-certificates tzdata && addgroup -g 10001 noteapp && adduser -D -u 10001 -G noteapp noteapp && mkdir -p /data/assets && chown -R noteapp:noteapp /data
+#22 CACHED
+
+#23 [stage-2 3/3] COPY --from=backend /noteapp /usr/local/bin/noteapp
+#23 DONE 0.0s
+
+#24 exporting to image
+#24 exporting layers
+#24 exporting layers 0.2s done
+#24 exporting manifest sha256:4cd945e2df17e7cbfa487d441579cedfe19ce88d9231dc40c5c0f32924dcd962 done
+#24 exporting config sha256:c18e873b22ac5c8ae646f01060ddc755f92465644228bfc143debd5d49f36ef7 done
+#24 exporting attestation manifest sha256:52712e340aa95aef12bef36b970c005701cf023f7205796df7348dd9c8cf2bec done
+#24 exporting manifest list sha256:3c84dfb17b8b123463e6afe6c1e088e2703424da8116632e2a9d2404ee8215ad done
+#24 naming to docker.io/library/noteapp:local done
+#24 unpacking to docker.io/library/noteapp:local 0.0s done
+#24 DONE 0.3s
+
+#25 resolving provenance for metadata file
+#25 DONE 0.0s
+ Image noteapp:local Built 

@@ -1,0 +1,119 @@
+{
+  "schema_versions": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "counts": {
+    "assets": 12,
+    "delete_batches": 11,
+    "events": 18,
+    "page_events": 3,
+    "pages": 39,
+    "projects": 31,
+    "recent_visits": 49,
+    "schema_migrations": 4,
+    "task_events": 3,
+    "task_pages": 6,
+    "tasks": 24
+  },
+  "assets": [
+    {
+      "id": "057b278d7e5636269568f53e0fce6390",
+      "storage_key": "057b278d7e5636269568f53e0fce6390",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "0bc668faf4276acb703d1c6567d60e6b",
+      "storage_key": "0bc668faf4276acb703d1c6567d60e6b",
+      "size": 15,
+      "sha256": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776"
+    },
+    {
+      "id": "229e8e745b02589b1a5e8e5beb325a0e",
+      "storage_key": "229e8e745b02589b1a5e8e5beb325a0e",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "2af4e4070188f18ff8f06041e24a45ea",
+      "storage_key": "2af4e4070188f18ff8f06041e24a45ea",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "6b1a33a146ebacf02a7e61a1bbec294a",
+      "storage_key": "6b1a33a146ebacf02a7e61a1bbec294a",
+      "size": 25,
+      "sha256": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783"
+    },
+    {
+      "id": "8d18bc4c6ed5145c52f410d6b151ab50",
+      "storage_key": "8d18bc4c6ed5145c52f410d6b151ab50",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "b1b6bfc70f8ec02349bafc8a23117e6b",
+      "storage_key": "b1b6bfc70f8ec02349bafc8a23117e6b",
+      "size": 25,
+      "sha256": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783"
+    },
+    {
+      "id": "b743ae7b1ec5995fdcebecc9bffe7660",
+      "storage_key": "b743ae7b1ec5995fdcebecc9bffe7660",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "d15add2e44fa27bcda269b9c0270e725",
+      "storage_key": "d15add2e44fa27bcda269b9c0270e725",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "d229dabb217e3bcfffed0a32c4b65ece",
+      "storage_key": "d229dabb217e3bcfffed0a32c4b65ece",
+      "size": 25,
+      "sha256": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783"
+    },
+    {
+      "id": "d890678093ea71b374f14dfb8c0d168d",
+      "storage_key": "d890678093ea71b374f14dfb8c0d168d",
+      "size": 15,
+      "sha256": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776"
+    },
+    {
+      "id": "e8cadc02de4588f4d8793bcf64ff2959",
+      "storage_key": "e8cadc02de4588f4d8793bcf64ff2959",
+      "size": 15,
+      "sha256": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776"
+    }
+  ],
+  "files": {
+    "assets/057b278d7e5636269568f53e0fce6390": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/0bc668faf4276acb703d1c6567d60e6b": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776",
+    "assets/229e8e745b02589b1a5e8e5beb325a0e": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/2af4e4070188f18ff8f06041e24a45ea": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/6b1a33a146ebacf02a7e61a1bbec294a": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783",
+    "assets/8d18bc4c6ed5145c52f410d6b151ab50": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/b1b6bfc70f8ec02349bafc8a23117e6b": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783",
+    "assets/b743ae7b1ec5995fdcebecc9bffe7660": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/d15add2e44fa27bcda269b9c0270e725": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/d229dabb217e3bcfffed0a32c4b65ece": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783",
+    "assets/d890678093ea71b374f14dfb8c0d168d": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776",
+    "assets/e8cadc02de4588f4d8793bcf64ff2959": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776",
+    "noteapp.db": "8c17bc7e1174908b0729fd939b3132a5baf5c696cb95b99229bdc467b4170a8e"
+  },
+  "integrity_check": "ok",
+  "foreign_key_check": [],
+  "format_version": 1,
+  "app_version": "7a922d6-stage5",
+  "image_reference": "noteapp:local",
+  "image_id": "sha256:3c84dfb17b8b123463e6afe6c1e088e2703424da8116632e2a9d2404ee8215ad",
+  "source_container": "noteapp-v1-check-noteapp-1",
+  "source_volume": "noteapp-v1-check",
+  "created_at": "2026-10-23T21:25:26.873926+00:00"
+}

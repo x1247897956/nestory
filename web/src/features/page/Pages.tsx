@@ -1,5 +1,6 @@
 import { Relations } from "../relation/Relations";
-import { useState } from "react";
+import { flushSync } from "react-dom";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../app/api";
@@ -28,6 +29,11 @@ export function Pages({
   const [title, setTitle] = useState("");
   const [parent, setParent] = useState("");
   const [error, setError] = useState("");
+  const [creating, setCreating] = useState(false);
+  useEffect(() => {
+    setTitle("");
+    setParent("");
+  }, [projectId, pageId]);
   const [epoch, setEpoch] = useState(0);
   const list = useQuery({
     queryKey: ["pages", projectId],
@@ -81,24 +87,33 @@ export function Pages({
         )}
         {!archived && (
           <form
+            data-dirty={!!title.trim() || !!parent || creating}
             onSubmit={async (e) => {
               e.preventDefault();
               setError("");
+              setCreating(true);
               try {
                 const p = await api<Page>(
                   "/projects/" + projectId + "/pages",
                   "POST",
                   { title, parent_id: parent || null },
                 );
-                setTitle("");
+                flushSync(() => {
+                  setTitle("");
+                  setParent("");
+                  setCreating(false);
+                });
                 await refresh();
                 nav("/projects/" + projectId + "/pages/" + p.id);
               } catch (e) {
                 setError((e as Error).message);
+              } finally {
+                setCreating(false);
               }
             }}
           >
             <input
+              disabled={creating}
               aria-label="新页面标题"
               required
               value={title}
@@ -106,6 +121,7 @@ export function Pages({
               placeholder="页面标题"
             />
             <select
+              disabled={creating}
               aria-label="新页面父级"
               value={parent}
               onChange={(e) => setParent(e.target.value)}
@@ -117,7 +133,7 @@ export function Pages({
                 </option>
               ))}
             </select>
-            <button>新建页面</button>
+            <button disabled={creating || !title.trim()}>新建页面</button>
           </form>
         )}
         {error && <p role="alert">{error}</p>}

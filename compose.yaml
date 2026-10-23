@@ -1,8 +1,12 @@
 services:
   noteapp:
-    build: .
-    image: noteapp:local
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-development}
+    image: ${APP_IMAGE:-noteapp:local}
     restart: unless-stopped
+    stop_grace_period: 15s
     ports:
       - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8080}:8080"
     environment:
@@ -13,3 +17,4 @@ services:
       - noteapp-data:/data
 volumes:
   noteapp-data:
+    name: ${APP_VOLUME_NAME:-noteapp_noteapp-data}
