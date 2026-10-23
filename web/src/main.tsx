@@ -8,6 +8,8 @@ const client = new QueryClient({
 });
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
+  { path: "/search", element: <App /> },
+  { path: "/trash", element: <App /> },
   { path: "/projects/:projectId", element: <App /> },
   { path: "/projects/:projectId/tasks/:taskId", element: <App /> },
   { path: "/projects/:projectId/events", element: <App /> },

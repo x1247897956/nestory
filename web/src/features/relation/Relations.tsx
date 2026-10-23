@@ -1,3 +1,4 @@
+import { DeleteButton } from "../trash/DeleteButton";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -86,6 +87,7 @@ export function Relations({
   return (
     <section className="relations" aria-label="关联对象">
       <h3>关联对象</h3>
+      {!archived && <DeleteButton type={type} id={id} projectId={projectId} />}
       {list.map((item) => (
         <div className="relation-row" key={item.type + item.id}>
           {item.deleted ? (

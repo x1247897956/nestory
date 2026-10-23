@@ -10,3 +10,6 @@ var PagesAssets string
 
 //go:embed 003_events_relations.sql
 var EventsRelations string
+
+//go:embed 004_workspace_trash.sql
+var WorkspaceTrash string

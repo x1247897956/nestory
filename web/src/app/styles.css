@@ -759,3 +759,24 @@ h3 > span:last-child {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.global-view {
+  padding: 32px;
+  max-width: 960px;
+}
+.global-view li {
+  padding: 12px;
+  border-bottom: 1px solid #e5e3dd;
+}
+.global-view article {
+  padding: 16px;
+  border-bottom: 1px solid #e5e3dd;
+}
+.delete-control {
+  margin: 16px 0;
+}
+.delete-control [role="dialog"] {
+  padding: 16px;
+  border: 1px solid #c46e57;
+  background: #fff8f4;
+}

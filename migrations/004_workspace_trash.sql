@@ -1,0 +1,2 @@
+CREATE TABLE recent_visits(object_type TEXT NOT NULL CHECK(object_type IN ('project','page')),object_id TEXT NOT NULL,visited_at INTEGER NOT NULL,PRIMARY KEY(object_type,object_id));
+CREATE TABLE delete_batches(id TEXT PRIMARY KEY,object_type TEXT NOT NULL,object_id TEXT NOT NULL,project_id TEXT NOT NULL REFERENCES projects(id),title TEXT NOT NULL,member_count INTEGER NOT NULL,deleted_at INTEGER NOT NULL,restored_at INTEGER);

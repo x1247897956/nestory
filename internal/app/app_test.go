@@ -125,3 +125,30 @@ func TestEventAndRelationAPI(t *testing.T) {
 		req(t, h, "DELETE", "/relations/"+r, nil, 200)
 	}
 }
+
+func TestArchivedAllWritesAndDeletedRelations(t *testing.T) {
+	h, close := setup(t)
+	defer close()
+	p := project(t, h, "Archive boundaries")
+	pid := p["id"].(string)
+	a := task(t, h, p, "A", nil)
+	aid := a["id"].(string)
+	pg := req(t, h, "POST", "/projects/"+pid+"/pages", object{"title": "Page"}, 201)
+	pgid := pg["id"].(string)
+	ev := req(t, h, "POST", "/projects/"+pid+"/events", object{"title": "Event", "start_at": "2026-10-23T00:00:00+08:00", "end_at": "2026-10-23T01:00:00+08:00"}, 201)
+	eid := ev["id"].(string)
+	req(t, h, "PUT", "/relations/task-page/"+aid+"/"+pgid, nil, 200)
+	pg2 := req(t, h, "POST", "/projects/"+pid+"/pages", object{"title": "Live Page"}, 201)
+	pg2id := pg2["id"].(string)
+	preview := req(t, h, "GET", "/pages/"+pgid+"/delete-preview", nil, 200)
+	del := req(t, h, "DELETE", "/pages/"+pgid, preview, 200)
+	req(t, h, "PATCH", "/projects/"+pid, object{"version": p["version"], "archived": true}, 200)
+	for _, v := range []struct {
+		method, path string
+		body         object
+	}{{"POST", "/projects/" + pid + "/tasks", object{"title": "x"}}, {"POST", "/projects/" + pid + "/pages", object{"title": "x"}}, {"POST", "/projects/" + pid + "/events", object{"title": "x", "start_at": "2026-10-23T00:00:00Z", "end_at": "2026-10-23T01:00:00Z"}}, {"PATCH", "/tasks/" + aid, object{"version": a["version"], "body": "- [x] forbidden"}}, {"POST", "/tasks/" + aid + "/move", object{"version": a["version"], "position": 0}}, {"PATCH", "/events/" + eid, object{"version": ev["version"], "title": "forbidden"}},
+		{"PATCH", "/pages/" + pg2id, object{"version": pg2["version"], "body": "- [x] forbidden"}}, {"POST", "/pages/" + pg2id + "/move", object{"version": pg2["version"], "position": 0}}, {"PUT", "/relations/task-event/" + aid + "/" + eid, nil}, {"POST", "/trash/" + del["batch_id"].(string) + "/restore", nil}} {
+		req(t, h, v.method, v.path, v.body, 409)
+	}
+	req(t, h, "POST", "/recent", object{"type": "project", "id": pid}, 200)
+}

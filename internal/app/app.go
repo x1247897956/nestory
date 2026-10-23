@@ -14,7 +14,10 @@ import (
 	"noteapp/internal/project"
 	"noteapp/internal/relation"
 	"noteapp/internal/task"
+	"noteapp/internal/trash"
+	"noteapp/internal/workspace"
 	"noteapp/web"
+	"strconv"
 	"strings"
 )
 
@@ -181,6 +184,67 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		mux.HandleFunc(method+" /api/v1/relations/{kind}/{left}/{right}", func(w http.ResponseWriter, r *http.Request) {
 			e := relations.Change(r.Context(), r.PathValue("kind"), r.PathValue("left"), r.PathValue("right"), method == "PUT")
 			respond(w, 200, map[string]bool{"ok": true}, e)
+		})
+	}
+
+	ws := workspace.New(db, c.Timezone, nil)
+	bin := trash.New(db)
+	mux.HandleFunc("GET /api/v1/workspace/today", func(w http.ResponseWriter, r *http.Request) { v, e := ws.Today(r.Context()); respond(w, 200, v, e) })
+	mux.HandleFunc("GET /api/v1/search", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		limit, offset := 20, 0
+		var e error
+		if q.Has("limit") {
+			limit, e = strconv.Atoi(q.Get("limit"))
+			if e != nil {
+				httpx.Fail(w, httpx.Invalid("limit 无效"))
+				return
+			}
+		}
+		if q.Has("offset") {
+			offset, e = strconv.Atoi(q.Get("offset"))
+			if e != nil {
+				httpx.Fail(w, httpx.Invalid("offset 无效"))
+				return
+			}
+		}
+		v, e := ws.Search(r.Context(), q.Get("q"), q.Get("include_archived") == "true", limit, offset)
+		respond(w, 200, v, e)
+	})
+	mux.HandleFunc("GET /api/v1/recent", func(w http.ResponseWriter, r *http.Request) {
+		v, e := ws.Recent(r.Context(), r.URL.Query().Get("include_archived") == "true")
+		respond(w, 200, v, e)
+	})
+	mux.HandleFunc("POST /api/v1/recent", func(w http.ResponseWriter, r *http.Request) {
+		var in struct {
+			Type string `json:"type"`
+			ID   string `json:"id"`
+		}
+		if e := httpx.Decode(w, r, &in); e != nil {
+			httpx.Fail(w, e)
+			return
+		}
+		e := ws.Visit(r.Context(), in.Type, in.ID)
+		respond(w, 200, map[string]bool{"ok": true}, e)
+	})
+	mux.HandleFunc("GET /api/v1/trash", func(w http.ResponseWriter, r *http.Request) { v, e := bin.List(r.Context()); respond(w, 200, v, e) })
+	mux.HandleFunc("POST /api/v1/trash/{batch}/restore", func(w http.ResponseWriter, r *http.Request) {
+		e := bin.Restore(r.Context(), r.PathValue("batch"))
+		respond(w, 200, map[string]bool{"ok": true}, e)
+	})
+	for _, typ := range []string{"tasks", "pages", "events"} {
+		mux.HandleFunc("GET /api/v1/"+typ+"/{id}/delete-preview", func(w http.ResponseWriter, r *http.Request) {
+			v, e := bin.Preview(r.Context(), typ, r.PathValue("id"))
+			respond(w, 200, v, e)
+		})
+		mux.HandleFunc("DELETE /api/v1/"+typ+"/{id}", func(w http.ResponseWriter, r *http.Request) {
+			var in trash.Preview
+			if e := httpx.Decode(w, r, &in); e != nil {
+				httpx.Fail(w, e)
+				return
+			}
+			v, e := bin.Delete(r.Context(), typ, r.PathValue("id"), in)
+			respond(w, 200, map[string]string{"batch_id": v}, e)
 		})
 	}
 	mux.HandleFunc("GET /api/", func(w http.ResponseWriter, r *http.Request) { httpx.Fail(w, httpx.NotFound) })

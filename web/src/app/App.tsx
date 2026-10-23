@@ -1,3 +1,6 @@
+import { Workspace } from "../features/workspace/Workspace";
+import { Search } from "../features/search/Search";
+import { Trash } from "../features/trash/Trash";
 import { useState, useEffect } from "react";
 import {
   Link,
@@ -60,6 +63,18 @@ export function App() {
   const path = useLocation().pathname;
   const notes = path.includes("/pages");
   const calendar = path.includes("/events");
+  useEffect(() => {
+    if (projectId && current.data)
+      void api("/recent", "POST", { type: "project", id: projectId })
+        .then(() => qc.invalidateQueries({ queryKey: ["recent"] }))
+        .catch(() => {});
+  }, [projectId, current.data?.id, qc]);
+  useEffect(() => {
+    if (pageId)
+      void api("/recent", "POST", { type: "page", id: pageId })
+        .then(() => qc.invalidateQueries({ queryKey: ["recent"] }))
+        .catch(() => {});
+  }, [pageId, qc]);
   const p = current.data;
   const all = tasks.data ?? [];
   const readOnly = !!p?.archived_at;
@@ -149,6 +164,15 @@ export function App() {
           </span>
         </Link>
         <div className="sidebar-label">你的工作空间</div>
+        <Link className="nav-item" to="/">
+          今日工作台
+        </Link>
+        <Link className="nav-item" to="/search">
+          搜索
+        </Link>
+        <Link className="nav-item" to="/trash">
+          回收站
+        </Link>
         <button
           className={"nav-item " + (!archived ? "active" : "")}
           onClick={() => setArchived(false)}
@@ -191,7 +215,7 @@ export function App() {
           ＋ 新建项目
         </button>
         <div className="sidebar-bottom">
-          <span className="local-dot" /> 本地空间 · 阶段 3<br />
+          <span className="local-dot" /> 本地空间 · 阶段 4<br />
         </div>
       </aside>
       <main>
@@ -203,22 +227,18 @@ export function App() {
           <span className="private-tag">LOCAL & PRIVATE</span>
         </div>
         {!projectId ? (
-          <div className="welcome">
-            <span className="eyebrow">A LITTLE SPACE FOR BIG IDEAS</span>
-            <h1>
-              从一个项目，
-              <br />
-              开始你的下一步。
-            </h1>
-            <p>
-              整理想法，拆解行动。
-              <br />
-              让每一次推进，都有清晰的落点。
-            </p>
+          <>
+            {path === "/search" ? (
+              <Search />
+            ) : path === "/trash" ? (
+              <Trash />
+            ) : (
+              <Workspace />
+            )}
             <button className="primary" onClick={() => setProjectForm("new")}>
               ＋ 创建第一个项目
             </button>
-          </div>
+          </>
         ) : current.isPending ? (
           <p className="loading">正在打开项目…</p>
         ) : current.isError && !current.data ? (
