@@ -17,7 +17,7 @@ func TestMigrationAndPersistentPragmas(t *testing.T) {
 	for _, check := range []struct {
 		query string
 		want  string
-	}{{"PRAGMA foreign_keys", "1"}, {"PRAGMA journal_mode", "wal"}, {"PRAGMA busy_timeout", "5000"}, {"SELECT count(*) FROM schema_migrations", "1"}} {
+	}{{"PRAGMA foreign_keys", "1"}, {"PRAGMA journal_mode", "wal"}, {"PRAGMA busy_timeout", "5000"}, {"SELECT count(*) FROM schema_migrations", "2"}} {
 		var got string
 		if err = db.QueryRowContext(ctx, check.query).Scan(&got); err != nil || got != check.want {
 			t.Fatalf("%s got %s err %v", check.query, got, err)

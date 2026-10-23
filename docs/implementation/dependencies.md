@@ -26,3 +26,17 @@
 完整前端传递依赖版本、integrity、license 保存在 `web/package-lock.json`，Go 版本与校验和在 `go.mod` / `go.sum`。Go 传递依赖许可证汇总见 `go-licenses.json`；前端汇总见 `npm-licenses.json`。这些是元数据记录，发布/分发时仍应保留依赖源包中的许可证和第三方通知。
 
 Dockerfile 使用经 Docker registry 实际解析的 node、golang、alpine manifest digest。基础系统 APK 使用固定 Alpine 分支的安全更新，故 APK 内容会随仓库更新；不是逐包完全离线复现。
+
+阶段 2 新增直接依赖（固定版本；npm lock 同步记录所有传递版本和 integrity）：
+
+| 依赖 | 版本 | 许可 |
+| --- | --- | --- |
+| @uiw/react-codemirror | 4.25.3 | MIT |
+| @codemirror/lang-markdown | 6.3.4 | MIT |
+| @codemirror/view | 6.43.15 | MIT |
+| react-markdown | 10.1.0 | MIT |
+| remark-gfm | 4.0.1 | MIT |
+
+Markdown 默认跳过 HTML；图片仅允许本应用附件 URL，服务仅内联检测出的 PNG/JPEG/GIF/WebP。传递依赖许可详见同步生成的 npm-licenses.json（保留各包 integrity）；完整许可文本随源包保留。
+
+`rehype-highlight` 7.0.2（MIT）为预览围栏代码提供语法高亮；原始 HTML 仍禁用。

@@ -46,26 +46,30 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
     ).status(),
   ).toBe(409);
   await page.reload();
-  await expect(page.getByLabel("Markdown 正文")).toHaveValue("- [ ] 阅读全文");
+  await expect(page.getByLabel("Markdown 正文")).toHaveText("- [ ] 阅读全文");
   const second = await context.newPage();
   await second.goto(parentURL);
-  await expect(second.getByLabel("Markdown 正文")).toHaveValue(
-    "- [ ] 阅读全文",
-  );
+  await expect(second.getByLabel("Markdown 正文")).toHaveText("- [ ] 阅读全文");
   await page.getByLabel("Markdown 正文").fill("first tab");
   await page.getByRole("button", { name: "保存任务", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("已保存");
   await second.getByLabel("Markdown 正文").fill("second tab draft");
   await second.getByRole("button", { name: "保存任务", exact: true }).click();
   await expect(second.getByRole("alert")).toContainText("内容已更新");
-  await expect(second.getByLabel("Markdown 正文")).toHaveValue(
+  await expect(second.getByLabel("Markdown 正文")).toHaveText(
     "second tab draft",
   );
   await second.close();
   await page.getByRole("button", { name: "归档项目", exact: true }).click();
-  await expect(page.getByLabel("Markdown 正文")).toBeDisabled();
+  await expect(page.getByLabel("Markdown 正文")).toHaveAttribute(
+    "contenteditable",
+    "false",
+  );
   await page.getByRole("button", { name: "取消归档", exact: true }).click();
-  await expect(page.getByLabel("Markdown 正文")).toBeEnabled();
+  await expect(page.getByLabel("Markdown 正文")).toHaveAttribute(
+    "contenteditable",
+    "true",
+  );
   await expect(page.getByRole("button", { name: /删除/ })).toHaveCount(0);
   await page.screenshot({ path: "/tmp/noteapp-stage1.png", fullPage: true });
 });

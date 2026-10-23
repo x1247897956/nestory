@@ -3,19 +3,29 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 	_ "time/tzdata"
 )
 
 type Config struct {
-	Addr      string
-	DataDir   string
-	Timezone  string
-	DevOrigin string
+	UploadLimit int64
+	Addr        string
+	DataDir     string
+	Timezone    string
+	DevOrigin   string
 }
 
 func Load() (Config, error) {
 	c := Config{Addr: env("APP_ADDR", ":8080"), DataDir: env("APP_DATA_DIR", "./data"), Timezone: env("APP_TIMEZONE", "Asia/Shanghai"), DevOrigin: os.Getenv("APP_DEV_ORIGIN")}
+	c.UploadLimit = 20 << 20
+	if raw := os.Getenv("APP_UPLOAD_LIMIT"); raw != "" {
+		n, e := strconv.ParseInt(raw, 10, 64)
+		if e != nil || n < 1 {
+			return c, fmt.Errorf("APP_UPLOAD_LIMIT 必须为正整数字节数")
+		}
+		c.UploadLimit = n
+	}
 	if _, err := time.LoadLocation(c.Timezone); err != nil {
 		return c, fmt.Errorf("APP_TIMEZONE: %w", err)
 	}

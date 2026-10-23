@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
+import { useAutosave } from "../../components/markdown/useAutosave";
 import type { Task } from "../../app/api";
 import { stages, priorities } from "../../app/api";
 export type TaskDraft = {
@@ -26,51 +28,19 @@ export function TaskEditor({
   onSave: (draft: TaskDraft, version: number) => Promise<void>;
   onReload: () => void | Promise<void>;
 }) {
-  const [draft, setDraft] = useState(() => fromTask(task));
-  const [baseline, setBaseline] = useState(() => fromTask(task));
-  const [version, setVersion] = useState(task.version);
-  const [busy, setBusy] = useState(false);
+  const {
+    draft,
+    setDraft,
+    version,
+    busy,
+    error: saveError,
+    dirty,
+    save,
+  } = useAutosave(fromTask(task), task.version, onSave, archived);
   const [error, setError] = useState("");
-  const [saved, setSaved] = useState(false);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(baseline);
-  useEffect(() => {
-    const listener = (e: BeforeUnloadEvent) => {
-      if (dirty) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-    window.addEventListener("beforeunload", listener);
-    return () => window.removeEventListener("beforeunload", listener);
-  }, [dirty]);
-  // A server refresh must never replace a local draft. Reload is an explicit user action.
-  useEffect(() => {
-    if (!dirty && !busy) {
-      const next = fromTask(task);
-      setDraft(next);
-      setBaseline(next);
-      setVersion(task.version);
-    }
-  }, [task]);
-  const change = (key: keyof TaskDraft, value: string) => {
+  const saved = !dirty;
+  const change = (key: keyof TaskDraft, value: string) =>
     setDraft((d) => ({ ...d, [key]: value }));
-    setSaved(false);
-  };
-  const save = async () => {
-    setBusy(true);
-    setError("");
-    const snapshot = { ...draft };
-    try {
-      await onSave(snapshot, version);
-      setBaseline(snapshot);
-      setVersion((v) => v + 1);
-      setSaved(true);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
   return (
     <section className="editor" data-dirty={dirty} aria-label="任务详情">
       <div className="eyebrow">
@@ -127,17 +97,15 @@ export function TaskEditor({
           />
         </label>
       </div>
-      <label className="body-label">
-        Markdown 正文<span>源码</span>
-        <textarea
-          aria-label="Markdown 正文"
-          spellCheck={false}
+      <div className="body-label">
+        Markdown 正文
+        <MarkdownEditor
           value={draft.body}
-          onChange={(e) => change("body", e.target.value)}
+          onChange={(v) => change("body", v)}
           disabled={archived}
-          placeholder="写下执行思路、参考资料与检查清单…"
+          projectId={task.project_id}
         />
-      </label>
+      </div>
       <div className="save-bar">
         <span role="status">
           {busy
@@ -158,9 +126,9 @@ export function TaskEditor({
           </button>
         )}
       </div>
-      {error && (
+      {(error || saveError) && (
         <div className="error" role="alert">
-          {error}
+          {error || saveError}
           <p>本地草稿已保留。可先复制正文，再重新载入。</p>
           <button
             onClick={() =>

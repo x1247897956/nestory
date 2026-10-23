@@ -67,3 +67,22 @@ it("keeps a conflict draft when explicit reload fails", async () => {
   );
   expect(screen.getByLabelText("Markdown 正文")).toHaveValue("keep me");
 });
+
+vi.mock("@uiw/react-codemirror", () => ({
+  default: ({
+    value,
+    onChange,
+    editable,
+  }: {
+    value: string;
+    onChange: (v: string) => void;
+    editable: boolean;
+  }) => (
+    <textarea
+      aria-label="Markdown 正文"
+      value={value}
+      disabled={!editable}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  ),
+}));

@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"noteapp/internal/asset"
+	"noteapp/internal/page"
 	"noteapp/internal/platform/config"
 	"noteapp/internal/platform/httpx"
 	"noteapp/internal/project"
@@ -18,6 +20,10 @@ func New(db *sql.DB, c config.Config) http.Handler {
 	mux := http.NewServeMux()
 	p := project.New(db)
 	t := task.New(db)
+	pg := page.New(db)
+	assets := asset.New(db, c.DataDir, c.UploadLimit)
+	mux.HandleFunc("POST /api/v1/projects/{id}/assets", assets.UploadHTTP)
+	mux.HandleFunc("GET /api/v1/assets/{id}", assets.Download)
 	mux.HandleFunc("GET /api/v1/healthz", func(w http.ResponseWriter, r *http.Request) { httpx.JSON(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("GET /api/v1/readyz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.PingContext(r.Context()); err != nil {
@@ -93,6 +99,41 @@ func New(db *sql.DB, c config.Config) http.Handler {
 			return
 		}
 		v, err := t.Move(r.Context(), r.PathValue("id"), in)
+		respond(w, 200, v, err)
+	})
+	mux.HandleFunc("GET /api/v1/projects/{id}/pages", func(w http.ResponseWriter, r *http.Request) {
+		v, err := pg.List(r.Context(), r.PathValue("id"))
+		respond(w, 200, v, err)
+	})
+	mux.HandleFunc("POST /api/v1/projects/{id}/pages", func(w http.ResponseWriter, r *http.Request) {
+		var in page.Input
+		if err := httpx.Decode(w, r, &in); err != nil {
+			httpx.Fail(w, err)
+			return
+		}
+		v, err := pg.Create(r.Context(), r.PathValue("id"), in)
+		respond(w, 201, v, err)
+	})
+	mux.HandleFunc("GET /api/v1/pages/{id}", func(w http.ResponseWriter, r *http.Request) {
+		v, err := pg.Get(r.Context(), r.PathValue("id"))
+		respond(w, 200, v, err)
+	})
+	mux.HandleFunc("PATCH /api/v1/pages/{id}", func(w http.ResponseWriter, r *http.Request) {
+		var in page.Input
+		if err := httpx.Decode(w, r, &in); err != nil {
+			httpx.Fail(w, err)
+			return
+		}
+		v, err := pg.Update(r.Context(), r.PathValue("id"), in)
+		respond(w, 200, v, err)
+	})
+	mux.HandleFunc("POST /api/v1/pages/{id}/move", func(w http.ResponseWriter, r *http.Request) {
+		var in page.MoveInput
+		if err := httpx.Decode(w, r, &in); err != nil {
+			httpx.Fail(w, err)
+			return
+		}
+		v, err := pg.Move(r.Context(), r.PathValue("id"), in)
 		respond(w, 200, v, err)
 	})
 	mux.HandleFunc("GET /api/", func(w http.ResponseWriter, r *http.Request) { httpx.Fail(w, httpx.NotFound) })

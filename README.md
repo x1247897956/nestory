@@ -1,6 +1,6 @@
 # Noteapp
 
-单人、本地或受信任局域网使用的项目与任务软件。阶段 1 已提供项目新建/编辑/归档、五阶段任务、一层子任务、优先级、日期、分组筛选、Markdown 源码输入与版本冲突保护。未实现的笔记、日历、关联、删除和回收站没有操作入口。
+单人、本地或受信任局域网使用的项目、任务与笔记软件。已提供项目归档、五阶段任务及一层子任务、无限层级页面树、共享 Markdown 源码/预览/分屏、检查项、800ms 串行自动保存和安全附件上传下载。日历、关联、删除和回收站留待后续阶段。
 
 ## 开发
 
@@ -23,6 +23,7 @@ go run ./cmd/noteapp
 | APP_ADDR | :8080 | Go 服务监听地址 |
 | APP_DATA_DIR | ./data | SQLite 与附件存储目录 |
 | APP_TIMEZONE | Asia/Shanghai | 部署时区，启动校验 |
+| APP_UPLOAD_LIMIT | 20971520 | 单附件最大字节数，20 MiB；正整数 |
 | APP_DEV_ORIGIN | 空 | 额外允许的开发浏览器 Origin |
 | APP_BIND | 127.0.0.1 | Compose 端口绑定 |
 | APP_PORT | 8080 | Compose 主机端口 |
@@ -52,12 +53,12 @@ npm run build
 npx playwright install chromium
 # 或使用现有 Chromium：
 # PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/path/to/chromium" npm run e2e
-npm run e2e -- tasks.spec.ts
+npm run e2e -- tasks.spec.ts notes.spec.ts
 ```
 
 Playwright 默认启动 Go 后端并使用 `/tmp/noteapp-e2e-data` 临时数据库和 18080 端口；可用 `E2E_BASE_URL=http://127.0.0.1:8080 npm run e2e` 对已运行实例验证。测试会创建带时间戳项目，建议使用测试实例。
 
-所有 HTTP JSON 接口位于 `/api/v1`：`/healthz` 检查进程、`/readyz` 检查数据库、`/config` 提供时区和阶段元数据；项目和任务接口见技术设计。PATCH 与 move 必须提交 version。400 为参数错误，404 为不存在，409 为版本/归档/父级冲突，500 不暴露数据库详情。任务保存是阶段 1 的显式保存按钮；失败和 409 会保留草稿，可复制、重试或确认后重新载入。关闭标签页和应用内路由离开会提示未保存内容。
+所有 HTTP JSON 接口位于 `/api/v1`：`/healthz` 检查进程、`/readyz` 检查数据库、`/config` 提供时区和阶段元数据；项目、任务、页面与附件接口见技术设计。PATCH 与 move 必须提交 version。400 为参数错误，404 为不存在，409 为版本/归档/父级冲突，500 不暴露数据库详情。任务和页面正文在停止输入 800ms 后自动保存，每个对象串行发送快照；保留显式保存按钮。失败和 409 会保留草稿，可复制、重试或确认后重新载入。关闭标签页和应用内路由离开会提示未保存内容。
 
 ## 停机一致性备份与恢复
 

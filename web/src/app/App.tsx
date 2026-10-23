@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useParams, useBlocker } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useBlocker,
+  useLocation,
+} from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, stages, priorities, type Project, type Task } from "./api";
 import { ProjectForm } from "../features/project/ProjectForm";
 import { TaskEditor, type TaskDraft } from "../features/task/TaskEditor";
 import "./styles.css";
+import { Pages } from "../features/page/Pages";
 export function App() {
-  const { projectId, taskId } = useParams();
+  const { projectId, taskId, pageId } = useParams();
   const nav = useNavigate();
   const qc = useQueryClient();
   const [archived, setArchived] = useState(false);
@@ -48,6 +55,7 @@ export function App() {
     queryFn: () => api<Task>("/tasks/" + taskId),
     enabled: !!taskId,
   });
+  const notes = useLocation().pathname.includes("/pages");
   const p = current.data;
   const all = tasks.data ?? [];
   const readOnly = !!p?.archived_at;
@@ -175,7 +183,7 @@ export function App() {
           ＋ 新建项目
         </button>
         <div className="sidebar-bottom">
-          <span className="local-dot" /> 本地空间 · 阶段 1<br />
+          <span className="local-dot" /> 本地空间 · 阶段 2<br />
         </div>
       </aside>
       <main>
@@ -243,9 +251,10 @@ export function App() {
                 {p?.description || "给这个项目一些空间，让想法逐步成为行动。"}
               </p>
               <div className="project-tabs">
-                <span>
+                <Link to={"/projects/" + projectId}>
                   任务 <b>{all.length}</b>
-                </span>
+                </Link>{" "}
+                <Link to={"/projects/" + projectId + "/pages"}>页面</Link>
                 <small>{count} 项待推进</small>
               </div>
             </header>
@@ -264,182 +273,196 @@ export function App() {
                 {error}
               </p>
             )}
-            <div className={"workspace " + (taskId ? "with-detail" : "")}>
-              <section className="task-list">
-                <div className="list-toolbar">
-                  <div>
-                    <h2>所有任务</h2>
-                    <span>{all.length} 个任务，专注当下的一步</span>
-                  </div>
-                  <button onClick={() => setGroup(!group)}>
-                    {group ? "取消分组" : "按阶段分组"}
-                  </button>
-                </div>
-                <div className="filters">
-                  <label>
-                    筛选阶段
-                    <select
-                      value={stage}
-                      onChange={(e) => setStage(e.target.value)}
-                    >
-                      <option value="all">全部阶段</option>
-                      {stages.map(([id, name]) => (
-                        <option value={id} key={id}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    筛选优先级
-                    <select
-                      value={priority}
-                      onChange={(e) => setPriority(e.target.value)}
-                    >
-                      <option value="all">全部优先级</option>
-                      {priorities.map(([id, name]) => (
-                        <option value={id} key={id}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                {tasks.isError ? (
-                  <div role="alert">
-                    任务加载失败
-                    <button onClick={() => tasks.refetch()}>重试</button>
-                  </div>
-                ) : group ? (
-                  stages
-                    .filter(([id]) => stage === "all" || stage === id)
-                    .map(([id, name]) => {
-                      const items = roots.filter(
-                        (t) =>
-                          t.stage === id &&
-                          (visible(t) || children(t.id).some(visible)),
-                      );
-                      const orphanChildren = all.filter(
-                        (t) =>
-                          t.parent_id &&
-                          t.stage === id &&
-                          visible(t) &&
-                          !items.some((p) => p.id === t.parent_id) &&
-                          roots.find((p) => p.id === t.parent_id)?.stage !== id,
-                      );
-                      return (
-                        <div className="task-group" key={id}>
-                          <h3>
-                            <span className={"stage-dot " + id} />
-                            {name}
-                            <span>{items.length + orphanChildren.length}</span>
-                          </h3>
-                          {items.map(renderRoot)}
-                          {orphanChildren.map((t) => (
-                            <div key={t.id}>
-                              <small className="parent-hint">
-                                ↳ {all.find((p) => p.id === t.parent_id)?.title}
-                              </small>
-                              {row(t, true)}
-                            </div>
-                          ))}
-                          {!items.length && !orphanChildren.length && (
-                            <div className="empty-group">暂无任务</div>
-                          )}
-                        </div>
-                      );
-                    })
-                ) : (
-                  roots
-                    .filter((t) => visible(t) || children(t.id).some(visible))
-                    .map(renderRoot)
-                )}
-                {!readOnly && (
-                  <form
-                    className="new-task"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      setCreating(true);
-                      setError("");
-                      try {
-                        const t = await api<Task>(
-                          "/projects/" + projectId + "/tasks",
-                          "POST",
-                          { title: newTitle, parent_id: newParent || null },
-                        );
-                        setNewTitle("");
-                        setNewParent("");
-                        if (t.parent_id)
-                          setExpanded((old) => new Set(old).add(t.parent_id!));
-                        await qc.invalidateQueries({
-                          queryKey: ["tasks", projectId],
-                        });
-                        nav("/projects/" + projectId + "/tasks/" + t.id);
-                      } catch (err) {
-                        setError((err as Error).message);
-                      } finally {
-                        setCreating(false);
-                      }
-                    }}
-                  >
-                    <input
-                      aria-label="新任务标题"
-                      placeholder="＋ 添加一个新任务…"
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      required
-                    />
-                    <select
-                      aria-label="父任务"
-                      value={newParent}
-                      onChange={(e) => setNewParent(e.target.value)}
-                    >
-                      <option value="">顶层任务</option>
-                      {roots.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.title} 的子任务
-                        </option>
-                      ))}
-                    </select>
-                    <button disabled={creating || !newTitle.trim()}>
-                      {creating ? "添加中…" : "添加任务"}
+            {notes ? (
+              <Pages
+                projectId={projectId}
+                pageId={pageId}
+                archived={readOnly}
+              />
+            ) : (
+              <div className={"workspace " + (taskId ? "with-detail" : "")}>
+                <section className="task-list">
+                  <div className="list-toolbar">
+                    <div>
+                      <h2>所有任务</h2>
+                      <span>{all.length} 个任务，专注当下的一步</span>
+                    </div>
+                    <button onClick={() => setGroup(!group)}>
+                      {group ? "取消分组" : "按阶段分组"}
                     </button>
-                  </form>
-                )}
-              </section>
-              {taskId && (
-                <aside className="detail-pane">
-                  <button
-                    className="close-detail"
-                    aria-label="关闭详情"
-                    onClick={() => nav("/projects/" + projectId)}
-                  >
-                    ×
-                  </button>
-                  {detail.isPending ? (
-                    <p>加载任务…</p>
-                  ) : detail.isError && !detail.data ? (
-                    <p role="alert">
+                  </div>
+                  <div className="filters">
+                    <label>
+                      筛选阶段
+                      <select
+                        value={stage}
+                        onChange={(e) => setStage(e.target.value)}
+                      >
+                        <option value="all">全部阶段</option>
+                        {stages.map(([id, name]) => (
+                          <option value={id} key={id}>
+                            {name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      筛选优先级
+                      <select
+                        value={priority}
+                        onChange={(e) => setPriority(e.target.value)}
+                      >
+                        <option value="all">全部优先级</option>
+                        {priorities.map(([id, name]) => (
+                          <option value={id} key={id}>
+                            {name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  {tasks.isError ? (
+                    <div role="alert">
                       任务加载失败
-                      <button onClick={() => detail.refetch()}>重试</button>
-                    </p>
-                  ) : detail.data && detail.data.project_id === projectId ? (
-                    <TaskEditor
-                      key={taskId + ":" + editorEpoch}
-                      task={detail.data}
-                      archived={readOnly}
-                      onSave={saveTask}
-                      onReload={async () => {
-                        await detail.refetch({ throwOnError: true });
-                        setEditorEpoch((n) => n + 1);
-                      }}
-                    />
+                      <button onClick={() => tasks.refetch()}>重试</button>
+                    </div>
+                  ) : group ? (
+                    stages
+                      .filter(([id]) => stage === "all" || stage === id)
+                      .map(([id, name]) => {
+                        const items = roots.filter(
+                          (t) =>
+                            t.stage === id &&
+                            (visible(t) || children(t.id).some(visible)),
+                        );
+                        const orphanChildren = all.filter(
+                          (t) =>
+                            t.parent_id &&
+                            t.stage === id &&
+                            visible(t) &&
+                            !items.some((p) => p.id === t.parent_id) &&
+                            roots.find((p) => p.id === t.parent_id)?.stage !==
+                              id,
+                        );
+                        return (
+                          <div className="task-group" key={id}>
+                            <h3>
+                              <span className={"stage-dot " + id} />
+                              {name}
+                              <span>
+                                {items.length + orphanChildren.length}
+                              </span>
+                            </h3>
+                            {items.map(renderRoot)}
+                            {orphanChildren.map((t) => (
+                              <div key={t.id}>
+                                <small className="parent-hint">
+                                  ↳{" "}
+                                  {all.find((p) => p.id === t.parent_id)?.title}
+                                </small>
+                                {row(t, true)}
+                              </div>
+                            ))}
+                            {!items.length && !orphanChildren.length && (
+                              <div className="empty-group">暂无任务</div>
+                            )}
+                          </div>
+                        );
+                      })
                   ) : (
-                    <p>任务不属于此项目</p>
+                    roots
+                      .filter((t) => visible(t) || children(t.id).some(visible))
+                      .map(renderRoot)
                   )}
-                </aside>
-              )}
-            </div>
+                  {!readOnly && (
+                    <form
+                      className="new-task"
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        setCreating(true);
+                        setError("");
+                        try {
+                          const t = await api<Task>(
+                            "/projects/" + projectId + "/tasks",
+                            "POST",
+                            { title: newTitle, parent_id: newParent || null },
+                          );
+                          setNewTitle("");
+                          setNewParent("");
+                          if (t.parent_id)
+                            setExpanded((old) =>
+                              new Set(old).add(t.parent_id!),
+                            );
+                          await qc.invalidateQueries({
+                            queryKey: ["tasks", projectId],
+                          });
+                          nav("/projects/" + projectId + "/tasks/" + t.id);
+                        } catch (err) {
+                          setError((err as Error).message);
+                        } finally {
+                          setCreating(false);
+                        }
+                      }}
+                    >
+                      <input
+                        aria-label="新任务标题"
+                        placeholder="＋ 添加一个新任务…"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        required
+                      />
+                      <select
+                        aria-label="父任务"
+                        value={newParent}
+                        onChange={(e) => setNewParent(e.target.value)}
+                      >
+                        <option value="">顶层任务</option>
+                        {roots.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.title} 的子任务
+                          </option>
+                        ))}
+                      </select>
+                      <button disabled={creating || !newTitle.trim()}>
+                        {creating ? "添加中…" : "添加任务"}
+                      </button>
+                    </form>
+                  )}
+                </section>
+                {taskId && (
+                  <aside className="detail-pane">
+                    <button
+                      className="close-detail"
+                      aria-label="关闭详情"
+                      onClick={() => nav("/projects/" + projectId)}
+                    >
+                      ×
+                    </button>
+                    {detail.isPending ? (
+                      <p>加载任务…</p>
+                    ) : detail.isError && !detail.data ? (
+                      <p role="alert">
+                        任务加载失败
+                        <button onClick={() => detail.refetch()}>重试</button>
+                      </p>
+                    ) : detail.data && detail.data.project_id === projectId ? (
+                      <TaskEditor
+                        key={taskId + ":" + editorEpoch}
+                        task={detail.data}
+                        archived={readOnly}
+                        onSave={saveTask}
+                        onReload={async () => {
+                          await detail.refetch({ throwOnError: true });
+                          setEditorEpoch((n) => n + 1);
+                        }}
+                      />
+                    ) : (
+                      <p>任务不属于此项目</p>
+                    )}
+                  </aside>
+                )}
+              </div>
+            )}
           </>
         )}
       </main>
