@@ -1,4 +1,4 @@
- Image noteapp:local Building 
+ Image noteapp:local Building
 #1 [internal] load local bake definitions
 #1 reading from stdin 583B done
 #1 DONE 0.0s
@@ -64,10 +64,10 @@
 #18 DONE 0.0s
 
 #19 [frontend 6/6] RUN npm run build
-#19 0.189 
+#19 0.189
 #19 0.189 > noteapp-web@0.1.0 build
 #19 0.189 > tsc -b && vite build
-#19 0.189 
+#19 0.189
 #19 1.677 vite v7.3.7 building client environment for production...
 #19 1.704 transforming...
 #19 3.176 ✓ 614 modules transformed.
@@ -76,7 +76,7 @@
 #19 3.541 dist/index.html                     0.37 kB │ gzip:   0.30 kB
 #19 3.541 dist/assets/index-C1Zmnpde.css     11.62 kB │ gzip:   3.54 kB
 #19 3.541 dist/assets/index-CNBrmjQH.js   1,652.54 kB │ gzip: 529.45 kB
-#19 3.541 
+#19 3.541
 #19 3.541 (!) Some chunks are larger than 500 kB after minification. Consider:
 #19 3.541 - Using dynamic import() to code-split the application
 #19 3.541 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
@@ -109,4 +109,4 @@
 
 #25 resolving provenance for metadata file
 #25 DONE 0.0s
- Image noteapp:local Built 
+ Image noteapp:local Built

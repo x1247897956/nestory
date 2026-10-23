@@ -28,7 +28,7 @@
 | source/restored smoke | 两实例各7项通过 |
 | shell语法/Python编译/git diff --check | 通过 |
 
-所有命令实际文本与产品第11节10项覆盖在acceptance-v1，原始检查输出与截图在 `docs/evidence/v1/`。完整DB归档仅本机 `/tmp/noteapp-v1-backup-20261024-acceptance/data.tar.gz`，未提交Git；证据目录约460KB，无实际用户外部数据。
+所有命令实际文本与产品第11节10项覆盖在acceptance-v1，检查输出（仅规范化日志尾部空白）与截图在 `docs/evidence/v1/`。完整DB归档仅本机 `/tmp/noteapp-v1-backup-20261024-acceptance/data.tar.gz`，未提交Git；证据目录约460KB，无实际用户外部数据。
 
 ## 红灯、定位与修复
 

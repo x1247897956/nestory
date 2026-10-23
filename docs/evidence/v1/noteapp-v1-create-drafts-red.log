@@ -21,7 +21,7 @@ Running 2 tests using 1 worker
   ✘  2 e2e/create-drafts.spec.ts:49:1 › new Project draft guards closing and cancel while empty form stays clean (301ms)
 
 
-  1) e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults 
+  1) e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults
 
     Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
 
@@ -47,7 +47,7 @@ Running 2 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  2) e2e/create-drafts.spec.ts:49:1 › new Project draft guards closing and cancel while empty form stays clean 
+  2) e2e/create-drafts.spec.ts:49:1 › new Project draft guards closing and cancel while empty form stays clean
 
     Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
 
@@ -72,5 +72,5 @@ Running 2 tests using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   2 failed
-    e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults 
-    e2e/create-drafts.spec.ts:49:1 › new Project draft guards closing and cancel while empty form stays clean 
+    e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults
+    e2e/create-drafts.spec.ts:49:1 › new Project draft guards closing and cancel while empty form stays clean
