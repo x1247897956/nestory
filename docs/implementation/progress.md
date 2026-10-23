@@ -48,3 +48,12 @@
 
 ## 阶段 5
 - 停机备份、空卷恢复、实际PRAGMA与附件校验、完整浏览器/容器/最终文档交付；由stage1代理承接最终交付任务。
+
+## 阶段 5 与最终结果
+- 提交c1e8244、73c65cd；正式最终镜像3c84dfb17b8b123463e6afe6c1e088e2703424da8116632e2a9d2404ee8215ad。
+- Go test/race/vet、前端19单测/typecheck/build、Playwright9/9、运维9/9、恢复浏览器1/1通过；完整数据空卷恢复SQL/关系计数/12附件SHA一致。
+- 全分支最终审查仅发现新建Page/Task/Project未保存保护缺口，浏览器先红后绿修复，限定复审通过。
+- 主代理最终复核Go test、前端19单测、运行预览smoke七项、git diff --check通过。
+- 按用户既定要求保留implementation分支和工作目录，未创建远程、未推送或发布。
+- 本机预览127.0.0.1:18084，合成验收数据卷noteapp-v1-check；恢复实例已停止，验收数据卷/备份保留。
+- 第一版10项产品验收及五阶段路线图全部实际完成，最终交付见README、docs/operations.md、docs/acceptance-v1.md。

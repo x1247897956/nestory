@@ -21,7 +21,7 @@
 
 ## 真实环境、恢复数量与命令
 
-正式测试源：容器 `noteapp-v1-check-noteapp-1`，命名卷 `noteapp-v1-check`，本机 `127.0.0.1:18084`。恢复目标：新空卷 `noteapp-v1-restored-20261024`、容器 `noteapp-v1-restored-check`，`127.0.0.1:18085`。原来的 `noteapp-formal-check` 容器/卷保持原状。正常容器实际UID/GID10001，数据目录可写；故意root:700卷的独立负例退出1，未以root运行应用绕过权限。
+正式测试源：容器 `noteapp-v1-check-noteapp-1`，命名卷 `noteapp-v1-check`，本机 `127.0.0.1:18084`。恢复目标：新空卷 `noteapp-v1-restored-20261024`、容器 `noteapp-v1-restored-check`，`127.0.0.1:18085`。原来的 `noteapp-formal-check` 容器已停止并移除，原数据卷保留；恢复验证实例18085已停止，18084预览继续运行。正常容器实际UID/GID10001，数据目录可写；故意root:700卷的独立负例退出1，未以root运行应用绕过权限。
 
 备份目录 `/tmp/noteapp-v1-backup-20261024-acceptance`（完整归档保留本机，不把数据库提交Git）。总记录数包含已软删除对象和历史验收批次：
 
