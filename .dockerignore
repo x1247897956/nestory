@@ -1,0 +1,6 @@
+.git
+web/node_modules
+web/dist
+data
+web/test-results
+web/playwright-report
