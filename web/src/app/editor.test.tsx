@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { TaskEditor } from "../features/task/TaskEditor";
 import type { Task } from "./api";
@@ -86,3 +92,32 @@ vi.mock("@uiw/react-codemirror", () => ({
     />
   ),
 }));
+it("guards navigation while a save is in flight after reverting to baseline", async () => {
+  let resolve!: () => void;
+  const save = vi.fn(
+    () =>
+      new Promise<void>((r) => {
+        resolve = r;
+      }),
+  );
+  const { container } = render(
+    <TaskEditor
+      task={task}
+      archived={false}
+      onSave={save}
+      onReload={() => {}}
+    />,
+  );
+  fireEvent.change(screen.getByLabelText("Markdown 正文"), {
+    target: { value: "in flight" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "保存任务" }));
+  fireEvent.change(screen.getByLabelText("Markdown 正文"), {
+    target: { value: task.body },
+  });
+  expect(container.querySelector('[aria-label="任务详情"]')).toHaveAttribute(
+    "data-dirty",
+    "true",
+  );
+  await act(async () => resolve());
+});

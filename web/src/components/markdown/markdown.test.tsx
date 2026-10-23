@@ -34,3 +34,12 @@ it("highlights fenced code without turning it into tasks", () => {
     "const",
   );
 });
+it("nested child checkbox only updates its own source marker", () => {
+  const change = vi.fn();
+  render(
+    <MarkdownPreview value={"- [ ] parent\n  - [ ] child"} onChange={change} />,
+  );
+  fireEvent.click(screen.getAllByRole("checkbox")[1]);
+  expect(change).toHaveBeenCalledTimes(1);
+  expect(change).toHaveBeenCalledWith("- [ ] parent\n  - [x] child");
+});

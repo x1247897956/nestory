@@ -42,7 +42,7 @@ export function TaskEditor({
   const change = (key: keyof TaskDraft, value: string) =>
     setDraft((d) => ({ ...d, [key]: value }));
   return (
-    <section className="editor" data-dirty={dirty} aria-label="任务详情">
+    <section className="editor" data-dirty={dirty || busy} aria-label="任务详情">
       <div className="eyebrow">
         TASK / {task.parent_id ? "子任务" : "任务详情"} <span>v{version}</span>
       </div>

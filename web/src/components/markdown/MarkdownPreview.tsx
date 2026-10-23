@@ -28,6 +28,7 @@ export function MarkdownPreview({
               <li {...props}>
                 <span
                   onClick={(e) => {
+                    e.stopPropagation();
                     if (
                       (e.target as HTMLElement).tagName === "INPUT" &&
                       !disabled &&

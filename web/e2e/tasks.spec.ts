@@ -73,3 +73,53 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await expect(page.getByRole("button", { name: /删除/ })).toHaveCount(0);
   await page.screenshot({ path: "/tmp/noteapp-stage1.png", fullPage: true });
 });
+
+test("navigation guards an in-flight save after reverting to baseline", async ({
+  page,
+  request,
+}) => {
+  const project = await (
+    await request.post("/api/v1/projects", {
+      data: { title: "延迟导航 " + Date.now() },
+    })
+  ).json();
+  const task = await (
+    await request.post("/api/v1/projects/" + project.id + "/tasks", {
+      data: { title: "保稿", body: "baseline A" },
+    })
+  ).json();
+  await page.goto("/projects/" + project.id + "/tasks/" + task.id);
+  await expect(page.getByLabel("Markdown 正文")).toHaveText("baseline A");
+  let release!: () => void;
+  let started!: () => void;
+  const pending = new Promise<void>((r) => {
+    release = r;
+  });
+  const began = new Promise<void>((r) => {
+    started = r;
+  });
+  await page.route("**/api/v1/tasks/" + task.id, async (route) => {
+    if (route.request().method() === "PATCH") {
+      started();
+      await pending;
+    }
+    await route.continue();
+  });
+  await page.getByLabel("Markdown 正文").fill("snapshot B");
+  await page.getByRole("button", { name: "保存任务", exact: true }).click();
+  await began;
+  await page.getByLabel("Markdown 正文").fill("baseline A");
+  const dialog = page.waitForEvent("dialog");
+  const navigation = page.locator(".project-tabs a").first().click();
+  await (await dialog).dismiss();
+  await navigation;
+  await expect(page.getByLabel("Markdown 正文")).toHaveText("baseline A");
+  release();
+  await expect(page.getByRole("status")).toHaveText("已保存");
+  await expect
+    .poll(
+      async () =>
+        (await (await request.get("/api/v1/tasks/" + task.id)).json()).body,
+    )
+    .toBe("baseline A");
+});
