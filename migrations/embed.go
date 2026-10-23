@@ -7,3 +7,6 @@ var Core string
 
 //go:embed 002_pages_assets.sql
 var PagesAssets string
+
+//go:embed 003_events_relations.sql
+var EventsRelations string

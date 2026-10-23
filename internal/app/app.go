@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"net/url"
 	"noteapp/internal/asset"
+	"noteapp/internal/event"
 	"noteapp/internal/page"
 	"noteapp/internal/platform/config"
 	"noteapp/internal/platform/httpx"
 	"noteapp/internal/project"
+	"noteapp/internal/relation"
 	"noteapp/internal/task"
 	"noteapp/web"
 	"strings"
@@ -136,6 +138,51 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		v, err := pg.Move(r.Context(), r.PathValue("id"), in)
 		respond(w, 200, v, err)
 	})
+
+	events := event.New(db)
+	relations := relation.New(db)
+	mux.HandleFunc("GET /api/v1/projects/{id}/relation-options", func(w http.ResponseWriter, r *http.Request) {
+		v, e := relations.Candidates(r.Context(), r.PathValue("id"))
+		respond(w, 200, v, e)
+	})
+	mux.HandleFunc("GET /api/v1/projects/{id}/events", func(w http.ResponseWriter, r *http.Request) {
+		v, e := events.List(r.Context(), r.PathValue("id"), r.URL.Query().Get("from"), r.URL.Query().Get("to"))
+		respond(w, 200, v, e)
+	})
+	mux.HandleFunc("POST /api/v1/projects/{id}/events", func(w http.ResponseWriter, r *http.Request) {
+		var in event.Input
+		if e := httpx.Decode(w, r, &in); e != nil {
+			httpx.Fail(w, e)
+			return
+		}
+		v, e := events.Create(r.Context(), r.PathValue("id"), in)
+		respond(w, 201, v, e)
+	})
+	mux.HandleFunc("GET /api/v1/events/{id}", func(w http.ResponseWriter, r *http.Request) {
+		v, e := events.Get(r.Context(), r.PathValue("id"))
+		respond(w, 200, v, e)
+	})
+	mux.HandleFunc("PATCH /api/v1/events/{id}", func(w http.ResponseWriter, r *http.Request) {
+		var in event.Input
+		if e := httpx.Decode(w, r, &in); e != nil {
+			httpx.Fail(w, e)
+			return
+		}
+		v, e := events.Update(r.Context(), r.PathValue("id"), in)
+		respond(w, 200, v, e)
+	})
+	for _, typ := range []string{"tasks", "pages", "events"} {
+		mux.HandleFunc("GET /api/v1/"+typ+"/{id}/relations", func(w http.ResponseWriter, r *http.Request) {
+			v, e := relations.List(r.Context(), typ, r.PathValue("id"))
+			respond(w, 200, v, e)
+		})
+	}
+	for _, method := range []string{"PUT", "DELETE"} {
+		mux.HandleFunc(method+" /api/v1/relations/{kind}/{left}/{right}", func(w http.ResponseWriter, r *http.Request) {
+			e := relations.Change(r.Context(), r.PathValue("kind"), r.PathValue("left"), r.PathValue("right"), method == "PUT")
+			respond(w, 200, map[string]bool{"ok": true}, e)
+		})
+	}
 	mux.HandleFunc("GET /api/", func(w http.ResponseWriter, r *http.Request) { httpx.Fail(w, httpx.NotFound) })
 	files, _ := fs.Sub(web.Files, "dist")
 	static := http.FileServer(http.FS(files))

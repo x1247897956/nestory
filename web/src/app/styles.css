@@ -702,3 +702,60 @@ h3 > span:last-child {
     }
   }
 }
+.calendar-workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1fr);
+  gap: 20px;
+  padding: 24px;
+  min-width: 0;
+}
+.calendar-workspace:has(.detail-pane) {
+  grid-template-columns: minmax(420px, 1fr) minmax(320px, 420px);
+}
+.calendar-workspace .fc {
+  font-size: 13px;
+  --fc-border-color: var(--border, #ddd);
+  --fc-button-bg-color: #42594a;
+  --fc-button-border-color: #42594a;
+  --fc-today-bg-color: #edf4ed;
+}
+.calendar-workspace .fc-toolbar-title {
+  font-size: 18px;
+}
+.calendar-workspace input {
+  max-width: 100%;
+}
+.calendar-workspace form {
+  padding: 16px;
+  background: #f4f6f0;
+  display: grid;
+  gap: 10px;
+}
+.relations {
+  padding: 18px;
+  border-top: 1px solid #ddd;
+}
+.relation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.relation-controls {
+  display: grid;
+  gap: 8px;
+}
+.relation-controls select {
+  width: 100%;
+  min-width: 0;
+}
+.relations button {
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  .calendar-workspace:has(.detail-pane) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

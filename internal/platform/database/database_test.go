@@ -17,7 +17,7 @@ func TestMigrationAndPersistentPragmas(t *testing.T) {
 	for _, check := range []struct {
 		query string
 		want  string
-	}{{"PRAGMA foreign_keys", "1"}, {"PRAGMA journal_mode", "wal"}, {"PRAGMA busy_timeout", "5000"}, {"SELECT count(*) FROM schema_migrations", "2"}} {
+	}{{"PRAGMA foreign_keys", "1"}, {"PRAGMA journal_mode", "wal"}, {"PRAGMA busy_timeout", "5000"}, {"SELECT count(*) FROM schema_migrations", "3"}} {
 		var got string
 		if err = db.QueryRowContext(ctx, check.query).Scan(&got); err != nil || got != check.want {
 			t.Fatalf("%s got %s err %v", check.query, got, err)
@@ -32,6 +32,10 @@ func TestMigrationAndPersistentPragmas(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
+	var migrations int
+	if err = db.QueryRowContext(ctx, "SELECT count(*) FROM schema_migrations").Scan(&migrations); err != nil || migrations != 3 {
+		t.Fatalf("migrations not idempotent: %d %v", migrations, err)
+	}
 	var got string
 	if err = db.QueryRowContext(ctx, "SELECT title FROM projects WHERE id='stable'").Scan(&got); err != nil || got != "Saved" {
 		t.Fatalf("lost persistent data: %s %v", got, err)

@@ -40,3 +40,5 @@ Dockerfile 使用经 Docker registry 实际解析的 node、golang、alpine mani
 Markdown 默认跳过 HTML；图片仅允许本应用附件 URL，服务仅内联检测出的 PNG/JPEG/GIF/WebP。传递依赖许可详见同步生成的 npm-licenses.json（保留各包 integrity）；完整许可文本随源包保留。
 
 `rehype-highlight` 7.0.2（MIT）为预览围栏代码提供语法高亮；原始 HTML 仍禁用。
+
+阶段 3：FullCalendar `@fullcalendar/core`、`react`、`daygrid`、`timegrid`、`interaction`、官方 `luxon3` 适配器统一固定 **6.1.19**（MIT）；`luxon` **3.7.2**（MIT）、`@types/luxon` **3.7.1**（MIT）。只使用标准日历插件，无 Premium 依赖。`package-lock.json` 与完整 npm 许可/integrity 清单同步；安装时 audit 为 0 vulnerabilities。命名时区由官方 luxon3 适配器处理，输入通过 Luxon 按部署时区生成带明确偏移的 RFC3339，拒绝夏令时跳时中不存在的墙上时间。

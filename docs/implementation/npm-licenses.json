@@ -426,6 +426,42 @@
     "integrity": "sha512-5ebpxr3nWMzrL/rnUI755Jkuee0bHL/Gq0WTF9lvcpv73wAp5eu8MfBUgWK9bhWvZjj7yX8etf/8tI8Ney695g=="
   },
   {
+    "name": "@fullcalendar/core",
+    "version": "6.1.19",
+    "license": "MIT",
+    "integrity": "sha512-z0aVlO5e4Wah6p6mouM0UEqtRf1MZZPt4mwzEyU6kusaNL+dlWQgAasF2cK23hwT4cmxkEmr4inULXgpyeExdQ=="
+  },
+  {
+    "name": "@fullcalendar/daygrid",
+    "version": "6.1.19",
+    "license": "MIT",
+    "integrity": "sha512-IAAfnMICnVWPjpT4zi87i3FEw0xxSza0avqY/HedKEz+l5MTBYvCDPOWDATpzXoLut3aACsjktIyw9thvIcRYQ=="
+  },
+  {
+    "name": "@fullcalendar/interaction",
+    "version": "6.1.19",
+    "license": "MIT",
+    "integrity": "sha512-GOciy79xe8JMVp+1evAU3ytdwN/7tv35t5i1vFkifiuWcQMLC/JnLg/RA2s4sYmQwoYhTw/p4GLcP0gO5B3X5w=="
+  },
+  {
+    "name": "@fullcalendar/luxon3",
+    "version": "6.1.19",
+    "license": "MIT",
+    "integrity": "sha512-hjLKOkVIn3KqUsRZqiESIMSe+y1Gwu4qlHGypkB3XCKe//YBGQN6TkLQsflApB62pqgBQNII9HSafHsGdGCI5g=="
+  },
+  {
+    "name": "@fullcalendar/react",
+    "version": "6.1.19",
+    "license": "MIT",
+    "integrity": "sha512-FP78vnyylaL/btZeHig8LQgfHgfwxLaIG6sKbNkzkPkKEACv11UyyBoTSkaavPsHtXvAkcTED1l7TOunAyPEnA=="
+  },
+  {
+    "name": "@fullcalendar/timegrid",
+    "version": "6.1.19",
+    "license": "MIT",
+    "integrity": "sha512-OuzpUueyO9wB5OZ8rs7TWIoqvu4v3yEqdDxZ2VcsMldCpYJRiOe7yHWKr4ap5Tb0fs7Rjbserc/b6Nt7ol6BRg=="
+  },
+  {
     "name": "@jridgewell/gen-mapping",
     "version": "0.3.13",
     "license": "MIT",
@@ -784,6 +820,12 @@
     "version": "3.0.5",
     "license": "MIT",
     "integrity": "sha512-rp/ezSWaD1m44dPKICGhiskI13nVr7qTloFwDa/IYkhhf5nzwP+zIQcIJh3WIFSBOy/H1PzB40jPjMDksN4F+g=="
+  },
+  {
+    "name": "@types/luxon",
+    "version": "3.7.1",
+    "license": "MIT",
+    "integrity": "sha512-H3iskjFIAn5SlJU7OuxUmTEpebK6TKB8rxZShDslBMZJ5u9S//KM1sbdAisiSrqwLQncVjnpi2OK2J51h+4lsg=="
   },
   {
     "name": "@types/mdast",
@@ -1320,6 +1362,12 @@
     "integrity": "sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w=="
   },
   {
+    "name": "luxon",
+    "version": "3.7.2",
+    "license": "MIT",
+    "integrity": "sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew=="
+  },
+  {
     "name": "lz-string",
     "version": "1.5.0",
     "license": "MIT",
@@ -1690,6 +1738,12 @@
     "version": "8.5.31",
     "license": "MIT",
     "integrity": "sha512-YUbWYCgErwnMAVkjUnYa+KlMBzGpHwiIt/DE7f0G33AuX2LH9UcTk6KgWxd3zRU+pN3u/C+Xl3EnMLM4Hea7Sg=="
+  },
+  {
+    "name": "preact",
+    "version": "10.12.1",
+    "license": "MIT",
+    "integrity": "sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg=="
   },
   {
     "name": "pretty-format",

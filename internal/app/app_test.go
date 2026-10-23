@@ -107,3 +107,21 @@ func TestHealthAndOrigin(t *testing.T) {
 	req(t, h, "GET", "/healthz", nil, 200)
 	req(t, h, "GET", "/readyz", nil, 503)
 }
+
+func TestEventAndRelationAPI(t *testing.T) {
+	h, close := setup(t)
+	defer close()
+	p := project(t, h, "毕业设计")
+	base := "/projects/" + p["id"].(string) + "/events"
+	ev := req(t, h, "POST", base, object{"title": "讨论方案", "start_at": "2026-10-24T23:00:00+08:00", "end_at": "2026-10-25T01:00:00+08:00"}, 201)
+	req(t, h, "PATCH", "/events/"+ev["id"].(string), object{"version": 1, "body": "描述"}, 200)
+	req(t, h, "PATCH", "/events/"+ev["id"].(string), object{"version": 1, "body": "旧稿"}, 409)
+	req(t, h, "GET", base, nil, 400)
+	ta := task(t, h, p, "执行实验", nil)
+	pg := req(t, h, "POST", "/projects/"+p["id"].(string)+"/pages", object{"title": "实验方案"}, 201)
+	for _, r := range []string{"task-page/" + ta["id"].(string) + "/" + pg["id"].(string), "task-event/" + ta["id"].(string) + "/" + ev["id"].(string), "page-event/" + pg["id"].(string) + "/" + ev["id"].(string)} {
+		req(t, h, "PUT", "/relations/"+r, nil, 200)
+		req(t, h, "PUT", "/relations/"+r, nil, 200)
+		req(t, h, "DELETE", "/relations/"+r, nil, 200)
+	}
+}

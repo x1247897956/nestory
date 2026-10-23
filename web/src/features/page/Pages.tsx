@@ -1,3 +1,4 @@
+import { Relations } from "../relation/Relations";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -38,7 +39,11 @@ export function Pages({
     enabled: !!pageId,
   });
   const refresh = () =>
-    qc.invalidateQueries({ queryKey: ["pages", projectId] });
+    Promise.all([
+      qc.invalidateQueries({ queryKey: ["pages", projectId] }),
+      qc.invalidateQueries({ queryKey: ["relation-options", projectId] }),
+      qc.invalidateQueries({ queryKey: ["relations"] }),
+    ]);
   const nodes = list.data ?? [];
   const flat: { page: Page; depth: number }[] = [];
   const stack = nodes
@@ -120,34 +125,42 @@ export function Pages({
       <section>
         {pageId ? (
           detail.data && detail.data.project_id === projectId ? (
-            <PageEditor
-              key={pageId + ":" + epoch}
-              page={detail.data}
-              nodes={nodes}
-              archived={archived}
-              onSave={async (draft, version) => {
-                const next = await api<Page>("/pages/" + pageId, "PATCH", {
-                  ...draft,
-                  version,
-                });
-                qc.setQueryData(["page", pageId], next);
-                await refresh();
-              }}
-              onMove={async (parent_id, position, version) => {
-                const next = await api<Page>(
-                  "/pages/" + pageId + "/move",
-                  "POST",
-                  { parent_id, position, version },
-                );
-                qc.setQueryData(["page", pageId], next);
-                await refresh();
-                setEpoch((n) => n + 1);
-              }}
-              onReload={async () => {
-                await detail.refetch({ throwOnError: true });
-                setEpoch((n) => n + 1);
-              }}
-            />
+            <>
+              <PageEditor
+                key={pageId + ":" + epoch}
+                page={detail.data}
+                nodes={nodes}
+                archived={archived}
+                onSave={async (draft, version) => {
+                  const next = await api<Page>("/pages/" + pageId, "PATCH", {
+                    ...draft,
+                    version,
+                  });
+                  qc.setQueryData(["page", pageId], next);
+                  await refresh();
+                }}
+                onMove={async (parent_id, position, version) => {
+                  const next = await api<Page>(
+                    "/pages/" + pageId + "/move",
+                    "POST",
+                    { parent_id, position, version },
+                  );
+                  qc.setQueryData(["page", pageId], next);
+                  await refresh();
+                  setEpoch((n) => n + 1);
+                }}
+                onReload={async () => {
+                  await detail.refetch({ throwOnError: true });
+                  setEpoch((n) => n + 1);
+                }}
+              />
+              <Relations
+                projectId={projectId}
+                type="pages"
+                id={pageId}
+                archived={archived}
+              />
+            </>
           ) : detail.isError ? (
             <p role="alert">
               页面加载失败<button onClick={() => detail.refetch()}>重试</button>

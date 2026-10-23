@@ -11,9 +11,11 @@ import { api, stages, priorities, type Project, type Task } from "./api";
 import { ProjectForm } from "../features/project/ProjectForm";
 import { TaskEditor, type TaskDraft } from "../features/task/TaskEditor";
 import "./styles.css";
+import { Events } from "../features/event/Events";
+import { Relations } from "../features/relation/Relations";
 import { Pages } from "../features/page/Pages";
 export function App() {
-  const { projectId, taskId, pageId } = useParams();
+  const { projectId, taskId, pageId, eventId } = useParams();
   const nav = useNavigate();
   const qc = useQueryClient();
   const [archived, setArchived] = useState(false);
@@ -55,7 +57,9 @@ export function App() {
     queryFn: () => api<Task>("/tasks/" + taskId),
     enabled: !!taskId,
   });
-  const notes = useLocation().pathname.includes("/pages");
+  const path = useLocation().pathname;
+  const notes = path.includes("/pages");
+  const calendar = path.includes("/events");
   const p = current.data;
   const all = tasks.data ?? [];
   const readOnly = !!p?.archived_at;
@@ -72,7 +76,11 @@ export function App() {
       version,
     });
     qc.setQueryData(["task", taskId], next);
-    await qc.invalidateQueries({ queryKey: ["tasks", projectId] });
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["tasks", projectId] }),
+      qc.invalidateQueries({ queryKey: ["relation-options", projectId] }),
+      qc.invalidateQueries({ queryKey: ["relations"] }),
+    ]);
   };
   const openTask = (t: Task) => {
     nav("/projects/" + projectId + "/tasks/" + t.id);
@@ -183,7 +191,7 @@ export function App() {
           ＋ 新建项目
         </button>
         <div className="sidebar-bottom">
-          <span className="local-dot" /> 本地空间 · 阶段 2<br />
+          <span className="local-dot" /> 本地空间 · 阶段 3<br />
         </div>
       </aside>
       <main>
@@ -255,6 +263,7 @@ export function App() {
                   任务 <b>{all.length}</b>
                 </Link>{" "}
                 <Link to={"/projects/" + projectId + "/pages"}>页面</Link>
+                <Link to={"/projects/" + projectId + "/events"}>日历</Link>
                 <small>{count} 项待推进</small>
               </div>
             </header>
@@ -273,7 +282,13 @@ export function App() {
                 {error}
               </p>
             )}
-            {notes ? (
+            {calendar ? (
+              <Events
+                projectId={projectId}
+                eventId={eventId}
+                archived={readOnly}
+              />
+            ) : notes ? (
               <Pages
                 projectId={projectId}
                 pageId={pageId}
@@ -446,16 +461,24 @@ export function App() {
                         <button onClick={() => detail.refetch()}>重试</button>
                       </p>
                     ) : detail.data && detail.data.project_id === projectId ? (
-                      <TaskEditor
-                        key={taskId + ":" + editorEpoch}
-                        task={detail.data}
-                        archived={readOnly}
-                        onSave={saveTask}
-                        onReload={async () => {
-                          await detail.refetch({ throwOnError: true });
-                          setEditorEpoch((n) => n + 1);
-                        }}
-                      />
+                      <>
+                        <TaskEditor
+                          key={taskId + ":" + editorEpoch}
+                          task={detail.data}
+                          archived={readOnly}
+                          onSave={saveTask}
+                          onReload={async () => {
+                            await detail.refetch({ throwOnError: true });
+                            setEditorEpoch((n) => n + 1);
+                          }}
+                        />
+                        <Relations
+                          projectId={projectId}
+                          type="tasks"
+                          id={taskId}
+                          archived={readOnly}
+                        />
+                      </>
                     ) : (
                       <p>任务不属于此项目</p>
                     )}
