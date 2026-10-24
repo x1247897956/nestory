@@ -436,10 +436,11 @@ export function App() {
                         <button onClick={() => detail.refetch()}>重试</button>
                       </p>
                     ) : detail.data && detail.data.project_id === projectId ? (
-                      <TaskSummary task={detail.data} tasks={all} archived={readOnly} onCreate={openCreate}>
+                      <TaskSummary task={detail.data} archived={readOnly} onCreate={openCreate}>
                         <TaskEditor
                           key={taskId + ":" + editorEpoch}
                           task={detail.data}
+                          parent={all.find(t => t.id === detail.data?.parent_id)}
                           archived={readOnly}
                           onSave={saveTask}
                           onReload={async () => {

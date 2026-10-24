@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
 import { useAutosave } from "../../components/markdown/useAutosave";
@@ -19,11 +20,13 @@ const fromTask = (t: Task): TaskDraft => ({
 });
 export function TaskEditor({
   task,
+  parent,
   archived,
   onSave,
   onReload,
 }: {
   task: Task;
+  parent?: Task;
   archived: boolean;
   onSave: (draft: TaskDraft, version: number) => Promise<void>;
   onReload: () => void | Promise<void>;
@@ -31,7 +34,6 @@ export function TaskEditor({
   const {
     draft,
     setDraft,
-    version,
     busy,
     error: saveError,
     dirty,
@@ -43,60 +45,15 @@ export function TaskEditor({
     setDraft((d) => ({ ...d, [key]: value }));
   return (
     <section className="editor" data-dirty={dirty || busy} aria-label="任务详情">
-      <div className="eyebrow">
-        TASK / {task.parent_id ? "子任务" : "任务详情"} <span>v{version}</span>
-      </div>
-      <label>
-        任务标题
-        <input
-          aria-label="任务标题"
-          value={draft.title}
-          onChange={(e) => change("title", e.target.value)}
-          disabled={archived}
-        />
-      </label>
-      <div className="field-grid">
-        <label>
-          阶段
-          <select
-            aria-label="阶段"
-            value={draft.stage}
-            onChange={(e) => change("stage", e.target.value)}
-            disabled={archived}
-          >
-            {stages.map(([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          优先级
-          <select
-            aria-label="优先级"
-            value={draft.priority}
-            onChange={(e) => change("priority", e.target.value)}
-            disabled={archived}
-          >
-            {priorities.map(([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          截止日期
-          <input
-            aria-label="截止日期"
-            type="date"
-            value={draft.due_date}
-            onChange={(e) => change("due_date", e.target.value)}
-            disabled={archived}
-          />
-        </label>
-      </div>
+      <header className="task-inline-header">
+        <h2 aria-label={draft.title}><input className="task-inline-title" aria-label="任务标题" value={draft.title} onChange={e => change("title", e.target.value)} disabled={archived} placeholder="任务标题" /></h2>
+        <div className="task-properties" aria-label="任务属性">
+          <label className="task-property stage-property"><i className={"stage-dot " + draft.stage} aria-hidden="true"/><select aria-label="阶段" value={draft.stage} onChange={e => change("stage",e.target.value)} disabled={archived}>{stages.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
+          <label className="task-property"><span>优先级</span><select aria-label="优先级" value={draft.priority} onChange={e => change("priority",e.target.value)} disabled={archived}>{priorities.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
+          <label className="task-property"><span>截止</span><input aria-label="截止日期" type="date" value={draft.due_date} onChange={e => change("due_date",e.target.value)} disabled={archived}/></label>
+          {parent && <span className="task-property parent-property"><span>父任务</span><Link to={`/projects/${task.project_id}/tasks/${parent.id}`}>{parent.title}</Link></span>}
+        </div>
+      </header>
       <div className="body-label">
         Markdown 正文
         <MarkdownEditor
