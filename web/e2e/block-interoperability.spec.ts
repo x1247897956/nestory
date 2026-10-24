@@ -1,3 +1,4 @@
+import { paragraphs, documentText } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
 import { importMarkdown } from "./editor-helpers";
 import { readFile } from "node:fs/promises";
@@ -74,7 +75,7 @@ test("dragging a block preserves its identity and saves the new order", async ({
   ).json();
   const n = await (
     await request.post(`/api/v1/projects/${p.id}/pages`, {
-      data: { title: "拖动笔记", body: "第一段\n\n第二段\n\n第三段" },
+      data: { title: "拖动笔记", body_document: paragraphs("第一段", "第二段", "第三段") },
     })
   ).json();
   await page.goto(`/projects/${p.id}/pages/${n.id}`);
@@ -95,7 +96,7 @@ test("dragging a block preserves its identity and saves the new order", async ({
     .not.toBe("第一段|第二段|第三段");
   const stored = await (await request.get("/api/v1/pages/" + n.id)).json();
   expect(stored.body_document.blocks).toHaveLength(3);
-  expect(stored.body).toContain("第一段");
-  expect(stored.body).toContain("第二段");
-  expect(stored.body).toContain("第三段");
+  expect(documentText(stored.body_document)).toContain("第一段");
+  expect(documentText(stored.body_document)).toContain("第二段");
+  expect(documentText(stored.body_document)).toContain("第三段");
 });

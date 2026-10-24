@@ -67,7 +67,7 @@ func TestCalendarBoundariesAndRecent(t *testing.T) {
 		t.Fatalf("%+v %v", today, e)
 	}
 	exec(`INSERT INTO pages(id,project_id,title,created_at,updated_at) VALUES('root','p','Root',1,1),('gone','p','Gone',1,1)`)
-	exec(`INSERT INTO pages(id,project_id,parent_id,title,body,created_at,updated_at) VALUES('leaf','p','root','Leaf','needle',1,1)`)
+	exec(`INSERT INTO pages(id,project_id,parent_id,title,body_document,created_at,updated_at) VALUES('leaf','p','root','Leaf','{"version":1,"blocks":[{"id":"needle","type":"paragraph","props":{},"content":[{"type":"text","text":"needle","styles":{}}],"children":[]}]}',1,1)`)
 	r, e := s.Search(ctx, "needle", false, 1, 0)
 	if e != nil || r.Total != 1 || r.Items[0].Path != "Root / Leaf" {
 		t.Fatalf("%+v %v", r, e)
@@ -168,6 +168,35 @@ func TestDashboardIncludesFutureAndUndatedTasksAndRangeEvents(t *testing.T) {
 	for _, r := range [][2]string{{"bad", "bad"}, {"2026-11-01T00:00:00Z", "2026-11-01T00:00:00Z"}, {"2026-01-01T00:00:00Z", "2028-01-01T00:00:00Z"}} {
 		if _, err := s.Dashboard(ctx, r[0], r[1]); err == nil {
 			t.Fatal("invalid range accepted", r)
+		}
+	}
+}
+
+func TestSearchReadsNativeTextAndAttachmentNames(t *testing.T) {
+	ctx := context.Background()
+	db, err := database.Open(ctx, filepath.Join(t.TempDir(), "search.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec(`INSERT INTO projects(id,title,created_at,updated_at) VALUES('p','P',1,1)`); err != nil {
+		t.Fatal(err)
+	}
+	doc := `{"version":1,"blocks":[{"id":"private-id","type":"paragraph","props":{},"content":[{"type":"text","text":"正文搜索","styles":{}}],"children":[{"id":"child","type":"paragraph","props":{},"content":[{"type":"text","text":"嵌套文字","styles":{}}],"children":[]}]},{"id":"asset","type":"file","props":{"name":"附件报告.pdf","url":"/api/v1/assets/private-url"},"children":[]}]}`
+	if _, err := db.Exec(`INSERT INTO pages(id,project_id,title,body_document,created_at,updated_at) VALUES('page','p','Page',?,1,1)`, doc); err != nil {
+		t.Fatal(err)
+	}
+	service := New(db, "Asia/Shanghai", time.Now)
+	for _, query := range []string{"正文搜索", "嵌套文字", "附件报告"} {
+		result, err := service.Search(ctx, query, false, 20, 0)
+		if err != nil || result.Total != 1 {
+			t.Fatalf("search %q: %+v %v", query, result, err)
+		}
+	}
+	for _, query := range []string{"private-id", "private-url", "paragraph"} {
+		result, err := service.Search(ctx, query, false, 20, 0)
+		if err != nil || result.Total != 0 {
+			t.Fatalf("search leaked JSON metadata %q: %+v %v", query, result, err)
 		}
 	}
 }

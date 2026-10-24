@@ -8,16 +8,14 @@ import type { Task } from "../../app/api";
 import { stages, priorities } from "../../app/api";
 export type TaskDraft = {
   title: string;
-  body: string;
-  body_document?: BodyDocument | null;
+  body_document: BodyDocument;
   stage: string;
   priority: string;
   due_date: string;
 };
 const fromTask = (t: Task): TaskDraft => ({
   title: t.title,
-  body: t.body,
-  body_document: t.body_document ?? undefined,
+  body_document: t.body_document ?? { version: 1, blocks: [] },
   stage: t.stage,
   priority: t.priority,
   due_date: t.due_date ?? "",
@@ -171,11 +169,9 @@ export function TaskEditor({
       </header>
       <div className="body-label">
         <MarkdownEditor
-          value={draft.body}
           body_document={draft.body_document}
-          legacy_body={task.legacy_body}
-          onChange={(body, body_document) =>
-            setDraft((d) => ({ ...d, body, body_document }))
+          onChange={(body_document) =>
+            setDraft((d) => ({ ...d, body_document }))
           }
           disabled={locked}
           projectId={task.project_id}
@@ -193,7 +189,7 @@ export function TaskEditor({
           <button
             onClick={() =>
               navigator.clipboard
-                .writeText(draft.body)
+                .writeText(JSON.stringify(draft.body_document, null, 2))
                 .catch(() => setError("复制失败，请手动选择正文复制"))
             }
           >

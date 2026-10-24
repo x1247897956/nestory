@@ -78,19 +78,19 @@ func TestVersionsArchiveAndMove(t *testing.T) {
 	b := task(t, h, p, "B", nil)
 	path := "/tasks/" + a["id"].(string)
 	req(t, h, "PATCH", path, object{"title": "missing version"}, 400)
-	updated := req(t, h, "PATCH", path, object{"version": a["version"], "body": "saved"}, 200)
-	req(t, h, "PATCH", path, object{"version": a["version"], "body": "stale"}, 409)
+	updated := req(t, h, "PATCH", path, object{"version": a["version"], "body_document": textDocument("saved")}, 200)
+	req(t, h, "PATCH", path, object{"version": a["version"], "body_document": textDocument("stale")}, 409)
 	a = req(t, h, "POST", path+"/move", object{"version": updated["version"], "parent_id": b["id"], "position": 0}, 200)
 	req(t, h, "POST", "/tasks/"+b["id"].(string)+"/move", object{"version": b["version"], "parent_id": a["id"], "position": 0}, 409)
 	pp := "/projects/" + p["id"].(string)
 	p = req(t, h, "PATCH", pp, object{"version": p["version"], "archived": true}, 200)
-	req(t, h, "PATCH", path, object{"version": a["version"], "body": "blocked"}, 409)
+	req(t, h, "PATCH", path, object{"version": a["version"], "body_document": textDocument("blocked")}, 409)
 	req(t, h, "POST", pp+"/tasks", object{"title": "blocked"}, 409)
 	req(t, h, "POST", path+"/move", object{"version": a["version"], "position": 0}, 409)
 	req(t, h, "PATCH", pp, object{"version": p["version"], "title": "blocked"}, 409)
 	req(t, h, "PATCH", pp, object{"version": p["version"]}, 409)
 	p = req(t, h, "PATCH", pp, object{"version": p["version"], "archived": false}, 200)
-	req(t, h, "PATCH", path, object{"version": a["version"], "body": "editable"}, 200)
+	req(t, h, "PATCH", path, object{"version": a["version"], "body_document": textDocument("editable")}, 200)
 }
 func TestHealthAndOrigin(t *testing.T) {
 	h, close := setup(t)
@@ -114,8 +114,8 @@ func TestEventAndRelationAPI(t *testing.T) {
 	p := project(t, h, "毕业设计")
 	base := "/projects/" + p["id"].(string) + "/events"
 	ev := req(t, h, "POST", base, object{"title": "讨论方案", "start_at": "2026-10-24T23:00:00+08:00", "end_at": "2026-10-25T01:00:00+08:00"}, 201)
-	req(t, h, "PATCH", "/events/"+ev["id"].(string), object{"version": 1, "body": "描述"}, 200)
-	req(t, h, "PATCH", "/events/"+ev["id"].(string), object{"version": 1, "body": "旧稿"}, 409)
+	req(t, h, "PATCH", "/events/"+ev["id"].(string), object{"version": 1, "body_document": textDocument("描述")}, 200)
+	req(t, h, "PATCH", "/events/"+ev["id"].(string), object{"version": 1, "body_document": textDocument("旧稿")}, 409)
 	req(t, h, "GET", base, nil, 400)
 	ta := task(t, h, p, "执行实验", nil)
 	pg := req(t, h, "POST", "/projects/"+p["id"].(string)+"/pages", object{"title": "实验方案"}, 201)
@@ -146,8 +146,8 @@ func TestArchivedAllWritesAndDeletedRelations(t *testing.T) {
 	for _, v := range []struct {
 		method, path string
 		body         object
-	}{{"POST", "/projects/" + pid + "/tasks", object{"title": "x"}}, {"POST", "/projects/" + pid + "/pages", object{"title": "x"}}, {"POST", "/projects/" + pid + "/events", object{"title": "x", "start_at": "2026-10-23T00:00:00Z", "end_at": "2026-10-23T01:00:00Z"}}, {"PATCH", "/tasks/" + aid, object{"version": a["version"], "body": "- [x] forbidden"}}, {"POST", "/tasks/" + aid + "/move", object{"version": a["version"], "position": 0}}, {"PATCH", "/events/" + eid, object{"version": ev["version"], "title": "forbidden"}},
-		{"PATCH", "/pages/" + pg2id, object{"version": pg2["version"], "body": "- [x] forbidden"}}, {"POST", "/pages/" + pg2id + "/move", object{"version": pg2["version"], "position": 0}}, {"PUT", "/relations/task-event/" + aid + "/" + eid, nil}, {"POST", "/trash/" + del["batch_id"].(string) + "/restore", nil}} {
+	}{{"POST", "/projects/" + pid + "/tasks", object{"title": "x"}}, {"POST", "/projects/" + pid + "/pages", object{"title": "x"}}, {"POST", "/projects/" + pid + "/events", object{"title": "x", "start_at": "2026-10-23T00:00:00Z", "end_at": "2026-10-23T01:00:00Z"}}, {"PATCH", "/tasks/" + aid, object{"version": a["version"], "body_document": textDocument("- [x] forbidden")}}, {"POST", "/tasks/" + aid + "/move", object{"version": a["version"], "position": 0}}, {"PATCH", "/events/" + eid, object{"version": ev["version"], "title": "forbidden"}},
+		{"PATCH", "/pages/" + pg2id, object{"version": pg2["version"], "body_document": textDocument("- [x] forbidden")}}, {"POST", "/pages/" + pg2id + "/move", object{"version": pg2["version"], "position": 0}}, {"PUT", "/relations/task-event/" + aid + "/" + eid, nil}, {"POST", "/trash/" + del["batch_id"].(string) + "/restore", nil}} {
 		req(t, h, v.method, v.path, v.body, 409)
 	}
 	req(t, h, "POST", "/recent", object{"type": "project", "id": pid}, 200)

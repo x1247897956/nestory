@@ -1,6 +1,6 @@
 # Noteapp 后端结构
 
-后端保持轻量模块化单体：普通构造函数组装、显式SQL、SQLite专用表。数据模型与既有HTTP接口保持兼容。
+后端保持轻量模块化单体：普通构造函数组装、显式SQL、SQLite专用表。正文接口使用块JSON；其他对象属性与事务语义保持不变。
 
 ## 职责和依赖
 
@@ -47,4 +47,8 @@ apperr包含invalid、not_found、conflict和too_large类别。HTTP适配层统�
 
 ## 块正文
 
-`internal/document` 定义三类对象共享的块文档写入规则：格式版本、块类型/ID唯一性、inline/table最小可读结构及规模限制。各类型服务在自己的事务中调用它，同时保存 `body_document`、当前 Markdown 投影 `body` 和首次转换前的 `legacy_body`。JSON 为权威正文；前端统一生成 Markdown 投影，后端不独立进行格式转换。旧客户端不能以单独变化的 body 覆盖块文档。属性编辑、归档、回收站和版本锁沿用原有边界，块不是新的业务对象，也不引入通用属性存储或协作服务。
+`internal/document` 校验三类对象共享的块文档：格式版本、块类型/ID唯一性、inline/table最小可读结构及规模限制。各类型服务在自己的版本事务中只保存 `body_document`；新建省略正文时保存空块文档，更新省略时保持正文，显式null拒绝。HTTP输入拒绝`body`与`legacy_body`等未知字段，响应没有这两项。错误恢复复制块JSON，Markdown仅在客户端导入/导出时转换。
+
+schema7校验/迁移全部对象（包含归档和回收站）后删除旧Markdown列。已有块数据原样保留；非空旧正文须先使用锁定BlockNote解析器准备，Go迁移检查源SHA256和块结构，在同一事务中复制、删列、删准备表及记录版本，失败回滚。数据库为块字段提供非null空文档默认值和JSON基础CHECK。完整应用级结构仍由document.Validate把关。
+
+搜索使用SQLite json_tree从块的text与附件name读取文本，不保存第二份正文或Markdown投影；不会把块ID、类型名、附件URL或样式值当正文搜索。属性、移动、归档、关联和批次恢复沿用现有事务边界。当前JSON搜索适合个人规模，未引入全文索引。

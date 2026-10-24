@@ -1,3 +1,4 @@
+import { paragraphs, documentText } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
 test("project, independent children, refresh, archive and two-tab conflict", async ({
   page,
@@ -85,7 +86,7 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
   ).json();
   const task = await (
     await request.post("/api/v1/projects/" + project.id + "/tasks", {
-      data: { title: "保稿", body: "baseline A" },
+      data: { title: "保稿", body_document: paragraphs("baseline A") },
     })
   ).json();
   await page.goto("/projects/" + project.id + "/tasks/" + task.id);
@@ -118,7 +119,7 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
   await expect
     .poll(
       async () =>
-        (await (await request.get("/api/v1/tasks/" + task.id)).json()).body.trim(),
+        documentText((await (await request.get("/api/v1/tasks/" + task.id)).json()).body_document),
     )
     .toBe("baseline A");
 });

@@ -23,8 +23,7 @@ import "./markdown.css";
 import type { BodyDocument, DocumentFields } from "../../app/document";
 
 type Props = DocumentFields & {
-  value: string;
-  onChange: (body: string, document?: BodyDocument) => void;
+  onChange: (document: BodyDocument) => void;
   disabled?: boolean;
   projectId?: string;
 };
@@ -200,9 +199,7 @@ const EditorCanvas = memo(function EditorCanvas({
   );
 });
 export function BlockEditor({
-  value,
   body_document,
-  legacy_body,
   onChange,
   disabled = false,
   projectId,
@@ -212,8 +209,7 @@ export function BlockEditor({
   const locked = useRef(disabled);
   locked.current = disabled;
   const latest = useRef({
-    value,
-    document: JSON.stringify(body_document ?? null),
+    document: JSON.stringify(body_document),
     onChange,
   });
   latest.current.onChange = onChange;
@@ -261,11 +257,6 @@ export function BlockEditor({
           }
         },
       });
-      if (!body_document && value)
-        instance.replaceBlocks(
-          instance.document,
-          instance.tryParseMarkdownToBlocks(value),
-        );
       return { editor: instance, error: "" };
     } catch (e) {
       return {
@@ -277,24 +268,20 @@ export function BlockEditor({
   const editor = loaded.editor;
   useEffect(() => {
     if (!editor) return;
-    const next = JSON.stringify(body_document ?? null);
-    if (value === latest.current.value && next === latest.current.document)
-      return;
+    const next = JSON.stringify(body_document);
+    if (next === latest.current.document) return;
     try {
       editor.replaceBlocks(
         editor.document,
         body_document?.blocks.length
           ? body_document.blocks
-          : value
-            ? editor.tryParseMarkdownToBlocks(value)
-            : [{ type: "paragraph" }],
+          : [{ type: "paragraph" }],
       );
-      latest.current.value = value;
       latest.current.document = next;
     } catch (e) {
       setError(`正文同步失败，草稿已保留：${(e as Error).message}`);
     }
-  }, [value, body_document, editor]);
+  }, [body_document, editor]);
   useEffect(() => {
     if (!pending) return;
     const guard = (event: BeforeUnloadEvent) => {
@@ -307,17 +294,15 @@ export function BlockEditor({
   const emit = useCallback(() => {
     if (!editor || locked.current) return;
     const blocks = structuredClone(editor.document);
-    const body = editor.blocksToMarkdownLossy(blocks);
     const doc: BodyDocument = { version: 1, blocks };
-    latest.current.value = body;
     latest.current.document = JSON.stringify(doc);
-    latest.current.onChange(body, doc);
+    latest.current.onChange(doc);
   }, [editor]);
   if (!editor)
     return (
       <div role="alert">
-        {loaded.error}
-        <button onClick={() => download(value, "正文原文.md")}>下载原文</button>
+        {error || loaded.error}
+        <button onClick={() => navigator.clipboard.writeText(JSON.stringify(body_document, null, 2)).catch(() => setError("复制失败，请重试"))}>复制草稿 JSON</button>
       </div>
     );
   return (
@@ -402,15 +387,6 @@ export function BlockEditor({
           {error}
           <button onClick={() => setError("")}>关闭</button>
         </p>
-      )}
-      {legacy_body && (
-        <details className="legacy-source">
-          <summary>旧版原文</summary>
-          <p>转换前的 Markdown 原文已保留。</p>
-          <button onClick={() => download(legacy_body, "转换前原文.md")}>
-            下载原文
-          </button>
-        </details>
       )}
     </div>
   );

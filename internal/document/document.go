@@ -7,34 +7,27 @@ import (
 	"noteapp/internal/apperr"
 )
 
-// Apply keeps the authoritative blocks, Markdown projection and original source
-// in one native object transaction. Missing document means a legacy client.
-func Apply(body *string, blocks *json.RawMessage, legacy **string, inputBody *string, input json.RawMessage) error {
+// Empty returns a fresh empty block document.
+func Empty() json.RawMessage { return json.RawMessage(`{"version":1,"blocks":[]}`) }
+
+// Apply updates the only source of body content. Omission preserves an existing
+// document; creation without content gets an empty block document. Explicit null
+// is rejected. Callers persist this inside the object's versioned transaction.
+func Apply(blocks *json.RawMessage, input json.RawMessage) error {
 	if len(input) == 0 {
-		if inputBody != nil {
-			if len(*blocks) > 0 && *inputBody != *body {
-				return apperr.Conflict("正文已使用块格式，请刷新后编辑")
-			}
-			*body = *inputBody
+		if len(*blocks) == 0 {
+			*blocks = Empty()
 		}
 		return nil
 	}
-	if inputBody == nil {
-		return apperr.Invalid("块正文必须同时提供 Markdown 投影 body")
-	}
 	if err := Validate(input); err != nil {
 		return err
-	}
-	if *legacy == nil {
-		original := *body
-		*legacy = &original
 	}
 	var compact bytes.Buffer
 	if err := json.Compact(&compact, input); err != nil {
 		return apperr.Invalid("无效块正文")
 	}
 	*blocks = append(json.RawMessage(nil), compact.Bytes()...)
-	*body = *inputBody
 	return nil
 }
 

@@ -1,3 +1,4 @@
+import type { BodyDocument } from "./document";
 import {
   render,
   screen,
@@ -49,7 +50,7 @@ it("keeps the mounted editor when background project and task refresh fail", asy
     id: "t",
     project_id: "p",
     title: "Task",
-    body: "saved",
+    body_document: { version: 1, blocks: [] },
     stage: "todo",
     priority: "none",
     due_date: null,
@@ -85,19 +86,19 @@ it("keeps the mounted editor when background project and task refresh fail", asy
 
 vi.mock("../components/markdown/MarkdownEditor", () => ({
   MarkdownEditor: ({
-    value,
+    body_document,
     onChange,
     disabled,
   }: {
-    value: string;
-    onChange: (v: string) => void;
+    body_document: BodyDocument;
+    onChange: (v: BodyDocument) => void;
     disabled: boolean;
   }) => (
     <textarea
       aria-label="Markdown 正文"
-      value={value}
+      value={(body_document.blocks[0]?.content as { text: string }[] | undefined)?.[0]?.text ?? ""}
       disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange({ version: 1, blocks: [{ type: "paragraph", content: [{ type: "text", text: e.target.value, styles: {} }] }] } as BodyDocument)}
     />
   ),
 }));

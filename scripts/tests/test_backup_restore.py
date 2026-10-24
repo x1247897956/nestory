@@ -15,7 +15,7 @@ class BackupRestore(unittest.TestCase):
   for _ in range(100):
    try:self.api('/readyz');break
    except Exception:time.sleep(.1)
-  self.project=self.api('/projects',{'title':'Backup中文'});self.task=self.api('/projects/'+self.project['id']+'/tasks',{'title':'Task','body':'persisted正文'})
+  self.project=self.api('/projects',{'title':'Backup中文'});self.task=self.api('/projects/'+self.project['id']+'/tasks',{'title':'Task','body_document':{'version':1,'blocks':[{'id':'persisted','type':'paragraph','content':[{'type':'text','text':'persisted正文','styles':{}}]}]}})
  def api(self,path,body=None):
   req=urllib.request.Request(self.url+'/api/v1'+path,data=json.dumps(body).encode() if body else None,headers={'Content-Type':'application/json'})
   with urllib.request.urlopen(req,timeout=5) as res:return json.load(res)
@@ -34,7 +34,7 @@ class BackupRestore(unittest.TestCase):
   for _ in range(100):
    try:got=self.api('/tasks/'+self.task['id']);break
    except Exception:time.sleep(.1)
-  self.assertEqual(got['body'],'persisted正文')
+  self.assertEqual(got['body_document'],self.task['body_document']);self.assertNotIn('body',got);self.assertNotIn('legacy_body',got)
  def test_failure_after_stop_restarts_original(self):
   # Corrupt the schema so manifest validation fails after tar, not before stopping.
   run('docker','exec',self.name,'sh','-c','mkdir /data/unexpected; ln -s /etc/passwd /data/unexpected/link')

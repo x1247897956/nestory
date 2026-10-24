@@ -22,9 +22,7 @@ export type CalendarEvent = {
   id: string;
   project_id: string;
   title: string;
-  body: string;
-  body_document?: BodyDocument | null;
-  legacy_body?: string | null;
+  body_document: BodyDocument;
   start_at: string;
   end_at: string;
   version: number;
@@ -36,8 +34,7 @@ function validTimes(start: string, end: string, zone: string) {
 }
 type Draft = {
   title: string;
-  body: string;
-  body_document?: BodyDocument | null;
+  body_document: BodyDocument;
   start_at: string;
   end_at: string;
 };
@@ -491,8 +488,7 @@ export function EventEditor({
   const a = useAutosave(
     {
       title: event.title,
-      body: event.body,
-      body_document: event.body_document ?? undefined,
+      body_document: event.body_document ?? { version: 1, blocks: [] },
       start_at: toInput(event.start_at, zone),
       end_at: toInput(event.end_at, zone),
     },
@@ -558,12 +554,10 @@ export function EventEditor({
       </header>
       <MarkdownEditor
         projectId={event.project_id}
-        value={a.draft.body}
         body_document={a.draft.body_document}
-        legacy_body={event.legacy_body}
         disabled={archived}
-        onChange={(body, body_document) =>
-          a.setDraft((d) => ({ ...d, body, body_document }))
+        onChange={(body_document) =>
+          a.setDraft((d) => ({ ...d, body_document }))
         }
       />
       {!a.draft.title.trim() && <p role="alert">请输入日程标题</p>}
@@ -579,7 +573,7 @@ export function EventEditor({
           <button
             onClick={() =>
               void navigator.clipboard
-                .writeText(a.draft.body)
+                .writeText(JSON.stringify(a.draft.body_document, null, 2))
                 .catch(() => setError("复制失败，请手动复制"))
             }
           >

@@ -1,3 +1,4 @@
+import type { BodyDocument } from "../../app/document";
 import { renderObjectEditor as render } from "../../test/renderObjectEditor";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { it, expect, vi } from "vitest";
@@ -10,7 +11,7 @@ it("edits in deployment time and preserves Markdown on conflict", async () => {
         id: "e",
         project_id: "p",
         title: "讨论方案",
-        body: "old",
+        body_document: { version: 1, blocks: [] },
         start_at: "2026-10-24T01:00:30Z",
         end_at: "2026-10-24T02:00:00Z",
         version: 1,
@@ -35,19 +36,19 @@ it("edits in deployment time and preserves Markdown on conflict", async () => {
 
 vi.mock("../../components/markdown/MarkdownEditor", () => ({
   MarkdownEditor: ({
-    value,
+    body_document,
     onChange,
     disabled,
   }: {
-    value: string;
-    onChange: (v: string) => void;
+    body_document: BodyDocument;
+    onChange: (v: BodyDocument) => void;
     disabled: boolean;
   }) => (
     <textarea
       aria-label="Markdown 正文"
-      value={value}
+      value={(body_document.blocks[0]?.content as { text: string }[] | undefined)?.[0]?.text ?? ""}
       disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange({ version: 1, blocks: [{ type: "paragraph", content: [{ type: "text", text: e.target.value, styles: {} }] }] } as BodyDocument)}
     />
   ),
 }));
@@ -60,7 +61,7 @@ it("preserves the original fall-back offset while only Markdown changes", async 
         id: "fold",
         project_id: "p",
         title: "回拨",
-        body: "old",
+        body_document: { version: 1, blocks: [] },
         start_at: "2026-11-01T01:30:30-05:00",
         end_at: "2026-11-01T02:30:45-05:00",
         version: 1,
@@ -82,7 +83,7 @@ it("preserves the original fall-back offset while only Markdown changes", async 
 
 it("keeps invalid time drafts without saving", async () => {
   const save = vi.fn();
-  render(<EventEditor event={{id:"invalid",project_id:"p",title:"讨论",body:"",start_at:"2026-10-24T01:00:00Z",end_at:"2026-10-24T02:00:00Z",version:1}} zone="Asia/Shanghai" archived={false} onSave={save} onReload={async()=>{}}/>);
+  render(<EventEditor event={{id:"invalid",project_id:"p",title:"讨论",body_document:{version:1,blocks:[]},start_at:"2026-10-24T01:00:00Z",end_at:"2026-10-24T02:00:00Z",version:1}} zone="Asia/Shanghai" archived={false} onSave={save} onReload={async()=>{}}/>);
   fireEvent.change(screen.getByLabelText("结束时间"), {target:{value:"2026-10-24T08:00"}});
   expect(screen.getByRole("alert")).toHaveTextContent("结束时间必须晚于开始时间");
   await new Promise(resolve => setTimeout(resolve, 900));

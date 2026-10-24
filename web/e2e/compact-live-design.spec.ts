@@ -1,3 +1,4 @@
+import { block, documentOf } from "./block-fixtures";
 import {test,expect} from '@playwright/test';
 test('project row settings persist and deletion restores the project',async({page,request})=>{
  const p=await(await request.post('/api/v1/projects',{data:{title:'菜单测试 '+Date.now()}})).json();
@@ -23,7 +24,7 @@ test('project row settings persist and deletion restores the project',async({pag
 });
 test('compact full-page objects use live Markdown and simple breadcrumbs',async({page,request})=>{
  const p=await(await request.post('/api/v1/projects',{data:{title:'紧凑页面 '+Date.now()}})).json();
- const task=await(await request.post(`/api/v1/projects/${p.id}/tasks`,{data:{title:'即时任务',body:'# 标题\n\n**强调**\n\n- [ ] 检查\n\n```text\n- [ ] 不应变成检查项\n```'} })).json();
+ const task=await(await request.post(`/api/v1/projects/${p.id}/tasks`,{data:{title:'即时任务',body_document:documentOf(block('heading','标题',{level:1}),{...block('paragraph','强调'),content:[{type:'text',text:'强调',styles:{bold:true}}]},block('checkListItem','检查',{checked:false}),block('codeBlock','- [ ] 不应变成检查项',{language:'text'}))} })).json();
  await page.goto(`/projects/${p.id}/tasks/${task.id}`);
  await expect(page.getByRole('button',{name:'即时',exact:true})).toHaveCount(0);
  await expect(page.locator('.bn-editor h1')).toContainText('标题');
@@ -32,7 +33,7 @@ test('compact full-page objects use live Markdown and simple breadcrumbs',async(
  await expect(page.getByText('Markdown 正文',{exact:true})).toHaveCount(0);
  const crumbs=page.getByRole('navigation',{name:'面包屑'});await expect(crumbs).toContainText('即时任务');await expect(crumbs).not.toContainText('概览');
  const check=page.locator('.bn-editor').getByRole('checkbox');await expect(check).toHaveCount(1);await check.check();await expect(page.getByRole('status')).toHaveText('已保存');
- expect((await(await request.get('/api/v1/tasks/'+task.id)).json()).body).toMatch(/[*-] \[x\] 检查/);
+ expect((await(await request.get('/api/v1/tasks/'+task.id)).json()).body_document.blocks.find((b:any)=>b.type==='checkListItem').props.checked).toBe(true);
  const note=await(await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title:'整页笔记'}})).json();
  await page.goto(`/projects/${p.id}/pages/${note.id}`);await expect(page.getByRole('region',{name:'笔记树'})).toHaveCount(0);await expect(crumbs).toContainText('整页笔记');
  const e=await(await request.post(`/api/v1/projects/${p.id}/events`,{data:{title:'整页日程',start_at:'2026-10-25T09:00:00+08:00',end_at:'2026-10-25T10:00:00+08:00'}})).json();

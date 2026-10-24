@@ -1,5 +1,6 @@
+import { block, documentOf } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
-test("blocks preserve old source, checklist identity, slash commands and assets across object types", async ({
+test("native blocks preserve checklist identity, slash commands and assets across object types", async ({
   page,
   request,
 }) => {
@@ -9,13 +10,12 @@ test("blocks preserve old source, checklist identity, slash commands and assets 
     })
   ).json();
   for (const kind of ["tasks", "pages", "events"]) {
-    const old =
-      "# 旧标题\n\n- [ ] 同名\n- [ ] 同名\n\n```js\n- [ ] 保持代码\n```\n\n末尾";
+    const original = documentOf(block("heading", "旧标题", {level: 1}), block("checkListItem", "同名", {checked: false}), block("checkListItem", "同名", {checked: false}), block("codeBlock", "- [ ] 保持代码", {language: "javascript"}), block("paragraph", "末尾"));
     const item = await (
       await request.post(`/api/v1/projects/${p.id}/${kind}`, {
         data: {
           title: "块正文 " + kind,
-          body: old,
+          body_document: original,
           ...(kind === "events"
             ? {
                 start_at: "2026-10-25T09:00:00Z",
@@ -33,12 +33,14 @@ test("blocks preserve old source, checklist identity, slash commands and assets 
     await page.waitForTimeout(1000);
     const untouched = await (await request.get(path)).json();
     expect(untouched.version).toBe(1);
-    expect(untouched.body_document).toBeNull();
-    expect(untouched.body).toBe(old);
+    expect(untouched.body_document).toEqual(original);
+    expect(untouched).not.toHaveProperty("body");
+    expect(untouched).not.toHaveProperty("legacy_body");
     await editor.getByRole("checkbox").nth(1).check();
     await expect(page.getByRole("status")).toHaveText("已保存");
     let stored = await (await request.get(path)).json();
-    expect(stored.legacy_body).toBe(old);
+    expect(stored).not.toHaveProperty("legacy_body");
+    expect(stored).not.toHaveProperty("body");
     expect(stored.body_document.version).toBe(1);
     expect(
       stored.body_document.blocks
@@ -93,7 +95,7 @@ test("blocks preserve old source, checklist identity, slash commands and assets 
     fullPage: true,
   });
 });
-test("empty metadata stays legacy; block copy, undo, slash keyboard and read-only mode", async ({
+test("empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode", async ({
   page,
   request,
 }) => {
@@ -111,7 +113,7 @@ test("empty metadata stays legacy; block copy, undo, slash keyboard and read-onl
   await page.goto(`/projects/${p.id}/tasks/${t.id}`);
   await page.getByLabel("阶段", { exact: true }).selectOption("in_process");
   await expect(page.getByRole("status")).toHaveText("已保存");
-  expect((await (await request.get(path)).json()).body_document).toBeNull();
+  expect((await (await request.get(path)).json()).body_document).toEqual({version: 1, blocks: []});
   const editor = page.getByRole("textbox", { name: "Markdown 正文" });
   await editor.click();
   await editor.pressSequentially("/h2");

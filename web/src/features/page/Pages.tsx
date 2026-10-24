@@ -13,9 +13,7 @@ export type Page = {
   project_id: string;
   parent_id: string | null;
   title: string;
-  body: string;
-  body_document?: BodyDocument | null;
-  legacy_body?: string | null;
+  body_document: BodyDocument;
   position: number;
   version: number;
 };
@@ -241,7 +239,7 @@ function PageEditor({
   focusTitle: boolean;
   archived: boolean;
   onSave: (
-    d: { title: string; body: string; body_document?: BodyDocument | null },
+    d: { title: string; body_document: BodyDocument },
     v: number,
   ) => Promise<void>;
   onReload: () => Promise<void>;
@@ -249,8 +247,7 @@ function PageEditor({
   const a = useAutosave(
     {
       title: page.title,
-      body: page.body,
-      body_document: page.body_document ?? undefined,
+      body_document: page.body_document ?? { version: 1, blocks: [] },
     },
     page.version,
     onSave,
@@ -294,12 +291,10 @@ function PageEditor({
       />
       <MarkdownEditor
         projectId={page.project_id}
-        value={a.draft.body}
         body_document={a.draft.body_document}
-        legacy_body={page.legacy_body}
         disabled={archived}
-        onChange={(body, body_document) =>
-          a.setDraft((d) => ({ ...d, body, body_document }))
+        onChange={(body_document) =>
+          a.setDraft((d) => ({ ...d, body_document }))
         }
       />
       <SaveIndicator busy={a.busy} dirty={a.dirty} error={a.error} />
@@ -311,7 +306,7 @@ function PageEditor({
           <button
             onClick={() =>
               navigator.clipboard
-                .writeText(a.draft.body)
+                .writeText(JSON.stringify(a.draft.body_document, null, 2))
                 .catch(() => setError("复制失败，请手动复制"))
             }
           >

@@ -19,8 +19,6 @@ type Page struct {
 	ParentID     *string         `json:"parent_id"`
 	Title        string          `json:"title"`
 	BodyDocument json.RawMessage `json:"body_document"`
-	LegacyBody   *string         `json:"legacy_body"`
-	Body         string          `json:"body"`
 	Position     int64           `json:"position"`
 	CreatedAt    int64           `json:"created_at"`
 	UpdatedAt    int64           `json:"updated_at"`
@@ -29,7 +27,6 @@ type Page struct {
 type Input struct {
 	Title        *string         `json:"title"`
 	BodyDocument json.RawMessage `json:"body_document"`
-	Body         *string         `json:"body"`
 	ParentID     *string         `json:"parent_id"`
 	Version      int64           `json:"version"`
 }
@@ -42,14 +39,14 @@ type Service struct{ db *sql.DB }
 
 func New(db *sql.DB) *Service { return &Service{db} }
 
-const columns = "id,project_id,parent_id,title,body,position,created_at,updated_at,version,body_document,legacy_body"
+const columns = "id,project_id,parent_id,title,position,created_at,updated_at,version,body_document"
 
 type scanner interface{ Scan(...any) error }
 
 func scan(row scanner) (Page, error) {
 	var t Page
 	var raw []byte
-	err := row.Scan(&t.ID, &t.ProjectID, &t.ParentID, &t.Title, &t.Body, &t.Position, &t.CreatedAt, &t.UpdatedAt, &t.Version, &raw, &t.LegacyBody)
+	err := row.Scan(&t.ID, &t.ProjectID, &t.ParentID, &t.Title, &t.Position, &t.CreatedAt, &t.UpdatedAt, &t.Version, &raw)
 	t.BodyDocument = json.RawMessage(raw)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = apperr.NotFound
@@ -91,7 +88,7 @@ func apply(t *Page, in Input) error {
 	if t.Title == "" {
 		return apperr.Invalid("页面标题不能为空")
 	}
-	if err := document.Apply(&t.Body, &t.BodyDocument, &t.LegacyBody, in.Body, in.BodyDocument); err != nil {
+	if err := document.Apply(&t.BodyDocument, in.BodyDocument); err != nil {
 		return err
 	}
 
@@ -152,7 +149,7 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Page, error
 	if err = tx.QueryRowContext(ctx, "SELECT COALESCE(MAX(position),-1)+1 FROM pages WHERE project_id=? AND parent_id IS ? AND deleted_at IS NULL", pid, t.ParentID).Scan(&t.Position); err != nil {
 		return t, err
 	}
-	_, err = tx.ExecContext(ctx, "INSERT INTO pages("+columns+") VALUES(?,?,?,?,?,?,?,?,?,?,?)", t.ID, t.ProjectID, t.ParentID, t.Title, t.Body, t.Position, t.CreatedAt, t.UpdatedAt, t.Version, t.BodyDocument, t.LegacyBody)
+	_, err = tx.ExecContext(ctx, "INSERT INTO pages("+columns+") VALUES(?,?,?,?,?,?,?,?,?)", t.ID, t.ProjectID, t.ParentID, t.Title, t.Position, t.CreatedAt, t.UpdatedAt, t.Version, t.BodyDocument)
 	if err != nil {
 		return t, err
 	}
@@ -185,7 +182,7 @@ func (s *Service) Update(ctx context.Context, tid string, in Input) (Page, error
 		return t, err
 	}
 	t.UpdatedAt = clock.Now()
-	res, err := tx.ExecContext(ctx, "UPDATE pages SET title=?,body=?,body_document=?,legacy_body=?,updated_at=?,version=version+1 WHERE id=? AND version=?", t.Title, t.Body, t.BodyDocument, t.LegacyBody, t.UpdatedAt, t.ID, in.Version)
+	res, err := tx.ExecContext(ctx, "UPDATE pages SET title=?,body_document=?,updated_at=?,version=version+1 WHERE id=? AND version=?", t.Title, t.BodyDocument, t.UpdatedAt, t.ID, in.Version)
 	if err != nil {
 		return t, err
 	}

@@ -1,3 +1,4 @@
+import { paragraphs } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
 test("project names are plain and parent selection is automatic without losing body drafts", async ({
   page,
@@ -10,7 +11,7 @@ test("project names are plain and parent selection is automatic without losing b
   const b = await post(`/projects/${p.id}/tasks`, { title: "父任务乙" });
   const child = await post(`/projects/${p.id}/tasks`, {
     title: "当前任务",
-    body: "原始正文",
+    body_document: paragraphs("原始正文"),
   });
   await page.goto(`/projects/${p.id}/tasks/${child.id}`);
   await expect(page.locator(".project-icon")).toHaveCount(0);

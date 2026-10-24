@@ -14,9 +14,7 @@ export type Task = {
   project_id: string;
   parent_id: string | null;
   title: string;
-  body: string;
-  body_document?: BodyDocument | null;
-  legacy_body?: string | null;
+  body_document: BodyDocument;
   stage: string;
   priority: string;
   due_date: string | null;

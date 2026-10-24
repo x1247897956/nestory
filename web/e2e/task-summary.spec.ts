@@ -1,7 +1,8 @@
+import { paragraphs } from "./block-fixtures";
 import { test, expect } from '@playwright/test';
 test('top-right create action and dedicated summaries for every task', async ({ page, request }) => {
   const project = await (await request.post('/api/v1/projects', {data:{title:'任务汇总 '+Date.now()}})).json();
-  const parent = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'准备方案',body:'汇总页中的任务正文',stage:'done'}})).json();
+  const parent = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'准备方案',body_document:paragraphs('汇总页中的任务正文'),stage:'done'}})).json();
   const child = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'整理素材',parent_id:parent.id}})).json();
   await page.goto(`/projects/${project.id}/tasks`);
   const add = page.getByRole('button',{name:'添加任务',exact:true});

@@ -1,3 +1,4 @@
+import type { BodyDocument } from "./document";
 import { renderObjectEditor as render } from "../test/renderObjectEditor";
 import { act, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
@@ -7,7 +8,7 @@ const task: Task = {
   id: "t",
   project_id: "p",
   title: "读论文",
-  body: "old",
+  body_document: { version: 1, blocks: [] },
   stage: "todo",
   priority: "none",
   due_date: null,
@@ -36,6 +37,17 @@ describe("Task editor", () => {
     );
     expect(screen.getByLabelText("Markdown 正文")).toHaveValue("my draft");
     expect(screen.getByRole("status")).toHaveTextContent("保存失败");
+    const submitted = save.mock.calls[0][0];
+    expect(submitted.body_document).toEqual({
+      version: 1,
+      blocks: [{ type: "paragraph", content: [{ type: "text", text: "my draft", styles: {} }] }],
+    });
+    expect(submitted).not.toHaveProperty("body");
+    expect(submitted).not.toHaveProperty("legacy_body");
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    fireEvent.click(screen.getByRole("button", { name: "复制草稿" }));
+    expect(JSON.parse(writeText.mock.calls[0][0])).toEqual(submitted.body_document);
   });
   it("makes archived tasks read only", () => {
     render(
@@ -69,19 +81,19 @@ it("keeps a conflict draft when explicit reload fails", async () => {
 
 vi.mock("../components/markdown/MarkdownEditor", () => ({
   MarkdownEditor: ({
-    value,
+    body_document,
     onChange,
     disabled,
   }: {
-    value: string;
-    onChange: (v: string) => void;
+    body_document: BodyDocument;
+    onChange: (v: BodyDocument) => void;
     disabled: boolean;
   }) => (
     <textarea
       aria-label="Markdown 正文"
-      value={value}
+      value={(body_document.blocks[0]?.content as { text: string }[] | undefined)?.[0]?.text ?? ""}
       disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange({ version: 1, blocks: [{ type: "paragraph", content: [{ type: "text", text: e.target.value, styles: {} }] }] } as BodyDocument)}
     />
   ),
 }));
@@ -106,7 +118,7 @@ it("guards navigation while a save is in flight after reverting to baseline", as
   });
   await waitFor(() => expect(save).toHaveBeenCalled(), { timeout: 2000 });
   fireEvent.change(screen.getByLabelText("Markdown 正文"), {
-    target: { value: task.body },
+    target: { value: "" },
   });
   expect(container.querySelector('[aria-label="任务详情"]')).toHaveAttribute(
     "data-dirty",

@@ -89,3 +89,34 @@ NOTEAPP_TEST_IMAGE=noteapp:local python3 -m unittest scripts.tests.test_backup_r
 ```
 
 运行完整浏览器旅程：先对独立测试实例执行 `E2E_BASE_URL=http://127.0.0.1:18084 npm run e2e --prefix web`。新旅程记录 `/tmp/noteapp-acceptance-v1.json` 对象与附件SHA。对此实例备份、同卷重建、恢复到空卷后，可对目标实例执行 `NOTEAPP_VERIFY_RESTORED=1 E2E_BASE_URL=http://127.0.0.1:18085 npm run e2e --prefix web -- acceptance-v1.spec.ts`。可通过 `NOTEAPP_ACCEPTANCE_FIXTURE` 显式选择fixture路径。标准Playwright使用各测试自己的全新浏览器context；macOS现有Brave可配置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`。
+
+## 块唯一正文升级（schema7）
+
+schema7从任务/笔记/日程中删除`body`和`legacy_body`，只保留非null的`body_document`。旧版客户端必须刷新；发送旧字段将返回400。旧镜像不能用于已升级卷，回退必须另建空卷并恢复schema6备份。首次新安装无需额外准备；已有非空旧Markdown的库会拒绝直接升级，避免静默丢正文。
+
+准备工具需要仓库锁定的Node26.9.0及`web/node_modules`（`npm ci --prefix web`）。它使用和编辑器相同的BlockNote0.56.0解析器，输出带原文SHA256的准备表，不改变旧字段或schema版本；细节见[准备工具](implementation/2026-10-25-block-migration-tool.md)。正式容器仍只有Go程序，不需要Node运行时。
+
+维护步骤：
+
+1. 保留旧镜像的不可变tag，构建新镜像。先用完整备份在**全新隔离卷**演练以下流程。
+2. 停止所有会写目标卷的应用，运行备份脚本（原容器已停止时脚本会保持停止）。保留原备份不变。在本机临时目录解出备份；不能只复制仍有写入的SQLite主文件。若备份包含WAL/SHM，先用SQLite backup生成一致副本，并重新核对清单，勿丢弃未checkpoint数据。
+3. 对一致、停止使用的副本运行`node scripts/prepare-block-migration.mjs --database /absolute/work/noteapp.db --offline`。重复运行应输出`reused`，不重建块ID。
+4. 验证目标卷没有其他运行中的写者，将准备后的数据库副本写回停机卷（UID/GID10001）。本次源库正常关闭后无WAL/SHM，安装前再次检查无这两个文件；遇到残留文件不要套用下面的主文件替换命令。
+5. 用新镜像启动，schema7在单一事务中校验全部对象与准备摘要、迁移和删除旧列，失败则回滚。检查日志和smoke；核对所有文档（含归档/回收站）、元数据、关系、附件SHA及SQLite完整性。无效JSON、源摘要变化或缺少准备结果必须定位，不能跳过校验。
+6. 新版备份再次恢复到第二个空卷验证，确认后应用同样流程到正式卷。保留升级前备份和旧镜像。
+
+本机本次维护命令示例（变量/路径应按实际环境替换；备份输出目录必须尚不存在）：
+
+```sh
+docker stop noteapp-v1-check-noteapp-1
+scripts/backup.sh --container noteapp-v1-check-noteapp-1 --volume noteapp-v1-check --image noteapp:slash-menu-20261024 --app-version slash-menu-20261024 --output backups/before-schema7
+mkdir -p /tmp/noteapp-schema7-work
+tar -xzf backups/before-schema7/data.tar.gz -C /tmp/noteapp-schema7-work
+node scripts/prepare-block-migration.mjs --database /tmp/noteapp-schema7-work/noteapp.db --offline
+# 仅在停机、无WAL/SHM且已验证源备份的前提下替换主文件。
+docker run --rm -i --network none --user 0:0 --entrypoint /bin/sh -v noteapp-v1-check:/data noteapp:slash-menu-20261024 -ec 'test ! -e /data/noteapp.db-wal; test ! -e /data/noteapp.db-shm; cat > /data/noteapp.db.prepared; chown 10001:10001 /data/noteapp.db.prepared; mv /data/noteapp.db.prepared /data/noteapp.db' < /tmp/noteapp-schema7-work/noteapp.db
+COMPOSE_PROJECT_NAME=noteapp-v1-check APP_VOLUME_NAME=noteapp-v1-check APP_PORT=18084 APP_IMAGE=noteapp:block-only-20261025 docker compose up -d --no-build --force-recreate
+python3 scripts/operations.py smoke --url http://127.0.0.1:18084
+```
+
+一次性迁移对旧Markdown的格式解释遵循BlockNote导入语义，升级前备份保留原始字节。已有块JSON不经过Markdown转换，原样保留。全文搜索现在直接读取块JSON的text与附件name，没有持久化Markdown副本或新增全文索引，适用于当前个人数据规模。

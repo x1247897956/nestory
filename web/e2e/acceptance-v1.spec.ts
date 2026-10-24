@@ -1,3 +1,4 @@
+import { assetIDs } from "./block-fixtures";
 import {importMarkdown} from "./editor-helpers";
 import { test, expect } from "@playwright/test";
 import { DateTime } from "luxon";
@@ -54,8 +55,8 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       });
     await expect
       .poll(async () => {
-        const value = (await (await request.get("/api/v1/pages/"+pgid)).json()).body;
-        return (value?.match(/\/api\/v1\/assets\//g) ?? []).length;
+        const value = (await (await request.get("/api/v1/pages/"+pgid)).json()).body_document;
+        return assetIDs(value).length;
       })
       .toBe(2);
     await expect(page.getByRole("status")).toHaveText("已保存");
@@ -84,7 +85,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     const tid = page.url().split("/").pop()!;
     const today = DateTime.now().setZone("Asia/Shanghai").toISODate()!;
     await page.getByLabel("截止日期", { exact: true }).fill(today);
-    await page.getByLabel("Markdown 正文").fill("- [ ] 独立检查项");
+    await importMarkdown(page, "- [ ] 独立检查项");
     await expect(page.getByRole("status")).toHaveText("已保存");
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     await page.getByLabel("关联目标").selectOption({ label: "完整笔记" });
@@ -124,7 +125,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       page.locator('a[href="/projects/' + pid + '/tasks/' + tid + '"]'),
     ).toBeVisible();
     await expect(
-      page.locator('a[href="/projects/' + pid + '/events/' + eid + '"]'),
+      page.locator('.fc-daygrid-day[data-date="' + today + '"] a[href="/projects/' + pid + '/events/' + eid + '"]'),
     ).toBeVisible();
     await page.goto("/projects/" + pid + "/pages/" + pgid);
     await page.getByRole("button", { name: "归档项目", exact: true }).click();
@@ -147,13 +148,10 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(
       page.getByRole("link", { name: "读摘要 · Todo", exact: true }),
     ).toBeVisible();
-    const body = (await (await request.get("/api/v1/pages/" + pgid)).json())
-      .body;
-    const assetIDs = [...body.matchAll(/\/api\/v1\/assets\/([a-f0-9]+)/g)].map(
-      (m: any) => m[1],
-    );
+    const document = (await (await request.get("/api/v1/pages/" + pgid)).json()).body_document;
+    const attachmentIDs = assetIDs(document);
     const assets = [];
-    for (const id of assetIDs) {
+    for (const id of attachmentIDs) {
       const res = await request.get("/api/v1/assets/" + id);
       expect(res.status()).toBe(200);
       assets.push({

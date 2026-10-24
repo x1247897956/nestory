@@ -21,8 +21,6 @@ type Task struct {
 	ParentID     *string         `json:"parent_id"`
 	Title        string          `json:"title"`
 	BodyDocument json.RawMessage `json:"body_document"`
-	LegacyBody   *string         `json:"legacy_body"`
-	Body         string          `json:"body"`
 	Stage        string          `json:"stage"`
 	Priority     string          `json:"priority"`
 	DueDate      *string         `json:"due_date"`
@@ -34,7 +32,6 @@ type Task struct {
 type Input struct {
 	Title        *string         `json:"title"`
 	BodyDocument json.RawMessage `json:"body_document"`
-	Body         *string         `json:"body"`
 	Stage        *string         `json:"stage"`
 	Priority     *string         `json:"priority"`
 	DueDate      *string         `json:"due_date"`
@@ -50,14 +47,14 @@ type Service struct{ db *sql.DB }
 
 func New(db *sql.DB) *Service { return &Service{db} }
 
-const columns = "id,project_id,parent_id,title,body,stage,priority,due_date,position,created_at,updated_at,version,body_document,legacy_body"
+const columns = "id,project_id,parent_id,title,stage,priority,due_date,position,created_at,updated_at,version,body_document"
 
 type scanner interface{ Scan(...any) error }
 
 func scan(row scanner) (Task, error) {
 	var t Task
 	var raw []byte
-	err := row.Scan(&t.ID, &t.ProjectID, &t.ParentID, &t.Title, &t.Body, &t.Stage, &t.Priority, &t.DueDate, &t.Position, &t.CreatedAt, &t.UpdatedAt, &t.Version, &raw, &t.LegacyBody)
+	err := row.Scan(&t.ID, &t.ProjectID, &t.ParentID, &t.Title, &t.Stage, &t.Priority, &t.DueDate, &t.Position, &t.CreatedAt, &t.UpdatedAt, &t.Version, &raw)
 	t.BodyDocument = json.RawMessage(raw)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = apperr.NotFound
@@ -99,7 +96,7 @@ func apply(t *Task, in Input) error {
 	if t.Title == "" {
 		return apperr.Invalid("任务标题不能为空")
 	}
-	if err := document.Apply(&t.Body, &t.BodyDocument, &t.LegacyBody, in.Body, in.BodyDocument); err != nil {
+	if err := document.Apply(&t.BodyDocument, in.BodyDocument); err != nil {
 		return err
 	}
 	if in.Stage != nil {
@@ -173,7 +170,7 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Task, error
 	if err = tx.QueryRowContext(ctx, "SELECT COALESCE(MAX(position),-1)+1 FROM tasks WHERE project_id=? AND parent_id IS ? AND deleted_at IS NULL", pid, t.ParentID).Scan(&t.Position); err != nil {
 		return t, err
 	}
-	_, err = tx.ExecContext(ctx, "INSERT INTO tasks("+columns+") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", t.ID, t.ProjectID, t.ParentID, t.Title, t.Body, t.Stage, t.Priority, t.DueDate, t.Position, t.CreatedAt, t.UpdatedAt, t.Version, t.BodyDocument, t.LegacyBody)
+	_, err = tx.ExecContext(ctx, "INSERT INTO tasks("+columns+") VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", t.ID, t.ProjectID, t.ParentID, t.Title, t.Stage, t.Priority, t.DueDate, t.Position, t.CreatedAt, t.UpdatedAt, t.Version, t.BodyDocument)
 	if err != nil {
 		return t, err
 	}
@@ -206,7 +203,7 @@ func (s *Service) Update(ctx context.Context, tid string, in Input) (Task, error
 		return t, err
 	}
 	t.UpdatedAt = clock.Now()
-	res, err := tx.ExecContext(ctx, "UPDATE tasks SET title=?,body=?,body_document=?,legacy_body=?,stage=?,priority=?,due_date=?,updated_at=?,version=version+1 WHERE id=? AND version=?", t.Title, t.Body, t.BodyDocument, t.LegacyBody, t.Stage, t.Priority, t.DueDate, t.UpdatedAt, t.ID, in.Version)
+	res, err := tx.ExecContext(ctx, "UPDATE tasks SET title=?,body_document=?,stage=?,priority=?,due_date=?,updated_at=?,version=version+1 WHERE id=? AND version=?", t.Title, t.BodyDocument, t.Stage, t.Priority, t.DueDate, t.UpdatedAt, t.ID, in.Version)
 	if err != nil {
 		return t, err
 	}
