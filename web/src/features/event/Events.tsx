@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -33,6 +33,7 @@ export function Events({
   archived: boolean;
 }) {
   const nav = useNavigate();
+  const [params] = useSearchParams();
   const qc = useQueryClient();
   const [range, setRange] = useState<{ from: string; to: string }>();
   const [selection, setSelection] = useState<{ start: string; end: string }>();
@@ -54,6 +55,12 @@ export function Events({
     queryFn: () => api<{ timezone: string }>("/config"),
   });
   const zone = config.data?.timezone;
+  useEffect(() => {
+    if (zone && params.get("create") === "1" && !archived && !eventId) {
+      const start = DateTime.now().setZone(zone).startOf("hour").plus({ hours: 1 });
+      setSelection({ start: toInput(start.toISO()!, zone), end: toInput(start.plus({ hours: 1 }).toISO()!, zone) });
+    }
+  }, [zone, params, archived, eventId]);
   const events = useQuery({
     queryKey: ["events", projectId, range],
     queryFn: () =>
@@ -180,7 +187,8 @@ export function Events({
           >
             <h3>新建日程</h3>
             <input
-              aria-label="新日程标题"
+              autoFocus
+                aria-label="新日程标题"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}

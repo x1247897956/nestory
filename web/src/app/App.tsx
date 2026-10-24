@@ -242,10 +242,14 @@ export function App() {
       </aside>
       <main>
         <div className="topbar">
-          <span>
-            工作空间 <span className="slash">/</span>{" "}
-            {projectId ? <><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link><span className="slash">/</span><span>{overview ? "概览" : notes ? "笔记" : calendar ? "日程" : "任务"}</span></> : path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}
-          </span>
+          <nav className="breadcrumbs" aria-label="面包屑">
+            <Link to="/">工作空间</Link><span className="slash" aria-hidden="true">/</span>
+            {projectId ? <>
+              <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link><span className="slash" aria-hidden="true">/</span>
+              <Link to={overview ? `/projects/${projectId}` : `/projects/${projectId}/${notes ? "pages" : calendar ? "events" : "tasks"}`} aria-current={!taskId && !pageId && !eventId ? "page" : undefined}>{overview ? "概览" : notes ? "笔记" : calendar ? "日程" : "任务"}</Link>
+              {(taskId || pageId || eventId) && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{taskId ? detail.data?.title ?? "任务详情" : pageId ? "笔记详情" : "日程详情"}</span></>}
+            </> : <span aria-current="page">{path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
+          </nav>
           <span className="private-tag">本地 · 私有</span>
         </div>
         {!projectId ? (
@@ -316,7 +320,7 @@ export function App() {
               </p>
             )}
             {overview ? (
-              <ProjectOverview projectId={projectId} tasks={all} loadingTasks={tasks.isPending} tasksError={tasks.isError} retryTasks={() => void tasks.refetch()} archived={readOnly} />
+              <ProjectOverview projectId={projectId} tasks={all} loadingTasks={tasks.isPending} tasksError={tasks.isError} retryTasks={() => void tasks.refetch()} archived={readOnly} onCreateTask={() => openCreate()} />
             ) : calendar ? (
               <Events
                 projectId={projectId}

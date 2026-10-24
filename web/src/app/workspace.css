@@ -225,3 +225,11 @@ label,.filters label { color:#6b7079; }
 .editor .task-property input:focus-visible,.editor .task-property select:focus-visible { outline:2px solid #243b63; outline-offset:3px; }
 .parent-property a { color:#243b63; text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
 @media(max-width:650px) { .editor .task-inline-title { font-size:22px; } .task-properties { gap:6px; } .editor .task-properties .task-property { padding:4px; } }
+.breadcrumbs { display:flex; gap:10px; align-items:center; min-width:0; font-size:12px; overflow:hidden; white-space:nowrap; }
+.breadcrumbs a { color:#626874; }
+.breadcrumbs a:hover { color:#243b63; text-decoration:underline; text-underline-offset:3px; }
+.breadcrumbs > span:last-child { overflow:hidden; text-overflow:ellipsis; }
+.overview-section-actions { display:flex; align-items:center; gap:16px; }
+.overview-section-actions button,.overview-create { color:#243b63; background:#f5f7fb; border:1px solid #e2e7ef; border-radius:4px; padding:5px 9px; font-size:11px; white-space:nowrap; }
+.overview-section-actions button:hover,.overview-create:hover { background:#eaf0f8; }
+@media(max-width:650px) { .overview-section-actions { gap:8px; } .overview-section-actions .section-open { font-size:10px; } .breadcrumbs { gap:5px; } }

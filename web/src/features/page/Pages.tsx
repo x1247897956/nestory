@@ -1,7 +1,7 @@
 import { Relations } from "../relation/Relations";
 import { flushSync } from "react-dom";
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../app/api";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
@@ -24,6 +24,9 @@ export function Pages({
   pageId?: string;
   archived: boolean;
 }) {
+  const [params] = useSearchParams();
+  const titleInput = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (params.get("create") === "1" && !archived) titleInput.current?.focus(); }, [params, archived]);
   const qc = useQueryClient();
   const nav = useNavigate();
   const [title, setTitle] = useState("");
@@ -114,6 +117,7 @@ export function Pages({
           >
             <input
               disabled={creating}
+              ref={titleInput}
               aria-label="新笔记标题"
               required
               value={title}
