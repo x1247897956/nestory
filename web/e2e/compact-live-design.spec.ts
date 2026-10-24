@@ -8,7 +8,7 @@ test('project row settings persist and deletion restores the project',async({pag
  await page.getByLabel('项目名称').fill('菜单已改名 '+p.id);
  await page.getByRole('button',{name:'保存项目',exact:true}).click();
  const settings=page.getByRole('button',{name:`项目设置 菜单已改名 ${p.id}`,exact:true});
- await settings.click();await menu.getByRole('button',{name:'置顶（Pin）',exact:true}).click();
+ await settings.click();await menu.getByRole('button',{name:'置顶',exact:true}).click();
  await expect.poll(async()=> (await(await request.get('/api/v1/projects/'+p.id)).json()).pinned).toBe(true);
  await page.reload();await settings.click();await expect(menu.getByRole('button',{name:'取消置顶',exact:true})).toBeVisible();
  await menu.getByRole('button',{name:'归档',exact:true}).click();

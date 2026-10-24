@@ -44,7 +44,7 @@ export function ProjectMenu({ project, onRename }: {
     <div ref={panel} id={`project-menu-${project.id}`} popover="auto" className="project-row-menu" aria-label={`${project.title}设置`}>
       <button disabled={busy || !!project.archived_at} onClick={() => { panel.current?.hidePopover(); onRename(); }}>重命名</button>
       <button disabled={busy} onClick={() => void change({ archived: !project.archived_at })}>{project.archived_at ? "取消归档" : "归档"}</button>
-      <button disabled={busy || !!project.archived_at} onClick={() => void change({ pinned: !project.pinned })}>{project.pinned ? "取消置顶" : "置顶（Pin）"}</button>
+      <button disabled={busy || !!project.archived_at} onClick={() => void change({ pinned: !project.pinned })}>{project.pinned ? "取消置顶" : "置顶"}</button>
       <DeleteButton type="projects" id={project.id} projectId={project.id} label="删除" disabled={!!project.archived_at}/>
       {error && <p role="alert">{error}</p>}
     </div>
