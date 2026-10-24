@@ -44,3 +44,7 @@ apperr包含invalid、not_found、conflict和too_large类别。HTTP适配层统�
 ## 当前边界
 
 单实例、单数据库连接的部署模型保持不变。尚未增加数据库抽象、多实例写入支持、通用属性写接口或自定义字段。
+
+## 块正文
+
+`internal/document` 定义三类对象共享的块文档写入规则：格式版本、块类型/ID唯一性、inline/table最小可读结构及规模限制。各类型服务在自己的事务中调用它，同时保存 `body_document`、当前 Markdown 投影 `body` 和首次转换前的 `legacy_body`。JSON 为权威正文；前端统一生成 Markdown 投影，后端不独立进行格式转换。旧客户端不能以单独变化的 body 覆盖块文档。属性编辑、归档、回收站和版本锁沿用原有边界，块不是新的业务对象，也不引入通用属性存储或协作服务。

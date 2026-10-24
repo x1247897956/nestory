@@ -1,3 +1,4 @@
+import {importMarkdown} from "./editor-helpers";
 import { test, expect } from "@playwright/test";
 import { DateTime } from "luxon";
 import { writeFileSync, readFileSync } from "node:fs";
@@ -32,9 +33,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       "完整笔记",
     );
     const pgid = page.url().split("/").pop()!;
-    await page
-      .getByLabel("Markdown 正文")
-      .fill('# 真实验收\n\n- [ ] 阅读\n\n```go\nfmt.Println("hello")\n```');
+    await importMarkdown(page,'# 真实验收\n\n- [ ] 阅读\n\n```go\nfmt.Println("hello")\n```');
     await expect(page.getByRole("status")).toHaveText("已保存");
     await page
       .getByLabel("上传附件")
@@ -43,10 +42,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
         mimeType: "image/png",
         buffer: png,
       });
-    await page.getByRole("button", {name:"源码",exact:true}).click();
-    await expect(page.getByLabel("Markdown 正文")).toContainText(
-      "/api/v1/assets/",
-    );
+    await expect(page.locator(".bn-editor img")).toBeVisible();
     await expect(page.getByRole("status")).toHaveText("已保存");
     await page
       .getByLabel("上传附件")
@@ -57,14 +53,13 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       });
     await expect
       .poll(async () => {
-        const value = await page.getByLabel("Markdown 正文").textContent();
+        const value = (await (await request.get("/api/v1/pages/"+pgid)).json()).body;
         return (value?.match(/\/api\/v1\/assets\//g) ?? []).length;
       })
       .toBe(2);
     await expect(page.getByRole("status")).toHaveText("已保存");
-    await page.getByRole("button", { name: "预览", exact: true }).click();
-    await expect(page.locator(".markdown-preview img")).toBeVisible();
-    await expect(page.locator(".markdown-preview pre code")).toContainText(
+    await expect(page.locator(".block-editor img")).toBeVisible();
+    await expect(page.locator(".block-editor pre code")).toContainText(
       "fmt.Println",
     );
     await page.getByRole("link", { name: "汇总", exact: true }).click();
@@ -223,11 +218,9 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       ).toBe(a.sha256);
     }
     await page.goto("/projects/" + f.project_id + "/pages/" + f.page_id);
-    await page.getByRole("button", {name:"源码",exact:true}).click();
-    await expect(page.getByLabel("Markdown 正文")).toContainText("# 真实验收");
-    await page.getByRole("button", { name: "预览", exact: true }).click();
-    await expect(page.locator(".markdown-preview img")).toBeVisible();
-    await expect(page.locator(".markdown-preview pre code")).toContainText(
+    await expect(page.getByLabel("Markdown 正文")).toContainText("真实验收");
+    await expect(page.locator(".block-editor img")).toBeVisible();
+    await expect(page.locator(".block-editor pre code")).toContainText(
       "fmt.Println",
     );
     await page.screenshot({

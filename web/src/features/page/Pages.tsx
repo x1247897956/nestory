@@ -1,3 +1,4 @@
+import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { flushSync } from "react-dom";
 import { useState, useEffect, useRef } from "react";
@@ -12,6 +13,8 @@ export type Page = {
   parent_id: string | null;
   title: string;
   body: string;
+  body_document?: BodyDocument | null;
+  legacy_body?: string | null;
   position: number;
   version: number;
 };
@@ -187,11 +190,11 @@ function PageEditor({
 }: {
   page: Page;
   archived: boolean;
-  onSave: (d: { title: string; body: string }, v: number) => Promise<void>;
+  onSave: (d: { title: string; body: string; body_document?: BodyDocument | null }, v: number) => Promise<void>;
   onReload: () => Promise<void>;
 }) {
   const a = useAutosave(
-    { title: page.title, body: page.body },
+    { title: page.title, body: page.body, body_document: page.body_document ?? undefined },
     page.version,
     onSave,
     archived,
@@ -210,8 +213,10 @@ function PageEditor({
       <MarkdownEditor
         projectId={page.project_id}
         value={a.draft.body}
+        body_document={a.draft.body_document}
+        legacy_body={page.legacy_body}
         disabled={archived}
-        onChange={(body) => a.setDraft((d) => ({ ...d, body }))}
+        onChange={(body, body_document) => a.setDraft((d) => ({ ...d, body, body_document }))}
       />
       <div className="save-bar">
         <span role="status">

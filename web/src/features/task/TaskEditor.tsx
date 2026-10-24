@@ -1,3 +1,4 @@
+import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { stages, priorities } from "../../app/api";
 export type TaskDraft = {
   title: string;
   body: string;
+  body_document?: BodyDocument | null;
   stage: string;
   priority: string;
   due_date: string;
@@ -15,6 +17,7 @@ export type TaskDraft = {
 const fromTask = (t: Task): TaskDraft => ({
   title: t.title,
   body: t.body,
+  body_document: t.body_document ?? undefined,
   stage: t.stage,
   priority: t.priority,
   due_date: t.due_date ?? "",
@@ -42,7 +45,7 @@ export function TaskEditor({
   } = useAutosave(fromTask(task), task.version, onSave, archived);
   const [error, setError] = useState("");
   const saved = !dirty;
-  const change = (key: keyof TaskDraft, value: string) =>
+  const change = (key: Exclude<keyof TaskDraft, "body_document">, value: string) =>
     setDraft((d) => ({ ...d, [key]: value }));
   return (
     <section className="editor" data-dirty={dirty || busy} aria-label="任务详情">
@@ -58,7 +61,9 @@ export function TaskEditor({
       <div className="body-label">
         <MarkdownEditor
           value={draft.body}
-          onChange={(v) => change("body", v)}
+          body_document={draft.body_document}
+          legacy_body={task.legacy_body}
+          onChange={(body, body_document) => setDraft(d => ({...d, body, body_document}))}
           disabled={archived}
           projectId={task.project_id}
         />

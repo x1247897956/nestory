@@ -1,3 +1,4 @@
+import type { BodyDocument } from "../../app/document";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,11 +19,13 @@ export type CalendarEvent = {
   project_id: string;
   title: string;
   body: string;
+  body_document?: BodyDocument | null;
+  legacy_body?: string | null;
   start_at: string;
   end_at: string;
   version: number;
 };
-type Draft = { title: string; body: string; start_at: string; end_at: string };
+type Draft = { title: string; body: string; body_document?: BodyDocument | null; start_at: string; end_at: string };
 export function Events({
   projectId,
   eventId,
@@ -285,6 +288,7 @@ export function EventEditor({
     {
       title: event.title,
       body: event.body,
+      body_document: event.body_document ?? undefined,
       start_at: toInput(event.start_at, zone),
       end_at: toInput(event.end_at, zone),
     },
@@ -335,8 +339,10 @@ export function EventEditor({
       <MarkdownEditor
         projectId={event.project_id}
         value={a.draft.body}
+        body_document={a.draft.body_document}
+        legacy_body={event.legacy_body}
         disabled={archived}
-        onChange={(body) => a.setDraft((d) => ({ ...d, body }))}
+        onChange={(body, body_document) => a.setDraft((d) => ({ ...d, body, body_document }))}
       />
       <div className="save-bar">
         <span role="status">

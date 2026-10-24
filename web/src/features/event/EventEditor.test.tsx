@@ -33,20 +33,20 @@ it("edits in deployment time and preserves Markdown on conflict", async () => {
   expect(save.mock.calls[0][0].start_at).toBe("2026-10-24T01:00:30Z");
 });
 
-vi.mock("@uiw/react-codemirror", () => ({
-  default: ({
+vi.mock("../../components/markdown/MarkdownEditor", () => ({
+  MarkdownEditor: ({
     value,
     onChange,
-    editable,
+    disabled,
   }: {
     value: string;
     onChange: (v: string) => void;
-    editable: boolean;
+    disabled: boolean;
   }) => (
     <textarea
       aria-label="Markdown 正文"
       value={value}
-      disabled={!editable}
+      disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
     />
   ),

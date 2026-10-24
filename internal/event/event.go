@@ -3,8 +3,10 @@ package event
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"noteapp/internal/apperr"
+	"noteapp/internal/document"
 	"noteapp/internal/platform/clock"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
@@ -13,35 +15,40 @@ import (
 )
 
 type Event struct {
-	ID        string `json:"id"`
-	ProjectID string `json:"project_id"`
-	Title     string `json:"title"`
-	Body      string `json:"body"`
-	StartAt   string `json:"start_at"`
-	EndAt     string `json:"end_at"`
-	CreatedAt int64  `json:"created_at"`
-	UpdatedAt int64  `json:"updated_at"`
-	Version   int64  `json:"version"`
+	ID           string          `json:"id"`
+	ProjectID    string          `json:"project_id"`
+	Title        string          `json:"title"`
+	BodyDocument json.RawMessage `json:"body_document"`
+	LegacyBody   *string         `json:"legacy_body"`
+	Body         string          `json:"body"`
+	StartAt      string          `json:"start_at"`
+	EndAt        string          `json:"end_at"`
+	CreatedAt    int64           `json:"created_at"`
+	UpdatedAt    int64           `json:"updated_at"`
+	Version      int64           `json:"version"`
 }
 type Input struct {
-	Title   *string `json:"title"`
-	Body    *string `json:"body"`
-	StartAt *string `json:"start_at"`
-	EndAt   *string `json:"end_at"`
-	Version int64   `json:"version"`
+	Title        *string         `json:"title"`
+	BodyDocument json.RawMessage `json:"body_document"`
+	Body         *string         `json:"body"`
+	StartAt      *string         `json:"start_at"`
+	EndAt        *string         `json:"end_at"`
+	Version      int64           `json:"version"`
 }
 type Service struct{ db *sql.DB }
 
 func New(db *sql.DB) *Service { return &Service{db} }
 
-const columns = "id,project_id,title,body,start_at,end_at,created_at,updated_at,version"
+const columns = "id,project_id,title,body,start_at,end_at,created_at,updated_at,version,body_document,legacy_body"
 
 type scanner interface{ Scan(...any) error }
 
 func scan(r scanner) (Event, error) {
 	var v Event
+	var raw []byte
 	var a, b int64
-	e := r.Scan(&v.ID, &v.ProjectID, &v.Title, &v.Body, &a, &b, &v.CreatedAt, &v.UpdatedAt, &v.Version)
+	e := r.Scan(&v.ID, &v.ProjectID, &v.Title, &v.Body, &a, &b, &v.CreatedAt, &v.UpdatedAt, &v.Version, &raw, &v.LegacyBody)
+	v.BodyDocument = json.RawMessage(raw)
 	if errors.Is(e, sql.ErrNoRows) {
 		e = apperr.NotFound
 	}
@@ -105,8 +112,8 @@ func apply(v *Event, in Input) (int64, int64, error) {
 	if v.Title == "" {
 		return 0, 0, apperr.Invalid("日程标题不能为空")
 	}
-	if in.Body != nil {
-		v.Body = *in.Body
+	if err := document.Apply(&v.Body, &v.BodyDocument, &v.LegacyBody, in.Body, in.BodyDocument); err != nil {
+		return 0, 0, err
 	}
 	if in.StartAt != nil {
 		v.StartAt = *in.StartAt
@@ -134,7 +141,7 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Event, erro
 	if e = project.Writable(ctx, tx, pid); e != nil {
 		return v, e
 	}
-	_, e = tx.ExecContext(ctx, "INSERT INTO events("+columns+") VALUES(?,?,?,?,?,?,?,?,?)", v.ID, pid, v.Title, v.Body, a, b, v.CreatedAt, v.UpdatedAt, v.Version)
+	_, e = tx.ExecContext(ctx, "INSERT INTO events("+columns+") VALUES(?,?,?,?,?,?,?,?,?,?,?)", v.ID, pid, v.Title, v.Body, a, b, v.CreatedAt, v.UpdatedAt, v.Version, v.BodyDocument, v.LegacyBody)
 	if e != nil {
 		return v, e
 	}
@@ -167,7 +174,7 @@ func (s *Service) Update(ctx context.Context, key string, in Input) (Event, erro
 		return v, e
 	}
 	v.UpdatedAt = clock.Now()
-	res, e := tx.ExecContext(ctx, "UPDATE events SET title=?,body=?,start_at=?,end_at=?,updated_at=?,version=version+1 WHERE id=? AND version=?", v.Title, v.Body, a, b, v.UpdatedAt, key, in.Version)
+	res, e := tx.ExecContext(ctx, "UPDATE events SET title=?,body=?,body_document=?,legacy_body=?,start_at=?,end_at=?,updated_at=?,version=version+1 WHERE id=? AND version=?", v.Title, v.Body, v.BodyDocument, v.LegacyBody, a, b, v.UpdatedAt, key, in.Version)
 	if e != nil {
 		return v, e
 	}

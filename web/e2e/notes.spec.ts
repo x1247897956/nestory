@@ -1,3 +1,4 @@
+import {importMarkdown} from "./editor-helpers";
 import { test, expect } from "@playwright/test";
 test("page tree, source-position tasks, autosave failures and persistent safe assets", async ({
   page,
@@ -43,16 +44,13 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
     ).status(),
   ).toBe(409);
   const source = "中文笔记\n\n- [ ] 同名\n- [ ] 同名\n\n```js\n- [ ] 代码\n```";
-  await page.getByLabel("Markdown 正文").fill(source);
-  await page.getByRole("button", { name: "分屏", exact: true }).click();
+  await importMarkdown(page,source);
   await expect(page.getByRole("checkbox")).toHaveCount(2);
   await page.getByRole("checkbox").nth(1).check();
-  await page.getByRole("button", {name:"源码",exact:true}).click();
-  await expect(page.getByLabel("Markdown 正文")).toContainText("- [x] 同名");
+  await expect(page.locator(".bn-editor").getByRole("checkbox").nth(1)).toBeChecked();
   await expect(page.getByRole("status")).toHaveText("已保存");
   await page.reload();
-  await page.getByRole("button", {name:"源码",exact:true}).click();
-  await expect(page.getByLabel("Markdown 正文")).toContainText("- [x] 同名");
+  await expect(page.locator(".bn-editor").getByRole("checkbox").nth(1)).toBeChecked();
   await page.route("**/api/v1/pages/" + c.id, async (route) => {
     if (route.request().method() === "PATCH")
       await route.fulfill({
@@ -64,13 +62,11 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   });
   await page.getByLabel("Markdown 正文").fill("失败时全文保留");
   await expect(page.getByRole("alert")).toContainText("模拟保存失败");
-  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");
   const dialog = page.waitForEvent("dialog");
   const navigation = page.getByRole("link", {name:"汇总", exact:true}).click();
   await (await dialog).dismiss();
   await navigation;
-  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");
   await page.unroute("**/api/v1/pages/" + c.id);
   await page.getByRole("button", { name: "重试保存" }).click();
@@ -101,12 +97,8 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
         "base64",
       ),
     });
-  await page.getByRole("button", {name:"源码",exact:true}).click();
-  await expect(page.getByLabel("Markdown 正文")).toContainText(
-    "/api/v1/assets/",
-  );
+  await expect(page.locator(".bn-editor img")).toBeVisible();
   await expect(page.getByRole("status")).toHaveText("已保存");
-  await page.getByRole("button", { name: "预览", exact: true }).click();
   await expect(page.getByRole("img")).toBeVisible();
   const url = await page.getByRole("img").getAttribute("src");
   expect((await request.get(url!)).headers()["content-disposition"]).toContain(
@@ -127,7 +119,6 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   expect(dl.headers()["content-disposition"]).toContain("attachment");
   expect(dl.headers()["x-content-type-options"]).toBe("nosniff");
   await page.reload();
-  await page.getByRole("button", { name: "预览", exact: true }).click();
   await expect(page.getByRole("img")).toBeVisible();
   await expect(page.getByRole("button", { name: /删除/ })).toHaveCount(0);
   await page.screenshot({ path: "/tmp/noteapp-stage2.png", fullPage: true });

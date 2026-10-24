@@ -1,3 +1,4 @@
+import type { BodyDocument } from "./document";
 export type Project = {
   pinned?: boolean;
   id: string;
@@ -14,6 +15,8 @@ export type Task = {
   parent_id: string | null;
   title: string;
   body: string;
+  body_document?: BodyDocument | null;
+  legacy_body?: string | null;
   stage: string;
   priority: string;
   due_date: string | null;

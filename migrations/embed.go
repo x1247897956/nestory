@@ -16,3 +16,6 @@ var WorkspaceTrash string
 
 //go:embed 005_project_actions.sql
 var ProjectActions string
+
+//go:embed 006_block_documents.sql
+var BlockDocuments string

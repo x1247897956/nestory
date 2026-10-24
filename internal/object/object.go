@@ -4,6 +4,7 @@
 package object
 
 import (
+	"encoding/json"
 	"noteapp/internal/apperr"
 	"noteapp/internal/taskmeta"
 )
@@ -36,16 +37,18 @@ type Entity interface{ AsObject() Object }
 // Object is a shared read view. Version tracks the native object row; relation
 // changes use their own idempotent operations and do not increment that version.
 type Object struct {
-	ID         string         `json:"id"`
-	Type       Type           `json:"type"`
-	ProjectID  string         `json:"project_id"`
-	Title      string         `json:"title"`
-	Body       string         `json:"body"`
-	Version    int64          `json:"version"`
-	CreatedAt  int64          `json:"created_at"`
-	UpdatedAt  int64          `json:"updated_at"`
-	ReadOnly   bool           `json:"read_only"`
-	Properties map[string]any `json:"properties"`
+	BodyDocument json.RawMessage `json:"body_document"`
+	LegacyBody   *string         `json:"legacy_body"`
+	ID           string          `json:"id"`
+	Type         Type            `json:"type"`
+	ProjectID    string          `json:"project_id"`
+	Title        string          `json:"title"`
+	Body         string          `json:"body"`
+	Version      int64           `json:"version"`
+	CreatedAt    int64           `json:"created_at"`
+	UpdatedAt    int64           `json:"updated_at"`
+	ReadOnly     bool            `json:"read_only"`
+	Properties   map[string]any  `json:"properties"`
 }
 
 func Describe(typ Type) (Definition, error) {

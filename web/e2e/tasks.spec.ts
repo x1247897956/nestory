@@ -49,11 +49,9 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
     ).status(),
   ).toBe(409);
   await page.reload();
-  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("- [ ] 阅读全文");
   const second = await context.newPage();
   await second.goto(parentURL);
-  await second.getByRole("button", {name:"源码",exact:true}).click();
   await expect(second.getByLabel("Markdown 正文")).toHaveText("- [ ] 阅读全文");
   await page.getByLabel("Markdown 正文").fill("first tab");
   await page.getByRole("button", { name: "保存任务", exact: true }).click();
@@ -61,7 +59,6 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await second.getByLabel("Markdown 正文").fill("second tab draft");
   await second.getByRole("button", { name: "保存任务", exact: true }).click();
   await expect(second.getByRole("alert")).toContainText("内容已更新");
-  await second.getByRole("button", {name:"源码",exact:true}).click();
   await expect(second.getByLabel("Markdown 正文")).toHaveText(
     "second tab draft",
   );
@@ -95,7 +92,6 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
     })
   ).json();
   await page.goto("/projects/" + project.id + "/tasks/" + task.id);
-  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("baseline A");
   let release!: () => void;
   let started!: () => void;
@@ -120,14 +116,13 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
   const navigation = page.getByRole("link", {name:"汇总", exact:true}).click();
   await (await dialog).dismiss();
   await navigation;
-  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("baseline A");
   release();
   await expect(page.getByRole("status")).toHaveText("已保存");
   await expect
     .poll(
       async () =>
-        (await (await request.get("/api/v1/tasks/" + task.id)).json()).body,
+        (await (await request.get("/api/v1/tasks/" + task.id)).json()).body.trim(),
     )
     .toBe("baseline A");
 });

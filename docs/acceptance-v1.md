@@ -67,3 +67,8 @@ NOTEAPP_VERIFY_RESTORED=1 E2E_BASE_URL=http://127.0.0.1:18085 PLAYWRIGHT_CHROMIU
 安装与开发按 [README](../README.md)，完整停机备份、空卷恢复、镜像版本和升级回退步骤按 [operations](operations.md)。新建默认配置已通过独立Compose project/空卷启动，API与静态页面同源。升级先保存旧image ID并验证备份，恢复先用相同image ID，另建卷演练后才切换；不自动降级schema。
 
 已知限制：单人免登录、仅受信任网络、SQLite单实例；无离线编辑/历史版本/永久删除/附件清理；候选一次加载项目元数据；当前前端主包约1.65MB（gzip527KB）有非阻断大包警告。时区回拨歧义输入明确拒绝，手改Event时间按分钟精度，未改的秒与原偏移保留。备份未加密；SHA只检损坏，不认证来源；需要Python3.9+和主机临时磁盘空间；SIGKILL/断电不能保证退出清理，失败目标不得覆盖重试；禁止并行维护同一卷。macOS浏览器测试需授权在沙箱外启动已有Brave，Playwright在Node26打印DEP0205但不影响测试结果。
+
+
+## 2026-10-24 块编辑补充验收
+
+用户确认用块编辑替代Markdown固定模式工具栏。BlockNote0.56.0适用于任务/笔记/日程，正文JSON主存储和原文保护随schema6交付。完整浏览器23/23通过，另拖动/互通2/2通过，最终Docker镜像5/5及空卷恢复后1/1通过；9份块文档、投影、原文逐条比较一致。实际项目已按用户授权全部移入回收站，部署实例活跃/归档列表均为0。详细检查、命令、镜像ID、备份路径及已知限制见 [块编辑记录](implementation/2026-10-24-block-editor.md)。

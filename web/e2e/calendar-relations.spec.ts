@@ -73,7 +73,6 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await page.getByLabel("Markdown 正文").fill("# 讨论\n\n- [ ] 方案");
       await expect(page.getByRole("status")).toHaveText("已保存");
       await page.reload();
-      await page.getByRole("button", {name:"源码",exact:true}).click();
       await expect(page.getByLabel("Markdown 正文")).toContainText("# 讨论");
       await page.getByRole("button", {name:"关闭日程详情"}).click();
       await page.getByRole("button", { name: "周", exact: true }).click();
