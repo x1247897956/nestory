@@ -1,0 +1,1206 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test
+
+(node:46535) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 35 tests using 1 worker
+
+(node:46536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46536) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 e2e/acceptance-v1.spec.ts:11:3 › v1 full journey in a fresh browser context (0ms)
+(node:46543) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46543) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46543) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   2 e2e/block-editor.spec.ts:3:1 › native blocks preserve checklist identity, slash commands and assets across object types (0ms)
+(node:46547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46547) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 e2e/block-editor.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (0ms)
+(node:46557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46557) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   4 e2e/block-interoperability.spec.ts:5:1 › Markdown import/export preserves tables, nested blocks, code and uploaded images (0ms)
+(node:46570) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46570) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46570) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   5 e2e/block-interoperability.spec.ts:61:1 › dragging a block preserves its identity and saves the new order (0ms)
+(node:46573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46573) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   6 e2e/calendar-relations.spec.ts:4:3 › calendar and all relations in browser America/Los_Angeles (1ms)
+(node:46575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46575) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 e2e/calendar-relations.spec.ts:4:3 › calendar and all relations in browser Europe/London (0ms)
+(node:46581) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46581) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46581) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   8 e2e/compact-live-design.spec.ts:3:1 › project row settings persist and deletion restores the project (0ms)
+(node:46583) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46583) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46583) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 e2e/compact-live-design.spec.ts:71:1 › compact full-page objects use live Markdown and simple breadcrumbs (1ms)
+(node:46587) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46587) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46587) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  10 e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults (0ms)
+(node:46592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46592) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  11 e2e/create-drafts.spec.ts:73:1 › new Project draft guards closing and cancel while empty form stays clean (0ms)
+(node:46595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46595) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  12 e2e/interaction-polish.spec.ts:3:1 › project names are plain and parent selection is automatic without losing body drafts (0ms)
+(node:46604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46604) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  13 e2e/interaction-polish.spec.ts:53:1 › calendar opens a compact default draft and creates automatically after valid input (0ms)
+(node:46606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46606) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  14 e2e/navigation-trash.spec.ts:2:1 › breadcrumbs name the current surface and project options dismiss naturally (0ms)
+(node:46608) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46608) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46608) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  15 e2e/navigation-trash.spec.ts:67:1 › trash is a compact list with optional details and working restore (0ms)
+(node:46618) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46618) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46618) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  16 e2e/notes.spec.ts:3:1 › page tree, source-position tasks, autosave failures and persistent safe assets (0ms)
+(node:46625) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46625) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46625) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  17 e2e/notes.spec.ts:122:1 › quick create retries failures and creates one blank note from overview entry (0ms)
+(node:46627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46627) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  18 e2e/object-properties.spec.ts:2:1 › all object types share collapsed relation properties with keyboard and mobile support (0ms)
+(node:46629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46629) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  19 e2e/overview-create-breadcrumbs.spec.ts:2:1 › overview creates all three types and breadcrumbs open each level (0ms)
+(node:46637) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46637) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46637) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  20 e2e/project-navigation.spec.ts:2:1 › flat sidebar and overview are the project entry point (0ms)
+(node:46639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46639) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  21 e2e/project-overview.spec.ts:2:1 › project opens overview and links to tasks pages and events (0ms)
+(node:46641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46641) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  22 e2e/project-overview.spec.ts:95:1 › empty project overview offers clear entry points (0ms)
+(node:46643) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46643) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46643) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  23 e2e/stability.spec.ts:6:1 › upload and parent move cannot overlap, attachment survives move (0ms)
+(node:46649) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46649) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46649) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  24 e2e/stability.spec.ts:57:1 › lost creation response retries same intent across reload without duplicate, later explicit creation is new (1ms)
+(node:46665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46665) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  25 e2e/stability.spec.ts:111:1 › unsaved native draft survives forced tab close and can be explicitly recovered in a new tab (1ms)
+(node:46756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46756) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  26 e2e/stability.spec.ts:150:1 › stale deletion with same count rejects unseen replacement and requires a fresh snapshot (92ms)
+  ✘  27 e2e/stability.spec.ts:180:1 › calendar lost save response reconciles to the committed time (0ms)
+(node:46770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46770) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  28 e2e/stability.spec.ts:233:1 › copied tabs isolate identical independent creations even with cloned window name (1ms)
+(node:46774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46774) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  29 e2e/task-summary.spec.ts:3:1 › top-right create action and dedicated summaries for every task (0ms)
+(node:46777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46777) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  30 e2e/tasks.spec.ts:3:1 › project, independent children, refresh, archive and two-tab conflict (0ms)
+(node:46783) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46783) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46783) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  31 e2e/tasks.spec.ts:108:1 › navigation guards an in-flight save after reverting to baseline (0ms)
+(node:46785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46785) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  32 e2e/workspace-design.spec.ts:3:1 › workspace emphasizes overdue work and removes status navigation and creation CTA (1ms)
+(node:46794) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46794) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46794) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  33 e2e/workspace-design.spec.ts:89:1 › archived projects remain reachable on a phone (1ms)
+(node:46806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46806) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  34 e2e/workspace-design.spec.ts:105:1 › workbench navigates future calendar ranges and includes undated and future tasks (1ms)
+(node:46810) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46810) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46810) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  35 e2e/workspace-trash.spec.ts:2:1 › workspace search, preview reconfirmation, batch isolation, relations and archive (0ms)
+
+
+  1) e2e/acceptance-v1.spec.ts:11:3 › v1 full journey in a fresh browser context ───────────────────
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-5EACDy --remote-debugging-pipe --no-startup-window
+    <launched> pid=46541
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-5EACDy --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46541[22m
+    [2m  - [pid=46541] <gracefully close start>[22m
+    [2m  - [pid=46541] <kill>[22m
+    [2m  - [pid=46541] <will force kill>[22m
+    [2m  - [pid=46541] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46541] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46541] starting temporary directories cleanup[22m
+    [2m  - [pid=46541] finished temporary directories cleanup[22m
+    [2m  - [pid=46541] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/block-editor.spec.ts:3:1 › native blocks preserve checklist identity, slash commands and assets across object types 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-guCf4F --remote-debugging-pipe --no-startup-window
+    <launched> pid=46546
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-guCf4F --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46546[22m
+    [2m  - [pid=46546] <gracefully close start>[22m
+    [2m  - [pid=46546] <kill>[22m
+    [2m  - [pid=46546] <will force kill>[22m
+    [2m  - [pid=46546] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46546] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46546] starting temporary directories cleanup[22m
+    [2m  - [pid=46546] finished temporary directories cleanup[22m
+    [2m  - [pid=46546] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/block-editor-native-blocks-20c66--assets-across-object-types/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/block-editor-native-blocks-20c66--assets-across-object-types/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/block-editor.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-qCtA71 --remote-debugging-pipe --no-startup-window
+    <launched> pid=46556
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-qCtA71 --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46556[22m
+    [2m  - [pid=46556] <gracefully close start>[22m
+    [2m  - [pid=46556] <kill>[22m
+    [2m  - [pid=46556] <will force kill>[22m
+    [2m  - [pid=46556] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46556] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46556] starting temporary directories cleanup[22m
+    [2m  - [pid=46556] finished temporary directories cleanup[22m
+    [2m  - [pid=46556] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/block-editor-empty-metadat-8a703-keyboard-and-read-only-mode/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/block-editor-empty-metadat-8a703-keyboard-and-read-only-mode/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) e2e/block-interoperability.spec.ts:5:1 › Markdown import/export preserves tables, nested blocks, code and uploaded images 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-tc7fxk --remote-debugging-pipe --no-startup-window
+    <launched> pid=46568
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-tc7fxk --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46568[22m
+    [2m  - [pid=46568] <gracefully close start>[22m
+    [2m  - [pid=46568] <kill>[22m
+    [2m  - [pid=46568] <will force kill>[22m
+    [2m  - [pid=46568] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46568] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46568] starting temporary directories cleanup[22m
+    [2m  - [pid=46568] finished temporary directories cleanup[22m
+    [2m  - [pid=46568] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/block-interoperability-Mar-11a2f-ks-code-and-uploaded-images/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/block-interoperability-Mar-11a2f-ks-code-and-uploaded-images/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) e2e/block-interoperability.spec.ts:61:1 › dragging a block preserves its identity and saves the new order 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-2USQql --remote-debugging-pipe --no-startup-window
+    <launched> pid=46572
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-2USQql --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46572[22m
+    [2m  - [pid=46572] <gracefully close start>[22m
+    [2m  - [pid=46572] <kill>[22m
+    [2m  - [pid=46572] <will force kill>[22m
+    [2m  - [pid=46572] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46572] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46572] starting temporary directories cleanup[22m
+    [2m  - [pid=46572] finished temporary directories cleanup[22m
+    [2m  - [pid=46572] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/block-interoperability-dra-da4ea-ity-and-saves-the-new-order/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/block-interoperability-dra-da4ea-ity-and-saves-the-new-order/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) e2e/calendar-relations.spec.ts:4:3 › calendar and all relations in browser America/Los_Angeles 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-YTqFbU --remote-debugging-pipe --no-startup-window
+    <launched> pid=46574
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-YTqFbU --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46574[22m
+    [2m  - [pid=46574] <gracefully close start>[22m
+    [2m  - [pid=46574] <kill>[22m
+    [2m  - [pid=46574] <will force kill>[22m
+    [2m  - [pid=46574] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46574] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46574] starting temporary directories cleanup[22m
+    [2m  - [pid=46574] finished temporary directories cleanup[22m
+    [2m  - [pid=46574] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/calendar-relations-calenda-ecaa6-browser-America-Los-Angeles/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/calendar-relations-calenda-ecaa6-browser-America-Los-Angeles/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) e2e/calendar-relations.spec.ts:4:3 › calendar and all relations in browser Europe/London ──────
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-JhO3fY --remote-debugging-pipe --no-startup-window
+    <launched> pid=46580
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-JhO3fY --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46580[22m
+    [2m  - [pid=46580] <gracefully close start>[22m
+    [2m  - [pid=46580] <kill>[22m
+    [2m  - [pid=46580] <will force kill>[22m
+    [2m  - [pid=46580] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46580] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46580] starting temporary directories cleanup[22m
+    [2m  - [pid=46580] finished temporary directories cleanup[22m
+    [2m  - [pid=46580] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/calendar-relations-calenda-0a6f9-ns-in-browser-Europe-London/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/calendar-relations-calenda-0a6f9-ns-in-browser-Europe-London/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) e2e/compact-live-design.spec.ts:3:1 › project row settings persist and deletion restores the project 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-39s134 --remote-debugging-pipe --no-startup-window
+    <launched> pid=46582
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-39s134 --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46582[22m
+    [2m  - [pid=46582] <gracefully close start>[22m
+    [2m  - [pid=46582] <kill>[22m
+    [2m  - [pid=46582] <will force kill>[22m
+    [2m  - [pid=46582] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46582] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46582] starting temporary directories cleanup[22m
+    [2m  - [pid=46582] finished temporary directories cleanup[22m
+    [2m  - [pid=46582] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/compact-live-design-projec-977c4-letion-restores-the-project/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/compact-live-design-projec-977c4-letion-restores-the-project/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) e2e/compact-live-design.spec.ts:71:1 › compact full-page objects use live Markdown and simple breadcrumbs 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-YrFyRg --remote-debugging-pipe --no-startup-window
+    <launched> pid=46586
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-YrFyRg --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46586[22m
+    [2m  - [pid=46586] <gracefully close start>[22m
+    [2m  - [pid=46586] <kill>[22m
+    [2m  - [pid=46586] <will force kill>[22m
+    [2m  - [pid=46586] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46586] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46586] starting temporary directories cleanup[22m
+    [2m  - [pid=46586] finished temporary directories cleanup[22m
+    [2m  - [pid=46586] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/compact-live-design-compac-e35c0-down-and-simple-breadcrumbs/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/compact-live-design-compac-e35c0-down-and-simple-breadcrumbs/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-MSZaaC --remote-debugging-pipe --no-startup-window
+    <launched> pid=46591
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-MSZaaC --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46591[22m
+    [2m  - [pid=46591] <gracefully close start>[22m
+    [2m  - [pid=46591] <kill>[22m
+    [2m  - [pid=46591] <will force kill>[22m
+    [2m  - [pid=46591] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46591] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46591] starting temporary directories cleanup[22m
+    [2m  - [pid=46591] finished temporary directories cleanup[22m
+    [2m  - [pid=46591] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/create-drafts-new-Page-and-00097-out-flagging-empty-defaults/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/create-drafts-new-Page-and-00097-out-flagging-empty-defaults/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) e2e/create-drafts.spec.ts:73:1 › new Project draft guards closing and cancel while empty form stays clean 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-KAzN2a --remote-debugging-pipe --no-startup-window
+    <launched> pid=46594
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-KAzN2a --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46594[22m
+    [2m  - [pid=46594] <gracefully close start>[22m
+    [2m  - [pid=46594] <kill>[22m
+    [2m  - [pid=46594] <will force kill>[22m
+    [2m  - [pid=46594] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46594] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46594] starting temporary directories cleanup[22m
+    [2m  - [pid=46594] finished temporary directories cleanup[22m
+    [2m  - [pid=46594] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/create-drafts-new-Project--f377d-hile-empty-form-stays-clean/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/create-drafts-new-Project--f377d-hile-empty-form-stays-clean/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) e2e/interaction-polish.spec.ts:3:1 › project names are plain and parent selection is automatic without losing body drafts 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-66IXok --remote-debugging-pipe --no-startup-window
+    <launched> pid=46603
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-66IXok --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46603[22m
+    [2m  - [pid=46603] <gracefully close start>[22m
+    [2m  - [pid=46603] <kill>[22m
+    [2m  - [pid=46603] <will force kill>[22m
+    [2m  - [pid=46603] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46603] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46603] starting temporary directories cleanup[22m
+    [2m  - [pid=46603] finished temporary directories cleanup[22m
+    [2m  - [pid=46603] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/interaction-polish-project-a339b--without-losing-body-drafts/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/interaction-polish-project-a339b--without-losing-body-drafts/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) e2e/interaction-polish.spec.ts:53:1 › calendar opens a compact default draft and creates automatically after valid input 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-Tt40SG --remote-debugging-pipe --no-startup-window
+    <launched> pid=46605
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-Tt40SG --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46605[22m
+    [2m  - [pid=46605] <gracefully close start>[22m
+    [2m  - [pid=46605] <kill>[22m
+    [2m  - [pid=46605] <will force kill>[22m
+    [2m  - [pid=46605] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46605] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46605] starting temporary directories cleanup[22m
+    [2m  - [pid=46605] finished temporary directories cleanup[22m
+    [2m  - [pid=46605] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/interaction-polish-calenda-c60b5-matically-after-valid-input/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/interaction-polish-calenda-c60b5-matically-after-valid-input/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) e2e/navigation-trash.spec.ts:2:1 › breadcrumbs name the current surface and project options dismiss naturally 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-v4ugD6 --remote-debugging-pipe --no-startup-window
+    <launched> pid=46607
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-v4ugD6 --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46607[22m
+    [2m  - [pid=46607] <gracefully close start>[22m
+    [2m  - [pid=46607] <kill>[22m
+    [2m  - [pid=46607] <will force kill>[22m
+    [2m  - [pid=46607] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46607] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46607] starting temporary directories cleanup[22m
+    [2m  - [pid=46607] finished temporary directories cleanup[22m
+    [2m  - [pid=46607] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-trash-breadcrum-71982-t-options-dismiss-naturally/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-trash-breadcrum-71982-t-options-dismiss-naturally/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) e2e/navigation-trash.spec.ts:67:1 › trash is a compact list with optional details and working restore 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-uxm3Oa --remote-debugging-pipe --no-startup-window
+    <launched> pid=46612
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-uxm3Oa --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46612[22m
+    [2m  - [pid=46612] <gracefully close start>[22m
+    [2m  - [pid=46612] <kill>[22m
+    [2m  - [pid=46612] <will force kill>[22m
+    [2m  - [pid=46612] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46612] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46612] starting temporary directories cleanup[22m
+    [2m  - [pid=46612] finished temporary directories cleanup[22m
+    [2m  - [pid=46612] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-trash-trash-is--6b101-details-and-working-restore/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-trash-trash-is--6b101-details-and-working-restore/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) e2e/notes.spec.ts:3:1 › page tree, source-position tasks, autosave failures and persistent safe assets 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-NLFJbn --remote-debugging-pipe --no-startup-window
+    <launched> pid=46624
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-NLFJbn --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46624[22m
+    [2m  - [pid=46624] <gracefully close start>[22m
+    [2m  - [pid=46624] <kill>[22m
+    [2m  - [pid=46624] <will force kill>[22m
+    [2m  - [pid=46624] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46624] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46624] starting temporary directories cleanup[22m
+    [2m  - [pid=46624] finished temporary directories cleanup[22m
+    [2m  - [pid=46624] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/notes-page-tree-source-pos-763b6--and-persistent-safe-assets/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/notes-page-tree-source-pos-763b6--and-persistent-safe-assets/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) e2e/notes.spec.ts:122:1 › quick create retries failures and creates one blank note from overview entry 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-yVGl0P --remote-debugging-pipe --no-startup-window
+    <launched> pid=46626
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-yVGl0P --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46626[22m
+    [2m  - [pid=46626] <gracefully close start>[22m
+    [2m  - [pid=46626] <kill>[22m
+    [2m  - [pid=46626] <will force kill>[22m
+    [2m  - [pid=46626] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46626] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46626] starting temporary directories cleanup[22m
+    [2m  - [pid=46626] finished temporary directories cleanup[22m
+    [2m  - [pid=46626] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/notes-quick-create-retries-2ed7d-nk-note-from-overview-entry/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/notes-quick-create-retries-2ed7d-nk-note-from-overview-entry/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) e2e/object-properties.spec.ts:2:1 › all object types share collapsed relation properties with keyboard and mobile support 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-pyGqsf --remote-debugging-pipe --no-startup-window
+    <launched> pid=46628
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-pyGqsf --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46628[22m
+    [2m  - [pid=46628] <gracefully close start>[22m
+    [2m  - [pid=46628] <kill>[22m
+    [2m  - [pid=46628] <will force kill>[22m
+    [2m  - [pid=46628] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46628] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46628] starting temporary directories cleanup[22m
+    [2m  - [pid=46628] finished temporary directories cleanup[22m
+    [2m  - [pid=46628] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/object-properties-all-obje-87a03-keyboard-and-mobile-support/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/object-properties-all-obje-87a03-keyboard-and-mobile-support/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) e2e/overview-create-breadcrumbs.spec.ts:2:1 › overview creates all three types and breadcrumbs open each level 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-dZVLBU --remote-debugging-pipe --no-startup-window
+    <launched> pid=46636
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-dZVLBU --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46636[22m
+    [2m  - [pid=46636] <gracefully close start>[22m
+    [2m  - [pid=46636] <kill>[22m
+    [2m  - [pid=46636] <will force kill>[22m
+    [2m  - [pid=46636] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46636] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46636] starting temporary directories cleanup[22m
+    [2m  - [pid=46636] finished temporary directories cleanup[22m
+    [2m  - [pid=46636] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/overview-create-breadcrumb-6c72d-breadcrumbs-open-each-level/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/overview-create-breadcrumb-6c72d-breadcrumbs-open-each-level/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) e2e/project-navigation.spec.ts:2:1 › flat sidebar and overview are the project entry point ───
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-zl8j2R --remote-debugging-pipe --no-startup-window
+    <launched> pid=46638
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-zl8j2R --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46638[22m
+    [2m  - [pid=46638] <gracefully close start>[22m
+    [2m  - [pid=46638] <kill>[22m
+    [2m  - [pid=46638] <will force kill>[22m
+    [2m  - [pid=46638] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46638] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46638] starting temporary directories cleanup[22m
+    [2m  - [pid=46638] finished temporary directories cleanup[22m
+    [2m  - [pid=46638] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/project-navigation-flat-si-8eb74-are-the-project-entry-point/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/project-navigation-flat-si-8eb74-are-the-project-entry-point/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) e2e/project-overview.spec.ts:2:1 › project opens overview and links to tasks pages and events 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-bLm6cV --remote-debugging-pipe --no-startup-window
+    <launched> pid=46640
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-bLm6cV --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46640[22m
+    [2m  - [pid=46640] <gracefully close start>[22m
+    [2m  - [pid=46640] <kill>[22m
+    [2m  - [pid=46640] <will force kill>[22m
+    [2m  - [pid=46640] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46640] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46640] starting temporary directories cleanup[22m
+    [2m  - [pid=46640] finished temporary directories cleanup[22m
+    [2m  - [pid=46640] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/project-overview-project-o-2e46f-s-to-tasks-pages-and-events/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/project-overview-project-o-2e46f-s-to-tasks-pages-and-events/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) e2e/project-overview.spec.ts:95:1 › empty project overview offers clear entry points ─────────
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-vOih8r --remote-debugging-pipe --no-startup-window
+    <launched> pid=46642
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-vOih8r --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46642[22m
+    [2m  - [pid=46642] <gracefully close start>[22m
+    [2m  - [pid=46642] <kill>[22m
+    [2m  - [pid=46642] <will force kill>[22m
+    [2m  - [pid=46642] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46642] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46642] starting temporary directories cleanup[22m
+    [2m  - [pid=46642] finished temporary directories cleanup[22m
+    [2m  - [pid=46642] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/project-overview-empty-pro-dcbf0-w-offers-clear-entry-points/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/project-overview-empty-pro-dcbf0-w-offers-clear-entry-points/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) e2e/stability.spec.ts:6:1 › upload and parent move cannot overlap, attachment survives move ──
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-sHNcXK --remote-debugging-pipe --no-startup-window
+    <launched> pid=46648
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-sHNcXK --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46648[22m
+    [2m  - [pid=46648] <gracefully close start>[22m
+    [2m  - [pid=46648] <kill>[22m
+    [2m  - [pid=46648] <will force kill>[22m
+    [2m  - [pid=46648] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46648] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46648] starting temporary directories cleanup[22m
+    [2m  - [pid=46648] finished temporary directories cleanup[22m
+    [2m  - [pid=46648] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/stability-upload-and-paren-94243-ap-attachment-survives-move/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/stability-upload-and-paren-94243-ap-attachment-survives-move/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) e2e/stability.spec.ts:57:1 › lost creation response retries same intent across reload without duplicate, later explicit creation is new 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-TN2Pzh --remote-debugging-pipe --no-startup-window
+    <launched> pid=46653
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-TN2Pzh --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46653[22m
+    [2m  - [pid=46653] <gracefully close start>[22m
+    [2m  - [pid=46653] <kill>[22m
+    [2m  - [pid=46653] <will force kill>[22m
+    [2m  - [pid=46653] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46653] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46653] starting temporary directories cleanup[22m
+    [2m  - [pid=46653] finished temporary directories cleanup[22m
+    [2m  - [pid=46653] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/stability-lost-creation-re-2f00d-er-explicit-creation-is-new/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/stability-lost-creation-re-2f00d-er-explicit-creation-is-new/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) e2e/stability.spec.ts:111:1 › unsaved native draft survives forced tab close and can be explicitly recovered in a new tab 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-2tzwPx --remote-debugging-pipe --no-startup-window
+    <launched> pid=46755
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-2tzwPx --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46755[22m
+    [2m  - [pid=46755] <gracefully close start>[22m
+    [2m  - [pid=46755] <kill>[22m
+    [2m  - [pid=46755] <will force kill>[22m
+    [2m  - [pid=46755] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46755] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46755] starting temporary directories cleanup[22m
+    [2m  - [pid=46755] finished temporary directories cleanup[22m
+    [2m  - [pid=46755] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/stability-unsaved-native-d-9d719-itly-recovered-in-a-new-tab/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/stability-unsaved-native-d-9d719-itly-recovered-in-a-new-tab/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) e2e/stability.spec.ts:180:1 › calendar lost save response reconciles to the committed time ───
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-kVspyI --remote-debugging-pipe --no-startup-window
+    <launched> pid=46769
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-kVspyI --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46769[22m
+    [2m  - [pid=46769] <gracefully close start>[22m
+    [2m  - [pid=46769] <kill>[22m
+    [2m  - [pid=46769] <will force kill>[22m
+    [2m  - [pid=46769] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46769] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46769] starting temporary directories cleanup[22m
+    [2m  - [pid=46769] finished temporary directories cleanup[22m
+    [2m  - [pid=46769] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/stability-calendar-lost-sa-06f54-ciles-to-the-committed-time/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/stability-calendar-lost-sa-06f54-ciles-to-the-committed-time/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) e2e/stability.spec.ts:233:1 › copied tabs isolate identical independent creations even with cloned window name 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-Z3Km9s --remote-debugging-pipe --no-startup-window
+    <launched> pid=46773
+    [pid=46773] <process did exit: exitCode=null, signal=SIGABRT>
+    [pid=46773] starting temporary directories cleanup
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-Z3Km9s --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46773[22m
+    [2m  - [pid=46773] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46773] starting temporary directories cleanup[22m
+    [2m  - [pid=46773] <gracefully close start>[22m
+    [2m  - [pid=46773] <kill>[22m
+    [2m  - [pid=46773] <skipped force kill spawnedProcess.killed=false processClosed=true>[22m
+    [2m  - [pid=46773] finished temporary directories cleanup[22m
+    [2m  - [pid=46773] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/stability-copied-tabs-isol-d4863-ven-with-cloned-window-name/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/stability-copied-tabs-isol-d4863-ven-with-cloned-window-name/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) e2e/task-summary.spec.ts:3:1 › top-right create action and dedicated summaries for every task 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-Q3J0Jd --remote-debugging-pipe --no-startup-window
+    <launched> pid=46776
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-Q3J0Jd --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46776[22m
+    [2m  - [pid=46776] <gracefully close start>[22m
+    [2m  - [pid=46776] <kill>[22m
+    [2m  - [pid=46776] <will force kill>[22m
+    [2m  - [pid=46776] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46776] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46776] starting temporary directories cleanup[22m
+    [2m  - [pid=46776] finished temporary directories cleanup[22m
+    [2m  - [pid=46776] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/task-summary-top-right-cre-d21c5-ed-summaries-for-every-task/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/task-summary-top-right-cre-d21c5-ed-summaries-for-every-task/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) e2e/tasks.spec.ts:3:1 › project, independent children, refresh, archive and two-tab conflict ─
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-tV19x1 --remote-debugging-pipe --no-startup-window
+    <launched> pid=46782
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-tV19x1 --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46782[22m
+    [2m  - [pid=46782] <gracefully close start>[22m
+    [2m  - [pid=46782] <kill>[22m
+    [2m  - [pid=46782] <will force kill>[22m
+    [2m  - [pid=46782] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46782] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46782] starting temporary directories cleanup[22m
+    [2m  - [pid=46782] finished temporary directories cleanup[22m
+    [2m  - [pid=46782] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/tasks-project-independent--11a0d-rchive-and-two-tab-conflict/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/tasks-project-independent--11a0d-rchive-and-two-tab-conflict/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) e2e/tasks.spec.ts:108:1 › navigation guards an in-flight save after reverting to baseline ────
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-YdOBZe --remote-debugging-pipe --no-startup-window
+    <launched> pid=46784
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-YdOBZe --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46784[22m
+    [2m  - [pid=46784] <gracefully close start>[22m
+    [2m  - [pid=46784] <kill>[22m
+    [2m  - [pid=46784] <will force kill>[22m
+    [2m  - [pid=46784] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46784] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46784] starting temporary directories cleanup[22m
+    [2m  - [pid=46784] finished temporary directories cleanup[22m
+    [2m  - [pid=46784] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/tasks-navigation-guards-an-8640d-after-reverting-to-baseline/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/tasks-navigation-guards-an-8640d-after-reverting-to-baseline/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) e2e/workspace-design.spec.ts:3:1 › workspace emphasizes overdue work and removes status navigation and creation CTA 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-LkVZrF --remote-debugging-pipe --no-startup-window
+    <launched> pid=46792
+    [pid=46792] <process did exit: exitCode=null, signal=SIGABRT>
+    [pid=46792] starting temporary directories cleanup
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-LkVZrF --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46792[22m
+    [2m  - [pid=46792] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46792] starting temporary directories cleanup[22m
+    [2m  - [pid=46792] <gracefully close start>[22m
+    [2m  - [pid=46792] <kill>[22m
+    [2m  - [pid=46792] <skipped force kill spawnedProcess.killed=false processClosed=true>[22m
+    [2m  - [pid=46792] finished temporary directories cleanup[22m
+    [2m  - [pid=46792] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-design-workspace-28668-navigation-and-creation-CTA/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-design-workspace-28668-navigation-and-creation-CTA/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) e2e/workspace-design.spec.ts:89:1 › archived projects remain reachable on a phone ────────────
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-ASTDsi --remote-debugging-pipe --no-startup-window
+    <launched> pid=46796
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-ASTDsi --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46796[22m
+    [2m  - [pid=46796] <gracefully close start>[22m
+    [2m  - [pid=46796] <kill>[22m
+    [2m  - [pid=46796] <will force kill>[22m
+    [2m  - [pid=46796] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46796] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46796] starting temporary directories cleanup[22m
+    [2m  - [pid=46796] finished temporary directories cleanup[22m
+    [2m  - [pid=46796] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-design-archived--50bb5-remain-reachable-on-a-phone/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-design-archived--50bb5-remain-reachable-on-a-phone/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) e2e/workspace-design.spec.ts:105:1 › workbench navigates future calendar ranges and includes undated and future tasks 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-oyk5Kk --remote-debugging-pipe --no-startup-window
+    <launched> pid=46808
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-oyk5Kk --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46808[22m
+    [2m  - [pid=46808] <gracefully close start>[22m
+    [2m  - [pid=46808] <kill>[22m
+    [2m  - [pid=46808] <will force kill>[22m
+    [2m  - [pid=46808] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46808] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46808] starting temporary directories cleanup[22m
+    [2m  - [pid=46808] finished temporary directories cleanup[22m
+    [2m  - [pid=46808] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-design-workbench-44304-es-undated-and-future-tasks/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-design-workbench-44304-es-undated-and-future-tasks/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) e2e/workspace-trash.spec.ts:2:1 › workspace search, preview reconfirmation, batch isolation, relations and archive 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-FdY9Q3 --remote-debugging-pipe --no-startup-window
+    <launched> pid=46817
+    Call log:
+    [2m  - <launching> /Applications/Brave Browser.app/Contents/MacOS/Brave Browser --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/kr/ht_b8fmx19lbz49rcxl7g47h0000gn/T/playwright_chromiumdev_profile-FdY9Q3 --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=46817[22m
+    [2m  - [pid=46817] <gracefully close start>[22m
+    [2m  - [pid=46817] <kill>[22m
+    [2m  - [pid=46817] <will force kill>[22m
+    [2m  - [pid=46817] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=46817] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=46817] starting temporary directories cleanup[22m
+    [2m  - [pid=46817] finished temporary directories cleanup[22m
+    [2m  - [pid=46817] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-trash-workspace--c23cd-ation-relations-and-archive/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-trash-workspace--c23cd-ation-relations-and-archive/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34 failed
+    e2e/acceptance-v1.spec.ts:11:3 › v1 full journey in a fresh browser context ────────────────────
+    e2e/block-editor.spec.ts:3:1 › native blocks preserve checklist identity, slash commands and assets across object types 
+    e2e/block-editor.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode 
+    e2e/block-interoperability.spec.ts:5:1 › Markdown import/export preserves tables, nested blocks, code and uploaded images 
+    e2e/block-interoperability.spec.ts:61:1 › dragging a block preserves its identity and saves the new order 
+    e2e/calendar-relations.spec.ts:4:3 › calendar and all relations in browser America/Los_Angeles ─
+    e2e/calendar-relations.spec.ts:4:3 › calendar and all relations in browser Europe/London ───────
+    e2e/compact-live-design.spec.ts:3:1 › project row settings persist and deletion restores the project 
+    e2e/compact-live-design.spec.ts:71:1 › compact full-page objects use live Markdown and simple breadcrumbs 
+    e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults 
+    e2e/create-drafts.spec.ts:73:1 › new Project draft guards closing and cancel while empty form stays clean 
+    e2e/interaction-polish.spec.ts:3:1 › project names are plain and parent selection is automatic without losing body drafts 
+    e2e/interaction-polish.spec.ts:53:1 › calendar opens a compact default draft and creates automatically after valid input 
+    e2e/navigation-trash.spec.ts:2:1 › breadcrumbs name the current surface and project options dismiss naturally 
+    e2e/navigation-trash.spec.ts:67:1 › trash is a compact list with optional details and working restore 
+    e2e/notes.spec.ts:3:1 › page tree, source-position tasks, autosave failures and persistent safe assets 
+    e2e/notes.spec.ts:122:1 › quick create retries failures and creates one blank note from overview entry 
+    e2e/object-properties.spec.ts:2:1 › all object types share collapsed relation properties with keyboard and mobile support 
+    e2e/overview-create-breadcrumbs.spec.ts:2:1 › overview creates all three types and breadcrumbs open each level 
+    e2e/project-navigation.spec.ts:2:1 › flat sidebar and overview are the project entry point ─────
+    e2e/project-overview.spec.ts:2:1 › project opens overview and links to tasks pages and events ──
+    e2e/project-overview.spec.ts:95:1 › empty project overview offers clear entry points ───────────
+    e2e/stability.spec.ts:6:1 › upload and parent move cannot overlap, attachment survives move ────
+    e2e/stability.spec.ts:57:1 › lost creation response retries same intent across reload without duplicate, later explicit creation is new 
+    e2e/stability.spec.ts:111:1 › unsaved native draft survives forced tab close and can be explicitly recovered in a new tab 
+    e2e/stability.spec.ts:180:1 › calendar lost save response reconciles to the committed time ─────
+    e2e/stability.spec.ts:233:1 › copied tabs isolate identical independent creations even with cloned window name 
+    e2e/task-summary.spec.ts:3:1 › top-right create action and dedicated summaries for every task ──
+    e2e/tasks.spec.ts:3:1 › project, independent children, refresh, archive and two-tab conflict ───
+    e2e/tasks.spec.ts:108:1 › navigation guards an in-flight save after reverting to baseline ──────
+    e2e/workspace-design.spec.ts:3:1 › workspace emphasizes overdue work and removes status navigation and creation CTA 
+    e2e/workspace-design.spec.ts:89:1 › archived projects remain reachable on a phone ──────────────
+    e2e/workspace-design.spec.ts:105:1 › workbench navigates future calendar ranges and includes undated and future tasks 
+    e2e/workspace-trash.spec.ts:2:1 › workspace search, preview reconfirmation, batch isolation, relations and archive 
+  1 passed (10.6s)

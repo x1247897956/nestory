@@ -1,0 +1,135 @@
+=== Symbol Results ===
+
+Vulnerability #1: GO-2026-6617
+    HTTP/2 server crash due to HPACK encoder race in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6617
+  Standard library
+    Found in: net/http/internal/http2@go1.27.1
+    Fixed in: net/http/internal/http2@go1.27.2
+    Example traces found:
+      #1: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown, which calls http2.Server.GracefulShutdown
+      #2: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown, which calls http2.Server.GracefulShutdown
+      #3: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #4: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #5: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.bufferedWriterTimeoutWriter.Write
+      #6: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.bufferedWriterTimeoutWriter.Write
+      #7: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.chunkWriter.Write
+      #8: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.chunkWriter.Write
+      #9: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http2.responseWriter.Write
+      #10: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http2.responseWriter.Write
+      #11: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http2.responseWriter.WriteHeader
+      #12: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http2.responseWriter.WriteHeader
+      #13: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.responseWriter.WriteString
+      #14: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.responseWriter.WriteString
+
+Vulnerability #2: GO-2026-6613
+    HTTP/1 server connection desynchronization after 2xx CONNECT response in
+    net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6613
+  Standard library
+    Found in: net/http@go1.27.1
+    Fixed in: net/http@go1.27.2
+    Example traces found:
+      #1: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which eventually calls http.CanonicalHeaderKey
+      #2: internal/platform/httpx/httpx.go:28:16: httpx.JSON calls http.Header.Set
+      #3: internal/asset/http.go:48:30: asset.Service.UploadHTTP calls http.Request.MultipartReader
+      #4: internal/asset/http.go:44:19: asset.Service.Download calls http.ServeContent
+      #5: internal/app/app.go:34:16: app.New calls http.ServeMux.HandleFunc
+      #6: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe
+      #7: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown
+      #8: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.body.Read
+      #9: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.bodyEOFSignal.Read
+      #10: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.bodyLocked.Read
+      #11: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which eventually calls http.checkConnErrorWriter.Write
+      #12: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which eventually calls http.chunkWriter.Write
+      #13: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.connReader.Read
+      #14: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.expectContinueReader.Read
+      #15: internal/platform/id/id.go:10:24: id.New calls rand.Read, which eventually calls http.loggingConn.Read
+      #16: internal/platform/database/database.go:7:2: database.init calls sqlite.init, which eventually calls http.loggingConn.Write
+      #17: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.maxBytesReader.Read
+      #18: internal/workspace/workspace.go:20:29: workspace.New calls time.LoadLocation, which eventually calls http.onceCloseListener.Close
+      #19: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http.response.ReadFrom
+      #20: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http.response.Write
+      #21: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader
+
+Vulnerability #3: GO-2026-6612
+    Double flow control refund on HTTP/2 server streams in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6612
+  Standard library
+    Found in: net/http/internal/http2@go1.27.1
+    Fixed in: net/http/internal/http2@go1.27.2
+    Example traces found:
+      #1: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #2: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #3: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http2.requestBody.Read
+      #4: internal/asset/asset.go:61:19: asset.Service.Upload calls io.Copy, which eventually calls http2.requestBody.Read
+
+Vulnerability #4: GO-2026-6611
+    Excessive CPU consumption from repeated initial window changes in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6611
+  Standard library
+    Found in: net/http/internal/http2@go1.27.1
+    Fixed in: net/http/internal/http2@go1.27.2
+    Example traces found:
+      #1: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown, which calls http2.Server.GracefulShutdown
+      #2: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown, which calls http2.Server.GracefulShutdown
+      #3: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #4: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #5: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.bufferedWriterTimeoutWriter.Write
+      #6: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.bufferedWriterTimeoutWriter.Write
+      #7: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.chunkWriter.Write
+      #8: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.chunkWriter.Write
+      #9: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http2.responseWriter.Write
+      #10: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http2.responseWriter.Write
+      #11: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http2.responseWriter.WriteHeader
+      #12: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http2.responseWriter.WriteHeader
+      #13: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.responseWriter.WriteString
+      #14: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.responseWriter.WriteString
+
+Vulnerability #5: GO-2026-6609
+    Lack of limit on size of parsed Range headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6609
+  Standard library
+    Found in: net/http@go1.27.1
+    Fixed in: net/http@go1.27.2
+    Example traces found:
+      #1: internal/asset/http.go:44:19: asset.Service.Download calls http.ServeContent
+      #2: internal/app/app.go:286:19: app.New calls http.fileHandler.ServeHTTP
+
+Vulnerability #6: GO-2026-6608
+    Memory limit bypass when parsing MIME headers in net/textproto,
+    mime/multipart
+  More info: https://pkg.go.dev/vuln/GO-2026-6608
+  Standard library
+    Found in: net/textproto@go1.27.1
+    Fixed in: net/textproto@go1.27.2
+    Example traces found:
+      #1: internal/asset/http.go:53:26: asset.Service.UploadHTTP calls multipart.Reader.NextPart
+
+Vulnerability #7: GO-2026-6603
+    HTTP/2 server memory exhaustion due to Trailer headers in net/http
+  More info: https://pkg.go.dev/vuln/GO-2026-6603
+  Standard library
+    Found in: net/http/internal/http2@go1.27.1
+    Fixed in: net/http/internal/http2@go1.27.2
+    Example traces found:
+      #1: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown, which calls http2.Server.GracefulShutdown
+      #2: cmd/noteapp/main.go:51:22: noteapp.run calls http.Server.Shutdown, which calls http2.Server.GracefulShutdown
+      #3: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #4: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.Server.ServeConn
+      #5: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.bufferedWriterTimeoutWriter.Write
+      #6: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.bufferedWriterTimeoutWriter.Write
+      #7: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.chunkWriter.Write
+      #8: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http.response.WriteHeader, which eventually calls http2.chunkWriter.Write
+      #9: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http2.responseWriter.Write
+      #10: internal/platform/httpx/httpx.go:30:31: httpx.JSON calls json.Encoder.Encode, which calls http2.responseWriter.Write
+      #11: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http2.responseWriter.WriteHeader
+      #12: internal/platform/httpx/httpx.go:29:15: httpx.JSON calls http2.responseWriter.WriteHeader
+      #13: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.responseWriter.WriteString
+      #14: cmd/noteapp/main.go:41:80: noteapp.run calls http.Server.ListenAndServe, which eventually calls http2.responseWriter.WriteString
+
+Your code is affected by 7 vulnerabilities from the Go standard library.
+This scan also found 5 vulnerabilities in packages you import and 3
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.

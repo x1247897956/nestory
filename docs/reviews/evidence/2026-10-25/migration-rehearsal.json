@@ -1,0 +1,115 @@
+{
+  "unprepared_logs": "2026/10/24 20:36:00 ERROR shutdown error=\"migrate: block-only migration: tasks/t has legacy Markdown; stop the app and run scripts/prepare-block-migration.mjs on a backed-up database\"\n",
+  "rejected_schema": 6,
+  "prepare_0": "{\"candidates\":3,\"inserted\":3,\"reused\":0}",
+  "prepare_1": "{\"candidates\":3,\"inserted\":0,\"reused\":3}",
+  "objects": {
+    "tasks": {
+      "id": "t",
+      "project_id": "p",
+      "parent_id": null,
+      "title": "task",
+      "body_document": {
+        "version": 1,
+        "blocks": [
+          {
+            "id": "85efcd02-bd40-40e8-9311-60e21e2d2099",
+            "type": "paragraph",
+            "props": {
+              "backgroundColor": "default",
+              "textColor": "default",
+              "textAlignment": "left"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "task正文",
+                "styles": {
+                  "bold": true
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      },
+      "stage": "todo",
+      "priority": "none",
+      "due_date": null,
+      "position": 0,
+      "created_at": 0,
+      "updated_at": 0,
+      "version": 1
+    },
+    "pages": {
+      "id": "n",
+      "project_id": "p",
+      "parent_id": null,
+      "title": "note",
+      "body_document": {
+        "version": 1,
+        "blocks": [
+          {
+            "id": "93752e64-2b54-4ca4-84d0-35e858e0a66a",
+            "type": "heading",
+            "props": {
+              "backgroundColor": "default",
+              "textColor": "default",
+              "textAlignment": "left",
+              "level": 1,
+              "isToggleable": false
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "note正文",
+                "styles": {}
+              }
+            ],
+            "children": []
+          }
+        ]
+      },
+      "position": 0,
+      "created_at": 0,
+      "updated_at": 0,
+      "version": 1
+    },
+    "events": {
+      "id": "e",
+      "project_id": "p",
+      "title": "event",
+      "body_document": {
+        "version": 1,
+        "blocks": [
+          {
+            "id": "73b6bc4d-8e48-4c0e-bb25-bf74940a4f5e",
+            "type": "checkListItem",
+            "props": {
+              "backgroundColor": "default",
+              "textColor": "default",
+              "textAlignment": "left",
+              "checked": true
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "event正文",
+                "styles": {}
+              }
+            ],
+            "children": []
+          }
+        ]
+      },
+      "start_at": "1970-01-01T00:00:00.001Z",
+      "end_at": "1970-01-01T00:00:00.002Z",
+      "created_at": 0,
+      "updated_at": 0,
+      "version": 1
+    }
+  },
+  "asset_sha256": "b81f37a043a6f767e7c94d105f4bd31282f3ecc20680bb9d09bd93461cf4c863",
+  "schema": 8,
+  "integrity": "ok"
+}

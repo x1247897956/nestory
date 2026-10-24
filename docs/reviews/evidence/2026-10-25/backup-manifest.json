@@ -1,0 +1,110 @@
+{
+  "schema_versions": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "counts": {
+    "assets": 10,
+    "creation_requests": 24,
+    "delete_batches": 10,
+    "events": 16,
+    "page_events": 2,
+    "pages": 31,
+    "projects": 41,
+    "recent_visits": 60,
+    "schema_migrations": 8,
+    "task_events": 1,
+    "task_pages": 2,
+    "tasks": 31
+  },
+  "assets": [
+    {
+      "id": "07acfca7cf4140ccf425eda0a343d876",
+      "storage_key": "07acfca7cf4140ccf425eda0a343d876",
+      "size": 25,
+      "sha256": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783"
+    },
+    {
+      "id": "0ee85a65bd9372830d63b17baac53ea1",
+      "storage_key": "0ee85a65bd9372830d63b17baac53ea1",
+      "size": 11,
+      "sha256": "fb27c555ebcc0d7db412449872f55240009af53cedf8003e2e0d5018340dc2f6"
+    },
+    {
+      "id": "1b9c4c16b79e9c6bf2c555f3d8f3e258",
+      "storage_key": "1b9c4c16b79e9c6bf2c555f3d8f3e258",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "1f9a2d8fbfa2403a6da18d262f431504",
+      "storage_key": "1f9a2d8fbfa2403a6da18d262f431504",
+      "size": 15,
+      "sha256": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776"
+    },
+    {
+      "id": "596fbe444747ff7262c036a9910b057b",
+      "storage_key": "596fbe444747ff7262c036a9910b057b",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "5fe005d36b6db8a320da6cc6a10f4d9c",
+      "storage_key": "5fe005d36b6db8a320da6cc6a10f4d9c",
+      "size": 15,
+      "sha256": "cab78b5f8f4a1736aebd8abab5e76205ac32d1b15dc43f249ed6de23efe69513"
+    },
+    {
+      "id": "98160a2fe60d00710b476bca2e23ed90",
+      "storage_key": "98160a2fe60d00710b476bca2e23ed90",
+      "size": 11,
+      "sha256": "fb27c555ebcc0d7db412449872f55240009af53cedf8003e2e0d5018340dc2f6"
+    },
+    {
+      "id": "a5c9a46f01c384635912a1b125744d3b",
+      "storage_key": "a5c9a46f01c384635912a1b125744d3b",
+      "size": 11,
+      "sha256": "fb27c555ebcc0d7db412449872f55240009af53cedf8003e2e0d5018340dc2f6"
+    },
+    {
+      "id": "b3c9b6d3c010d8c4851e8a1d50b2d021",
+      "storage_key": "b3c9b6d3c010d8c4851e8a1d50b2d021",
+      "size": 68,
+      "sha256": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77"
+    },
+    {
+      "id": "f811cb39bba4ff2e097231b0564dd2d5",
+      "storage_key": "f811cb39bba4ff2e097231b0564dd2d5",
+      "size": 16,
+      "sha256": "62302c01a8a7300d8ba5f23a73854d04cc0143c24b1c0df1a5eb85e2b5c89306"
+    }
+  ],
+  "files": {
+    "assets/07acfca7cf4140ccf425eda0a343d876": "5c140d35dcb46a622e2cedf5ef5cc3638cdffd1c118c9331f8c84669f0b74783",
+    "assets/0ee85a65bd9372830d63b17baac53ea1": "fb27c555ebcc0d7db412449872f55240009af53cedf8003e2e0d5018340dc2f6",
+    "assets/1b9c4c16b79e9c6bf2c555f3d8f3e258": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/1f9a2d8fbfa2403a6da18d262f431504": "f0a1126b4e05012526f2ffbec0039b8bcc840326597b80a24fcb3107c2e22776",
+    "assets/596fbe444747ff7262c036a9910b057b": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/5fe005d36b6db8a320da6cc6a10f4d9c": "cab78b5f8f4a1736aebd8abab5e76205ac32d1b15dc43f249ed6de23efe69513",
+    "assets/98160a2fe60d00710b476bca2e23ed90": "fb27c555ebcc0d7db412449872f55240009af53cedf8003e2e0d5018340dc2f6",
+    "assets/a5c9a46f01c384635912a1b125744d3b": "fb27c555ebcc0d7db412449872f55240009af53cedf8003e2e0d5018340dc2f6",
+    "assets/b3c9b6d3c010d8c4851e8a1d50b2d021": "d126d616641d42ac8b0a07ec302c9fa1ec049f86200931a0a60c8f3080284b77",
+    "assets/f811cb39bba4ff2e097231b0564dd2d5": "62302c01a8a7300d8ba5f23a73854d04cc0143c24b1c0df1a5eb85e2b5c89306",
+    "noteapp.db": "755f0d41eeed7986aa668ddcbdaec754dcd621966e06c2951e77d07d24bdd142"
+  },
+  "integrity_check": "ok",
+  "foreign_key_check": [],
+  "format_version": 1,
+  "app_version": "8169b66",
+  "image_reference": "noteapp:v1-stability-20261025",
+  "image_id": "sha256:a8c2a74e1628f0d132a2c922ed1165b96530eb36d9e4435e3e146d64d245bebf",
+  "source_container": "noteapp-release-audit-20261025",
+  "source_volume": "noteapp-release-audit-20261025",
+  "created_at": "2026-10-24T20:33:27.367489+00:00"
+}

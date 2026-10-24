@@ -1,0 +1,23 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test release-audit.spec.ts
+
+(node:50405) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:50406) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:50406) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:50406) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/release-audit.spec.ts:32:3 › reproduce accepted style document that cannot reopen (520ms)
+  ✓  2 e2e/release-audit.spec.ts:32:3 › reproduce accepted table document that cannot reopen (344ms)
+  ✓  3 e2e/release-audit.spec.ts:61:1 › quota failure preserves input and manual server retry works (385ms)
+  ✓  4 e2e/release-audit.spec.ts:96:1 › reproduce pending page upload discarded by reload recovery (2.5s)
+LAN HTTP evidence {"secure":false,"errors":[],"body":"Unexpected Application Error!\ncrypto.randomUUID is not a function\nTypeError: crypto.randomUUID is not a function\n    at http://audit.invalid:18187/assets/index-DnAjR_TL.js:196:170966\n    at M1 (http://audit.invalid:18187/assets/index-DnAjR_TL.js:8:53483)\n    at Object.useState (http://audit.invalid:18187/assets/index-DnAjR_TL.js:8:61638)\n    at Q9.mt.useState (http://audit.invalid:18187/assets/index-DnAjR_TL.js:1:10024)\n    at oA (http://audit.invalid:18187/assets/index-DnAjR_TL.js:196:170844)\n    at TMe (http://audit.invalid:18187/assets/index-DnAjR_TL.js:196:219316)\n    at S1 (http://audit.invalid:18187/assets/index-DnAjR_TL.js:8:48572)\n    at z1 (http://audit.invalid:18187/assets/index-DnAjR_TL.js:8:71428)\n    at hR (http://audit.invalid:18187/assets/index-DnAjR_TL.js:8:81818)\n    at VR (http://audit.invalid:18187/assets/index-DnAjR_TL.js:8:117659)\n\n💿 Hey developer 👋\n\nYou can provide a way better UX than this when your app throws errors by providing your own ErrorBoundary or errorElement prop on your route."}
+  ✓  5 e2e/release-audit.spec.ts:165:1 › reproduce trusted LAN HTTP secure-context failure and foreign Host acceptance (777ms)
+  ✓  6 e2e/release-audit.spec.ts:218:1 › limited hostile link and raw HTML vectors do not execute (330ms)
+
+  6 passed (6.3s)

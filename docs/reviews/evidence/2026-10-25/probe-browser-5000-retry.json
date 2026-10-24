@@ -1,0 +1,117 @@
+{
+  "image": "sha256:be03221b8db9bf06e1d8d73f0adf48a9fc58cbec2e47e3da3423718c91b004e8",
+  "container": "noteapp-audit-probe-07d021e69f",
+  "count_per_type": 5000,
+  "cross_origin": 403,
+  "foreign_host": 201,
+  "malformed_documents": [
+    {
+      "status": 201,
+      "id": "0f269e55a4ef2fe0cf2443a5047dc1c1",
+      "block": {
+        "id": "bad-style",
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "untrusted",
+            "styles": {
+              "unknown": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "status": 201,
+      "id": "a7ba0f215c063be9e4fd29e05d66a842",
+      "block": {
+        "id": "bad-table",
+        "type": "table",
+        "content": {
+          "type": "tableContent",
+          "headerRows": 4294967296,
+          "rows": [
+            {
+              "cells": [
+                []
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "idempotency": {
+    "statuses": [
+      201,
+      201,
+      201,
+      201,
+      201,
+      201,
+      201,
+      201
+    ],
+    "unique_ids": 1
+  },
+  "last_seed": [
+    "events",
+    4999
+  ],
+  "seed_seconds": 95.52,
+  "measurements": {
+    "pages": {
+      "bytes": 41788529,
+      "median_ms": 547.8,
+      "max_ms": 828.31
+    },
+    "tasks": {
+      "bytes": 42073078,
+      "median_ms": 609.62,
+      "max_ms": 722.41
+    },
+    "events": {
+      "bytes": 41958892,
+      "median_ms": 415.88,
+      "max_ms": 545.31
+    },
+    "search_miss": {
+      "bytes": 45,
+      "median_ms": 554.17,
+      "max_ms": 902.45
+    },
+    "search_body": {
+      "bytes": 4208,
+      "median_ms": 438.15,
+      "max_ms": 478.23
+    },
+    "dashboard": {
+      "bytes": 2523054,
+      "median_ms": 46.82,
+      "max_ms": 83.77
+    }
+  },
+  "browser": {
+    "task_list": {
+      "ready_ms": 933,
+      "nodes": 25122,
+      "heap_bytes": 103060064
+    },
+    "note_list": {
+      "ready_ms": 1635,
+      "nodes": 15081,
+      "heap_bytes": 192682473
+    },
+    "edit": {
+      "ready_ms": 196,
+      "nodes": 112,
+      "heap_bytes": 203348292
+    },
+    "type_ms": 33,
+    "autosaved_ms": 1329
+  },
+  "memory": "403.8MiB / 7.748GiB",
+  "kill_restart_equal": true,
+  "logs": ""
+}
