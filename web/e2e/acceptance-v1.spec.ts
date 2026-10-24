@@ -89,6 +89,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await page.getByLabel("截止日期", { exact: true }).fill(today);
     await page.getByLabel("Markdown 正文").fill("- [ ] 独立检查项");
     await expect(page.getByRole("status")).toHaveText("已保存");
+    if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     await page.getByLabel("关联目标").selectOption({ label: "完整笔记" });
     await page.getByRole("button", { name: "添加关联", exact: true }).click();
     await expect(
@@ -114,6 +115,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     const eid = page.url().split("/").pop()!;
     await page.getByLabel("Markdown 正文").fill("日程正文可恢复");
     await expect(page.getByRole("status")).toHaveText("已保存");
+    if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     for (const label of ["完整笔记", "读摘要 · Todo"]) {
       await page.getByLabel("关联目标").selectOption({ label });
       await page.getByRole("button", { name: "添加关联", exact: true }).click();
@@ -145,6 +147,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       "完整笔记",
     );
+    if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     await expect(
       page.getByRole("link", { name: "读摘要 · Todo", exact: true }),
     ).toBeVisible();

@@ -11,7 +11,7 @@ import { DateTime } from "luxon";
 import { api } from "../../app/api";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
 import { useAutosave } from "../../components/markdown/useAutosave";
-import { Relations } from "../relation/Relations";
+import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { toInput, fromInput } from "./time";
 export type CalendarEvent = {
   id: string;
@@ -254,12 +254,6 @@ export function Events({
                   setEpoch((n) => n + 1);
                 }}
               />
-              <Relations
-                projectId={projectId}
-                type="events"
-                id={eventId}
-                archived={archived}
-              />
             </>
           ) : detail.isError ? (
             <p role="alert">
@@ -319,19 +313,12 @@ export function EventEditor({
       aria-label="日程详情"
       data-dirty={a.dirty || a.busy}
     >
-      <label>
-        日程标题
-        <input
-          aria-label="日程标题"
-          disabled={archived}
-          value={a.draft.title}
-          onChange={(e) => a.setDraft((d) => ({ ...d, title: e.target.value }))}
-        />
-      </label>
-      <p>时间：{zone}</p>
+      <header className="task-inline-header">
+        <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="日程标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
+        <ObjectProperties projectId={event.project_id} type="events" id={event.id} archived={archived}>
       {(["start_at", "end_at"] as const).map((key) => (
-        <label key={key}>
-          {key === "start_at" ? "开始时间" : "结束时间"}
+        <label key={key} className="task-property">
+          <span>{key === "start_at" ? "开始时间" : "结束时间"}</span>
           <input
             aria-label={key === "start_at" ? "开始时间" : "结束时间"}
             type="datetime-local"
@@ -343,6 +330,9 @@ export function EventEditor({
           />
         </label>
       ))}
+        <span className="property-zone" title="日程的显示与输入时区">{zone}</span>
+        </ObjectProperties>
+      </header>
       <MarkdownEditor
         projectId={event.project_id}
         value={a.draft.body}

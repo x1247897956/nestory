@@ -19,7 +19,6 @@ import { TaskEditor, type TaskDraft } from "../features/task/TaskEditor";
 import "./styles.css";
 import "./workspace.css";
 import { Events } from "../features/event/Events";
-import { Relations } from "../features/relation/Relations";
 import { Pages } from "../features/page/Pages";
 export function App() {
   const { projectId, taskId, pageId, eventId } = useParams();
@@ -451,12 +450,6 @@ export function App() {
                             await detail.refetch({ throwOnError: true });
                             setEditorEpoch((n) => n + 1);
                           }}
-                        />
-                        <Relations
-                          projectId={projectId}
-                          type="tasks"
-                          id={taskId}
-                          archived={readOnly}
                         />
                       </TaskSummary>
                     ) : (

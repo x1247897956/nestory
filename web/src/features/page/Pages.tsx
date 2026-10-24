@@ -1,4 +1,4 @@
-import { Relations } from "../relation/Relations";
+import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { flushSync } from "react-dom";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -174,12 +174,6 @@ export function Pages({
                   setEpoch((n) => n + 1);
                 }}
               />
-              <Relations
-                projectId={projectId}
-                type="pages"
-                id={pageId}
-                archived={archived}
-              />
             </>
           ) : detail.isError ? (
             <p role="alert">
@@ -225,15 +219,51 @@ function PageEditor({
       aria-label="笔记详情"
       data-dirty={a.dirty || a.busy}
     >
-      <label>
-        笔记标题
-        <input
-          aria-label="笔记标题"
-          disabled={archived}
-          value={a.draft.title}
-          onChange={(e) => a.setDraft((d) => ({ ...d, title: e.target.value }))}
-        />
-      </label>
+      <header className="task-inline-header">
+        <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="笔记标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
+        <ObjectProperties projectId={page.project_id} type="pages" id={page.id} archived={archived}>
+          <details className="note-parent-property"><summary>父笔记 · {nodes.find(n => n.id === page.parent_id)?.title ?? "顶层笔记"}</summary>
+      {!archived && (
+        <div className="page-controls">
+          <select
+            aria-label="移动到父笔记"
+            value={parent}
+            onChange={(e) => setParent(e.target.value)}
+          >
+            <option value="">顶层笔记</option>
+            {nodes.map((n) => (
+              <option key={n.id} value={n.id}>
+                {n.title}
+              </option>
+            ))}
+          </select>
+          <label>
+            顺序
+            <input
+              aria-label="笔记顺序"
+              type="number"
+              min="0"
+              value={position}
+              onChange={(e) => setPosition(Number(e.target.value))}
+            />
+          </label>
+          <button
+            disabled={a.dirty || a.busy}
+            onClick={async () => {
+              setError("");
+              try {
+                await onMove(parent || null, position, a.version);
+              } catch (e) {
+                setError((e as Error).message);
+              }
+            }}
+          >
+            移动笔记
+          </button>
+        </div>
+      )}          </details>
+        </ObjectProperties>
+      </header>
       <MarkdownEditor
         projectId={page.project_id}
         value={a.draft.body}
@@ -284,45 +314,7 @@ function PageEditor({
           </button>
         </div>
       )}
-      {!archived && (
-        <div className="page-controls">
-          <select
-            aria-label="移动到父笔记"
-            value={parent}
-            onChange={(e) => setParent(e.target.value)}
-          >
-            <option value="">顶层笔记</option>
-            {nodes.map((n) => (
-              <option key={n.id} value={n.id}>
-                {n.title}
-              </option>
-            ))}
-          </select>
-          <label>
-            顺序
-            <input
-              aria-label="笔记顺序"
-              type="number"
-              min="0"
-              value={position}
-              onChange={(e) => setPosition(Number(e.target.value))}
-            />
-          </label>
-          <button
-            disabled={a.dirty || a.busy}
-            onClick={async () => {
-              setError("");
-              try {
-                await onMove(parent || null, position, a.version);
-              } catch (e) {
-                setError((e as Error).message);
-              }
-            }}
-          >
-            移动笔记
-          </button>
-        </div>
-      )}
+
     </article>
   );
 }

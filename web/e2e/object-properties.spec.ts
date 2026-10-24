@@ -1,0 +1,40 @@
+import {test,expect} from '@playwright/test';
+test('all object types share collapsed relation properties with keyboard and mobile support',async({page,request})=>{
+ const create=async(path:string,data:object)=>(await(await request.post('/api/v1'+path,{data})).json());
+ const p=await create('/projects',{title:'统一对象属性 '+Date.now()});
+ const t=await create(`/projects/${p.id}/tasks`,{title:'关联行动'});
+ const n=await create(`/projects/${p.id}/pages`,{title:'关联资料'});
+ const e=await create(`/projects/${p.id}/events`,{title:'关联讨论',start_at:'2026-10-25T09:00:00+08:00',end_at:'2026-10-25T10:00:00+08:00'});
+ await request.put(`/api/v1/relations/task-page/${t.id}/${n.id}`);
+ await request.put(`/api/v1/relations/page-event/${n.id}/${e.id}`);
+ for(const [type,id] of [['tasks',t.id],['pages',n.id],['events',e.id]]){
+  await page.goto(`/projects/${p.id}/${type}/${id}`);
+  const properties=page.getByRole('group',{name:'对象属性'});
+  const toggle=properties.locator('.relation-property > summary');
+  const panel=properties.getByRole('region',{name:'关联对象列表'});
+  await expect(toggle).toBeVisible();
+  await expect(panel).toBeHidden();
+  await toggle.click();
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole('link').first()).toBeVisible();
+  await toggle.press('Escape');
+  await expect(panel).toBeHidden();
+  await toggle.press('Enter');
+  await expect(panel).toBeVisible();
+  await page.getByLabel(type==='tasks'?'任务标题':type==='pages'?'笔记标题':'日程标题',{exact:true}).click();
+  await expect(panel).toBeHidden();
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.goto(`/projects/${p.id}/pages/${n.id}`);
+ await page.locator('.relation-property > summary').click();
+ const panel=page.getByRole('region',{name:'关联对象列表'});
+ await expect(panel).toBeVisible();
+ const box=await panel.boundingBox();expect(box!.x).toBeGreaterThanOrEqual(0);expect(box!.x+box!.width).toBeLessThanOrEqual(390);
+ await panel.getByRole('button',{name:'移除关联 关联行动',exact:true}).click();
+ await expect(panel.getByRole('link',{name:/关联行动/})).toHaveCount(0);
+ expect((await(await request.get(`/api/v1/tasks/${t.id}/relations`)).json()).length).toBe(0);
+ await page.getByRole('button',{name:'归档项目',exact:true}).click();
+ await page.locator('.relation-property > summary').click();
+ await expect(panel.getByRole('link',{name:/关联讨论/})).toBeVisible();
+ await expect(panel.getByRole('button',{name:'添加关联',exact:true})).toHaveCount(0);
+});

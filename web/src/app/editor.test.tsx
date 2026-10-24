@@ -1,6 +1,6 @@
+import { renderObjectEditor as render } from "../test/renderObjectEditor";
 import {
   act,
-  render,
   screen,
   fireEvent,
   waitFor,

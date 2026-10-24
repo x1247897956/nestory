@@ -233,3 +233,29 @@ label,.filters label { color:#6b7079; }
 .overview-section-actions button,.overview-create { color:#243b63; background:#f5f7fb; border:1px solid #e2e7ef; border-radius:4px; padding:5px 9px; font-size:11px; white-space:nowrap; }
 .overview-section-actions button:hover,.overview-create:hover { background:#eaf0f8; }
 @media(max-width:650px) { .overview-section-actions { gap:8px; } .overview-section-actions .section-open { font-size:10px; } .breadcrumbs { gap:5px; } }
+/* Object properties share one quiet row; connections are revealed on demand. */
+.object-properties { position:relative; }
+.relation-property > summary,.note-parent-property > summary { display:flex; align-items:center; gap:7px; list-style:none; cursor:pointer; padding:8px 9px; border:1px solid transparent; border-radius:5px; font-size:12px; color:#626874; }
+.relation-property > summary::-webkit-details-marker,.note-parent-property > summary::-webkit-details-marker { display:none; }
+.relation-property > summary:hover,.note-parent-property > summary:hover,.relation-property[open] > summary { background:#f2f4f8; color:#243b63; }
+.relation-property > summary:focus-visible,.note-parent-property > summary:focus-visible { outline:2px solid #243b63; outline-offset:2px; }
+.relation-property > summary > span:first-child { font-size:10px; padding:1px 5px; background:#e9edf3; border-radius:4px; color:#243b63; }
+.relation-popover { position:absolute; z-index:30; left:0; top:calc(100% + 8px); width:min(420px,100%); max-height:440px; overflow:auto; padding:16px; border:1px solid #dfe3eb; border-radius:8px; background:#fff; box-shadow:0 12px 36px #19223418; }
+.relation-popover header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.relation-popover h3 { font-size:13px; margin:0; color:#252a33; }
+.relation-popover header > span,.relation-empty { font-size:11px; color:#626874; }
+.relation-empty { line-height:1.7; padding:10px 0; }
+.relation-popover .relation-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid #eff0f3; font-size:12px; }
+.relation-popover .relation-row a { color:#243b63; overflow-wrap:anywhere; min-width:0; }
+.relation-popover .relation-row button { font-size:10px; padding:4px 6px; flex-shrink:0; color:#626874; }
+.relation-popover .relation-controls { display:grid; gap:8px; margin-top:14px; }
+.editor .relation-popover input,.editor .relation-popover select { width:100%; margin:0; padding:8px 9px; font-size:12px; background:#fff; }
+.relation-popover .relation-controls button { font-size:12px; padding:7px 10px; background:#243b63; color:#fff; border-color:#243b63; }
+.relation-popover p[role="alert"] { color:#994d42; font-size:12px; }
+.object-actions { margin-left:auto; }
+.object-actions .delete-control > button { padding:5px 7px; background:transparent; border:0; color:#737986; font-size:11px; }
+.object-actions .delete-control > button:hover { color:#994d42; background:#faf3f1; }
+.object-actions .delete-control > [role="dialog"] { position:absolute; z-index:40; top:100%; right:0; width:min(420px,100%); background:#fff; border:1px solid var(--border); padding:16px; border-radius:8px; box-shadow:0 12px 36px #19223418; }
+.object-actions .delete-control > p { position:absolute; top:100%; right:0; background:white; z-index:40; padding:10px; max-width:100%; }
+.note-parent-property .page-controls { position:absolute; z-index:30; left:0; top:calc(100% + 8px); width:min(420px,100%); padding:16px; border:1px solid var(--border); background:#fff; border-radius:8px; box-shadow:0 12px 36px #19223418; }
+.property-zone { color:#737986; font-size:10px; }

@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderObjectEditor as render } from "../../test/renderObjectEditor";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { it, expect, vi } from "vitest";
 import { EventEditor } from "./Events";
 it("edits in deployment time and preserves Markdown on conflict", async () => {

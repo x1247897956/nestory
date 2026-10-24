@@ -1,5 +1,4 @@
-import { DeleteButton } from "../trash/DeleteButton";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, stages } from "../../app/api";
@@ -28,6 +27,12 @@ export function Relations({
   id: string;
   archived: boolean;
 }) {
+  const popover = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const dismiss = (event: PointerEvent) => { if (!popover.current?.contains(event.target as Node) && popover.current) popover.current.open = false; };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, []);
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [target, setTarget] = useState("");
@@ -85,9 +90,12 @@ export function Relations({
     }
   };
   return (
-    <section className="relations" aria-label="关联对象">
-      <h3>关联对象</h3>
-      {!archived && <DeleteButton type={type} id={id} projectId={projectId} />}
+    <details ref={popover} className="relation-property" onKeyDown={event => { if (event.key === "Escape" && popover.current) { popover.current.open = false; popover.current.querySelector("summary")?.focus(); } }}>
+      <summary aria-label="关联对象">关联 <span>{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><span aria-hidden="true">⌄</span></summary>
+      <section className="relation-popover" aria-label="关联对象列表">
+      <header><h3>关联对象</h3><span>同项目 · 双向关联</span></header>
+      {relations.isPending && <p role="status">正在加载关联…</p>}
+      {!relations.isPending && !relations.isError && !list.length && <p className="relation-empty">暂无关联，可连接相关任务、笔记或日程。</p>}
       {list.map((item) => (
         <div className="relation-row" key={item.type + item.id}>
           {item.deleted ? (
@@ -133,7 +141,7 @@ export function Relations({
         <div className="relation-controls">
           <input
             aria-label="搜索关联标题"
-            placeholder="搜索同项目标题"
+            placeholder="搜索同项目对象"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -187,5 +195,6 @@ export function Relations({
       )}
       {error && <p role="alert">{error}</p>}
     </section>
+    </details>
   );
 }

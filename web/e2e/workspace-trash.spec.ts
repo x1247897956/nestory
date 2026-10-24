@@ -28,6 +28,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   await page.getByRole("button", { name: "确认删除 1 个对象" }).click();
   await expect(page).toHaveURL(new RegExp("/projects/" + p.id + "/pages$"));
   await page.goto("/projects/" + p.id + "/tasks/" + t.id);
+  await page.locator(".relation-property > summary").click();
   await expect(page.getByText("已删除 · 先删后代")).toBeVisible();
   await page.getByLabel("任务标题", { exact: true }).fill("未保存草稿");
   await page.getByRole("button", { name: "移入回收站" }).click();
