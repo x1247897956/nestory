@@ -1,0 +1,28 @@
+import { test, expect } from '@playwright/test';
+test('top-right create action and dedicated summaries for every task', async ({ page, request }) => {
+  const project = await (await request.post('/api/v1/projects', {data:{title:'任务汇总 '+Date.now()}})).json();
+  const parent = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'准备方案',body:'汇总页中的任务正文',stage:'done'}})).json();
+  const child = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'整理素材',parent_id:parent.id}})).json();
+  await page.goto(`/projects/${project.id}/tasks`);
+  const add = page.getByRole('button',{name:'添加任务',exact:true});
+  const addBox = await add.boundingBox();
+  const filtersBox = await page.getByLabel('筛选阶段').boundingBox();
+  expect(addBox!.y).toBeLessThan(filtersBox!.y);
+  await page.getByRole('button',{name:'准备方案',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'准备方案',exact:true})).toBeVisible();
+  await expect(page.getByRole('region',{name:'任务汇总'})).toBeVisible();
+  await expect(page.getByText('0 / 1')).toBeVisible();
+  await expect(page.getByRole('heading',{name:'所有任务'})).toHaveCount(0);
+  await page.locator(`a[href="/projects/${project.id}/tasks/${child.id}"]`).click();
+  await expect(page).toHaveURL(new RegExp('/tasks/'+child.id+'$'));
+  await expect(page.getByRole('heading',{name:'整理素材',exact:true})).toBeVisible();
+  await expect(page.getByRole('link',{name:'准备方案',exact:true})).toBeVisible();
+  await page.getByRole('link',{name:'返回任务列表'}).click();
+  await add.click();
+  const dialog = page.getByRole('dialog',{name:'添加任务'});
+  await dialog.getByLabel('新任务标题').fill('新增独立汇总');
+  await dialog.getByRole('button',{name:'创建任务',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'新增独立汇总',exact:true})).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('region',{name:'任务汇总'})).toBeVisible();
+});

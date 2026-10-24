@@ -2,7 +2,7 @@ import { flushSync } from "react-dom";
 import { Workspace } from "../features/workspace/Workspace";
 import { Search } from "../features/search/Search";
 import { Trash } from "../features/trash/Trash";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Link,
   useNavigate,
@@ -13,8 +13,11 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, stages, priorities, type Project, type Task } from "./api";
 import { ProjectForm } from "../features/project/ProjectForm";
+import { ProjectOverview } from "../features/project/ProjectOverview";
+import { TaskSummary } from "../features/task/TaskSummary";
 import { TaskEditor, type TaskDraft } from "../features/task/TaskEditor";
 import "./styles.css";
+import "./workspace.css";
 import { Events } from "../features/event/Events";
 import { Relations } from "../features/relation/Relations";
 import { Pages } from "../features/page/Pages";
@@ -23,6 +26,7 @@ export function App() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [archived, setArchived] = useState(false);
+  const activeProjectHeading = useRef<HTMLDivElement>(null);
   const [projectForm, setProjectForm] = useState<"new" | "edit" | null>(null);
   const [stage, setStage] = useState("all");
   const [priority, setPriority] = useState("all");
@@ -31,6 +35,19 @@ export function App() {
   const [newTitle, setNewTitle] = useState("");
   const [newParent, setNewParent] = useState("");
   const [creating, setCreating] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const createDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (createOpen) createDialog.current?.showModal();
+  }, [createOpen]);
+  const closeCreate = () => {
+    if (creating) return;
+    if ((newTitle.trim() || newParent) && !confirm("放弃未保存的新任务吗？")) return;
+    setCreateOpen(false); setNewTitle(""); setNewParent("");
+  };
+  const openCreate = (parent = "") => {
+    setNewParent(parent); setCreateOpen(true);
+  };
   const [editorEpoch, setEditorEpoch] = useState(0);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const blocker = useBlocker(
@@ -65,6 +82,7 @@ export function App() {
   useEffect(() => {
     setNewTitle("");
     setNewParent("");
+    setCreateOpen(false);
   }, [path]);
   useEffect(() => {
     const protect = (event: BeforeUnloadEvent) => {
@@ -76,6 +94,7 @@ export function App() {
     window.addEventListener("beforeunload", protect);
     return () => window.removeEventListener("beforeunload", protect);
   }, []);
+  const overview = !!projectId && path === "/projects/" + projectId;
   const notes = path.includes("/pages");
   const calendar = path.includes("/events");
   useEffect(() => {
@@ -90,7 +109,10 @@ export function App() {
         .then(() => qc.invalidateQueries({ queryKey: ["recent"] }))
         .catch(() => {});
   }, [pageId, qc]);
+  useEffect(() => { activeProjectHeading.current?.scrollIntoView?.({ block: "nearest" }); }, [projectId, projects.data]);
   const p = current.data;
+  const navigationProjects = [...(projects.data ?? [])];
+  if (p && !navigationProjects.some(project => project.id === p.id)) navigationProjects.push(p);
   const all = tasks.data ?? [];
   const readOnly = !!p?.archived_at;
   const invalidate = async () => {
@@ -120,9 +142,6 @@ export function App() {
     (priority === "all" || t.priority === priority);
   const roots = all.filter((t) => !t.parent_id);
   const children = (id: string) => all.filter((t) => t.parent_id === id);
-  const count = all.filter(
-    (t) => t.stage !== "done" && t.stage !== "cancelled",
-  ).length;
   const row = (t: Task, child = false) => (
     <div
       key={t.id}
@@ -175,50 +194,38 @@ export function App() {
         <Link to="/" className="brand">
           <span className="brand-mark">n.</span>
           <span>
-            Noteapp<small>为想法留出位置</small>
+            Noteapp<small>个人工作空间</small>
           </span>
         </Link>
         <div className="sidebar-label">你的工作空间</div>
-        <Link className="nav-item" to="/">
+        <Link className="nav-item" to="/" aria-current={path === "/" ? "page" : undefined}>
           今日工作台
         </Link>
-        <Link className="nav-item" to="/search">
+        <Link className="nav-item" to="/search" aria-current={path === "/search" ? "page" : undefined}>
           搜索
         </Link>
-        <Link className="nav-item" to="/trash">
+        <Link className="nav-item" to="/trash" aria-current={path === "/trash" ? "page" : undefined}>
           回收站
         </Link>
-        <button
-          className={"nav-item " + (!archived ? "active" : "")}
-          onClick={() => setArchived(false)}
-        >
-          ◈ 活跃项目
-        </button>
-        <button
-          className={"nav-item " + (archived ? "active" : "")}
-          onClick={() => setArchived(true)}
-        >
-          ▣ 归档项目
-        </button>
         <div className="sidebar-heading">
-          <span>PROJECTS / {projects.data?.length ?? 0}</span>
-          <button aria-label="新建项目" onClick={() => setProjectForm("new")}>
-            ＋
-          </button>
+          <span>{archived ? "已归档" : "项目"} <span className="project-count">{projects.data?.length ?? 0}</span></span>
+          <div className="project-heading-actions">
+            <details className="project-options" onKeyDown={event => { if (event.key === "Escape") event.currentTarget.open = false; }}>
+              <summary aria-label="项目选项">⋯</summary>
+              <div><button onClick={event => { setArchived(!archived); event.currentTarget.closest("details")!.open = false; }}>{archived ? "返回项目列表" : "查看已归档项目"}</button></div>
+            </details>
+            <button aria-label="新建项目" onClick={() => setProjectForm("new")}>＋</button>
+          </div>
         </div>
-        <nav>
-          {projects.data?.map((project) => (
-            <Link
-              key={project.id}
-              className={
-                "project-link " + (project.id === projectId ? "active" : "")
-              }
-              to={"/projects/" + project.id}
-            >
-              <span className="project-icon">{project.title.slice(0, 1)}</span>
-              {project.title}
-            </Link>
-          ))}
+        <nav aria-label="项目列表">
+          {navigationProjects.map(project => <div className="sidebar-project" key={project.id}>
+            <div ref={project.id === projectId ? activeProjectHeading : undefined}>
+              <Link className={"project-link " + (project.id === projectId ? "active" : "")} to={"/projects/" + project.id}>
+                <span className="project-icon" aria-hidden="true">{project.title.slice(0, 1)}</span>
+                <span>{project.title}</span>
+              </Link>
+            </div>
+          </div>)}
         </nav>
         {projects.isError && (
           <p role="alert">
@@ -230,16 +237,16 @@ export function App() {
           ＋ 新建项目
         </button>
         <div className="sidebar-bottom">
-          <span className="local-dot" /> 本地空间 · 阶段 4<br />
+          <span className="local-dot" /> 本地空间<br />
         </div>
       </aside>
       <main>
         <div className="topbar">
           <span>
             工作空间 <span className="slash">/</span>{" "}
-            {p?.title ?? "开始一个项目"}
+            {projectId ? <><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link><span className="slash">/</span><span>{overview ? "概览" : notes ? "笔记" : calendar ? "日程" : "任务"}</span></> : "总览"}
           </span>
-          <span className="private-tag">LOCAL & PRIVATE</span>
+          <span className="private-tag">本地 · 私有</span>
         </div>
         {!projectId ? (
           <>
@@ -250,9 +257,7 @@ export function App() {
             ) : (
               <Workspace />
             )}
-            <button className="primary" onClick={() => setProjectForm("new")}>
-              ＋ 创建第一个项目
-            </button>
+
           </>
         ) : current.isPending ? (
           <p className="loading">正在打开项目…</p>
@@ -263,7 +268,7 @@ export function App() {
         ) : (
           <>
             <header className="project-header">
-              <div className="eyebrow">PROJECT / 工作项目</div>
+
               <div className="header-title">
                 <h1>{p?.title}</h1>
                 <div>
@@ -291,16 +296,9 @@ export function App() {
                 </div>
               </div>
               <p>
-                {p?.description || "给这个项目一些空间，让想法逐步成为行动。"}
+                {p?.description}
               </p>
-              <div className="project-tabs">
-                <Link to={"/projects/" + projectId}>
-                  任务 <b>{all.length}</b>
-                </Link>{" "}
-                <Link to={"/projects/" + projectId + "/pages"}>页面</Link>
-                <Link to={"/projects/" + projectId + "/events"}>日历</Link>
-                <small>{count} 项待推进</small>
-              </div>
+
             </header>
             {(current.isError || detail.isError) && (
               <p className="error" role="alert">
@@ -317,7 +315,9 @@ export function App() {
                 {error}
               </p>
             )}
-            {calendar ? (
+            {overview ? (
+              <ProjectOverview projectId={projectId} tasks={all} loadingTasks={tasks.isPending} tasksError={tasks.isError} retryTasks={() => void tasks.refetch()} archived={readOnly} onCreateTask={() => openCreate()} />
+            ) : calendar ? (
               <Events
                 projectId={projectId}
                 eventId={eventId}
@@ -330,16 +330,16 @@ export function App() {
                 archived={readOnly}
               />
             ) : (
-              <div className={"workspace " + (taskId ? "with-detail" : "")}>
-                <section className="task-list">
+              <div className={"workspace " + (taskId ? "task-summary-workspace" : "")}>
+                {!taskId && <section className="task-list">
                   <div className="list-toolbar">
                     <div>
                       <h2>所有任务</h2>
                       <span>{all.length} 个任务，专注当下的一步</span>
                     </div>
-                    <button onClick={() => setGroup(!group)}>
+                    <div className="task-toolbar-actions"><button onClick={() => setGroup(!group)}>
                       {group ? "取消分组" : "按阶段分组"}
-                    </button>
+                    </button>{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
                   </div>
                   <div className="filters">
                     <label>
@@ -424,76 +424,10 @@ export function App() {
                       .filter((t) => visible(t) || children(t.id).some(visible))
                       .map(renderRoot)
                   )}
-                  {!readOnly && (
-                    <form
-                      className="new-task"
-                      data-dirty={!!newTitle.trim() || !!newParent || creating}
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        setCreating(true);
-                        setError("");
-                        try {
-                          const t = await api<Task>(
-                            "/projects/" + projectId + "/tasks",
-                            "POST",
-                            { title: newTitle, parent_id: newParent || null },
-                          );
-                          flushSync(() => {
-                            setNewTitle("");
-                            setNewParent("");
-                            setCreating(false);
-                          });
-                          if (t.parent_id)
-                            setExpanded((old) =>
-                              new Set(old).add(t.parent_id!),
-                            );
-                          await qc.invalidateQueries({
-                            queryKey: ["tasks", projectId],
-                          });
-                          nav("/projects/" + projectId + "/tasks/" + t.id);
-                        } catch (err) {
-                          setError((err as Error).message);
-                        } finally {
-                          setCreating(false);
-                        }
-                      }}
-                    >
-                      <input
-                        disabled={creating}
-                        aria-label="新任务标题"
-                        placeholder="＋ 添加一个新任务…"
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                        required
-                      />
-                      <select
-                        disabled={creating}
-                        aria-label="父任务"
-                        value={newParent}
-                        onChange={(e) => setNewParent(e.target.value)}
-                      >
-                        <option value="">顶层任务</option>
-                        {roots.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            {t.title} 的子任务
-                          </option>
-                        ))}
-                      </select>
-                      <button disabled={creating || !newTitle.trim()}>
-                        {creating ? "添加中…" : "添加任务"}
-                      </button>
-                    </form>
-                  )}
-                </section>
+
+                </section>}
                 {taskId && (
-                  <aside className="detail-pane">
-                    <button
-                      className="close-detail"
-                      aria-label="关闭详情"
-                      onClick={() => nav("/projects/" + projectId)}
-                    >
-                      ×
-                    </button>
+                  <div className="task-summary-page">
                     {detail.isPending ? (
                       <p>加载任务…</p>
                     ) : detail.isError && !detail.data ? (
@@ -502,7 +436,7 @@ export function App() {
                         <button onClick={() => detail.refetch()}>重试</button>
                       </p>
                     ) : detail.data && detail.data.project_id === projectId ? (
-                      <>
+                      <TaskSummary task={detail.data} tasks={all} archived={readOnly} onCreate={openCreate}>
                         <TaskEditor
                           key={taskId + ":" + editorEpoch}
                           task={detail.data}
@@ -519,17 +453,81 @@ export function App() {
                           id={taskId}
                           archived={readOnly}
                         />
-                      </>
+                      </TaskSummary>
                     ) : (
                       <p>任务不属于此项目</p>
                     )}
-                  </aside>
+                  </div>
                 )}
               </div>
             )}
           </>
         )}
       </main>
+      {createOpen && !readOnly && <dialog ref={createDialog} className="create-task-dialog" aria-label="添加任务" onCancel={e => { e.preventDefault(); closeCreate(); }}>
+                    <form
+                      className="create-task-form"
+                      data-dirty={!!newTitle.trim() || !!newParent || creating}
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        setCreating(true);
+                        setError("");
+                        try {
+                          const t = await api<Task>(
+                            "/projects/" + projectId + "/tasks",
+                            "POST",
+                            { title: newTitle, parent_id: newParent || null },
+                          );
+                          flushSync(() => {
+                            setNewTitle("");
+                            setNewParent("");
+                            setCreating(false);
+                            setCreateOpen(false);
+                          });
+                          if (t.parent_id)
+                            setExpanded((old) =>
+                              new Set(old).add(t.parent_id!),
+                            );
+                          await qc.invalidateQueries({
+                            queryKey: ["tasks", projectId],
+                          });
+                          nav("/projects/" + projectId + "/tasks/" + t.id);
+                        } catch (err) {
+                          setError((err as Error).message);
+                        } finally {
+                          setCreating(false);
+                        }
+                      }}
+                    >
+                      <h2>添加任务</h2>
+                      {error && <p role="alert" className="error">{error}</p>}
+                      <label>任务标题<input
+                        disabled={creating}
+                        aria-label="新任务标题"
+                        placeholder="＋ 添加一个新任务…"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        required
+                        autoFocus
+                      /></label>
+                      <label>父任务<select
+                        disabled={creating}
+                        aria-label="父任务"
+                        value={newParent}
+                        onChange={(e) => setNewParent(e.target.value)}
+                      >
+                        <option value="">顶层任务</option>
+                        {roots.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.title} 的子任务
+                          </option>
+                        ))}
+                      </select></label>
+                      <div className="create-task-actions"><button type="button" onClick={closeCreate} disabled={creating}>取消</button><button className="primary" disabled={creating || !newTitle.trim()}>
+                        {creating ? "添加中…" : "创建任务"}
+                      </button></div>
+                    </form>
+      </dialog>}
       {projectForm && (
         <ProjectForm
           project={projectForm === "edit" ? p : undefined}

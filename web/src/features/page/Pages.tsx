@@ -69,8 +69,8 @@ export function Pages({
   }
   return (
     <div className="page-workspace">
-      <section className="page-tree" aria-label="页面树">
-        <h2>页面</h2>
+      <section className="page-tree" aria-label="笔记树">
+        <h2>笔记</h2>
         {flat.map(({ page, depth }) => (
           <Link
             style={{ paddingLeft: Math.min(depth, 12) * 12 }}
@@ -82,7 +82,7 @@ export function Pages({
         ))}
         {list.isError && (
           <p role="alert">
-            页面加载失败<button onClick={() => list.refetch()}>重试</button>
+            笔记加载失败<button onClick={() => list.refetch()}>重试</button>
           </p>
         )}
         {!archived && (
@@ -114,26 +114,26 @@ export function Pages({
           >
             <input
               disabled={creating}
-              aria-label="新页面标题"
+              aria-label="新笔记标题"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="页面标题"
+              placeholder="笔记标题"
             />
             <select
               disabled={creating}
-              aria-label="新页面父级"
+              aria-label="新笔记父级"
               value={parent}
               onChange={(e) => setParent(e.target.value)}
             >
-              <option value="">顶层页面</option>
+              <option value="">顶层笔记</option>
               {flat.map(({ page }) => (
                 <option key={page.id} value={page.id}>
                   {page.title}
                 </option>
               ))}
             </select>
-            <button disabled={creating || !title.trim()}>新建页面</button>
+            <button disabled={creating || !title.trim()}>新建笔记</button>
           </form>
         )}
         {error && <p role="alert">{error}</p>}
@@ -179,13 +179,13 @@ export function Pages({
             </>
           ) : detail.isError ? (
             <p role="alert">
-              页面加载失败<button onClick={() => detail.refetch()}>重试</button>
+              笔记加载失败<button onClick={() => detail.refetch()}>重试</button>
             </p>
           ) : (
-            <p>加载页面…</p>
+            <p>加载笔记…</p>
           )
         ) : (
-          <p>选择或新建页面，开始记录。</p>
+          <p>选择或新建笔记，开始记录。</p>
         )}
       </section>
     </div>
@@ -218,13 +218,13 @@ function PageEditor({
   return (
     <article
       className="editor"
-      aria-label="页面详情"
+      aria-label="笔记详情"
       data-dirty={a.dirty || a.busy}
     >
       <label>
-        页面标题
+        笔记标题
         <input
-          aria-label="页面标题"
+          aria-label="笔记标题"
           disabled={archived}
           value={a.draft.title}
           onChange={(e) => a.setDraft((d) => ({ ...d, title: e.target.value }))}
@@ -248,7 +248,7 @@ function PageEditor({
         </span>
         {!archived && (
           <button onClick={() => a.save()} disabled={a.busy || !a.dirty}>
-            保存页面
+            保存笔记
           </button>
         )}
       </div>
@@ -283,11 +283,11 @@ function PageEditor({
       {!archived && (
         <div className="page-controls">
           <select
-            aria-label="移动到父页面"
+            aria-label="移动到父笔记"
             value={parent}
             onChange={(e) => setParent(e.target.value)}
           >
-            <option value="">顶层页面</option>
+            <option value="">顶层笔记</option>
             {nodes.map((n) => (
               <option key={n.id} value={n.id}>
                 {n.title}
@@ -297,7 +297,7 @@ function PageEditor({
           <label>
             顺序
             <input
-              aria-label="页面顺序"
+              aria-label="笔记顺序"
               type="number"
               min="0"
               value={position}
@@ -315,7 +315,7 @@ function PageEditor({
               }
             }}
           >
-            移动页面
+            移动笔记
           </button>
         </div>
       )}

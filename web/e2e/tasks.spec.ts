@@ -14,17 +14,19 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await page.getByLabel("项目说明").fill("阅读与思考");
   await page.getByRole("button", { name: "保存项目" }).click();
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
-  await page.getByLabel("新任务标题").fill("读论文");
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
+  await page.getByLabel("新任务标题").fill("读论文");
+  await page.getByRole("button", { name: "创建任务", exact: true }).click();
   await expect(page.getByLabel("任务标题", { exact: true })).toHaveValue(
     "读论文",
   );
   const parentURL = page.url();
   const parentID = parentURL.split("/").at(-1)!;
   const projectID = parentURL.split("/")[4];
+  await page.getByRole("button", { name: "添加任务", exact: true }).click();
   await page.getByLabel("新任务标题").fill("读摘要");
   await page.getByLabel("父任务", { exact: true }).selectOption(parentID);
-  await page.getByRole("button", { name: "添加任务", exact: true }).click();
+  await page.getByRole("button", { name: "创建任务", exact: true }).click();
   await expect(page.getByLabel("任务标题", { exact: true })).toHaveValue(
     "读摘要",
   );
@@ -110,7 +112,7 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
   await began;
   await page.getByLabel("Markdown 正文").fill("baseline A");
   const dialog = page.waitForEvent("dialog");
-  const navigation = page.locator(".project-tabs a").first().click();
+  const navigation = page.getByRole("link", {name:"汇总", exact:true}).click();
   await (await dialog).dismiss();
   await navigation;
   await expect(page.getByLabel("Markdown 正文")).toHaveText("baseline A");

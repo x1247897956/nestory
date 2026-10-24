@@ -14,18 +14,18 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
     ["B", "A"],
     ["C", "B"],
   ]) {
-    await page.getByLabel("新页面标题").fill(title);
+    await page.getByLabel("新笔记标题").fill(title);
     if (parent) {
       const opts = await page
-        .getByLabel("新页面父级")
+        .getByLabel("新笔记父级")
         .locator("option")
         .allTextContents();
       await page
-        .getByLabel("新页面父级")
+        .getByLabel("新笔记父级")
         .selectOption({ label: opts.find((n) => n === parent)! });
     }
-    await page.getByRole("button", { name: "新建页面", exact: true }).click();
-    await expect(page.getByLabel("页面标题", { exact: true })).toHaveValue(
+    await page.getByRole("button", { name: "新建笔记", exact: true }).click();
+    await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       title,
     );
   }
@@ -63,7 +63,7 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   await expect(page.getByRole("alert")).toContainText("模拟保存失败");
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");
   const dialog = page.waitForEvent("dialog");
-  const navigation = page.locator(".project-tabs a").first().click();
+  const navigation = page.getByRole("link", {name:"汇总", exact:true}).click();
   await (await dialog).dismiss();
   await navigation;
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");

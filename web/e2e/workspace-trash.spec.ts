@@ -69,7 +69,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   await page
     .locator('a[href="/projects/' + p.id + "/pages/" + a.id + '"]')
     .click();
-  await expect(page.getByLabel("页面标题", { exact: true })).toHaveValue(
+  await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
     "祖先中文%_",
   );
 
@@ -90,7 +90,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   await expect(
     page.getByText("此项目已归档，内容只读。取消归档后可继续编辑。"),
   ).toBeVisible();
-  await expect(page.getByLabel("页面标题", { exact: true })).toBeDisabled();
+  await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
   await expect(page.getByRole("button", { name: "移入回收站" })).toHaveCount(0);
   expect(
     (

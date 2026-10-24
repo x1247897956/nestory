@@ -52,7 +52,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
         draftWarning = true;
         await dialog.dismiss();
       });
-      await page.getByRole("link", { name: /^任务/ }).click();
+      await page.getByRole("link", { name: "汇总", exact: true }).click();
       await expect.poll(() => draftWarning).toBe(true);
       expect(
         await page.evaluate(() =>
@@ -147,7 +147,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       ).toHaveCount(0);
       const other = await create("/projects", { title: "其他" });
       const foreign = await create("/projects/" + other.id + "/pages", {
-        title: "外部页面",
+        title: "外部笔记",
       });
       expect(
         (

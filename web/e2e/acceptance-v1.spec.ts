@@ -25,10 +25,10 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await page.getByRole("button", { name: "保存项目" }).click();
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
     const pid = new URL(page.url()).pathname.split("/")[2];
-    await page.getByRole("link", { name: /^页面/ }).click();
-    await page.getByLabel("新页面标题").fill("完整笔记");
-    await page.getByRole("button", { name: "新建页面", exact: true }).click();
-    await expect(page.getByLabel("页面标题", { exact: true })).toHaveValue(
+    await page.getByRole("link", { name: "笔记", exact: true }).click();
+    await page.getByLabel("新笔记标题").fill("完整笔记");
+    await page.getByRole("button", { name: "新建笔记", exact: true }).click();
+    await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       "完整笔记",
     );
     const pgid = page.url().split("/").pop()!;
@@ -66,18 +66,21 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(page.locator(".markdown-preview pre code")).toContainText(
       "fmt.Println",
     );
-    await page.getByRole("link", { name: /^任务/ }).click();
-    await page.getByLabel("新任务标题").fill("读论文");
+    await page.getByRole("link", { name: "汇总", exact: true }).click();
+    await page.getByRole("link", { name: "任务", exact: true }).click();
     await page.getByRole("button", { name: "添加任务", exact: true }).click();
+    await page.getByLabel("新任务标题").fill("读论文");
+    await page.getByRole("button", { name: "创建任务", exact: true }).click();
     await expect(page.getByLabel("任务标题", { exact: true })).toHaveValue(
       "读论文",
     );
     const parent = page.url().split("/").pop()!;
     await page.getByLabel("阶段", { exact: true }).selectOption("done");
     await expect(page.getByRole("status")).toHaveText("已保存");
+    await page.getByRole("button", { name: "添加任务", exact: true }).click();
     await page.getByLabel("新任务标题").fill("读摘要");
     await page.getByLabel("父任务", { exact: true }).selectOption(parent);
-    await page.getByRole("button", { name: "添加任务", exact: true }).click();
+    await page.getByRole("button", { name: "创建任务", exact: true }).click();
     await expect(page.getByLabel("任务标题", { exact: true })).toHaveValue(
       "读摘要",
     );
@@ -91,7 +94,8 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(
       page.getByRole("link", { name: "完整笔记", exact: true }),
     ).toBeVisible();
-    await page.getByRole("link", { name: /^日历/ }).click();
+    await page.getByRole("link", { name: "汇总", exact: true }).click();
+    await page.getByRole("link", { name: "日程", exact: true }).click();
     await page.getByRole("button", { name: "月", exact: true }).click();
     await page
       .locator(
@@ -126,9 +130,9 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     ).toBeVisible();
     await page.goto("/projects/" + pid + "/pages/" + pgid);
     await page.getByRole("button", { name: "归档项目", exact: true }).click();
-    await expect(page.getByLabel("页面标题", { exact: true })).toBeDisabled();
+    await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
     await page.getByRole("button", { name: "取消归档", exact: true }).click();
-    await expect(page.getByLabel("页面标题", { exact: true })).toBeEnabled();
+    await expect(page.getByLabel("笔记标题", { exact: true })).toBeEnabled();
     await page.getByRole("button", { name: "移入回收站", exact: true }).click();
     await page
       .getByRole("button", { name: "确认删除 1 个对象", exact: true })
@@ -138,7 +142,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       .getByRole("button", { name: "恢复 完整笔记", exact: true })
       .click();
     await page.goto("/projects/" + pid + "/pages/" + pgid);
-    await expect(page.getByLabel("页面标题", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       "完整笔记",
     );
     await expect(

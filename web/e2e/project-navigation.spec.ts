@@ -1,0 +1,27 @@
+import {test,expect} from '@playwright/test';
+test('flat sidebar and overview are the project entry point',async({page,request})=>{
+  const title='项目入口 '+Date.now();
+  const p=await(await request.post('/api/v1/projects',{data:{title}})).json();
+  await page.goto(`/projects/${p.id}`);
+  const sidebar=page.getByRole('complementary');
+  await expect(sidebar.locator(`a.project-link[href="/projects/${p.id}"]`)).toBeVisible();
+  await expect(sidebar.getByRole('button',{name:/展开|折叠/})).toHaveCount(0);
+  await expect(sidebar.getByRole('link',{name:'笔记',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'项目汇总',exact:true})).toHaveCount(0);
+  await expect(page.getByText('从想法、行动到时间安排，一处展开。')).toHaveCount(0);
+  await expect(page.locator('.project-tabs')).toHaveCount(0);
+  const cards=page.locator('.overview-card');
+  await expect(cards).toHaveCount(3);
+  const first=await cards.nth(0).boundingBox(), second=await cards.nth(1).boundingBox();
+  expect(second!.y).toBeGreaterThanOrEqual(first!.y+first!.height);
+  await page.getByRole('link',{name:'笔记',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'笔记',exact:true})).toBeVisible();
+  await expect(page.getByLabel('新笔记标题')).toBeVisible();
+  await page.getByRole('link',{name:'汇总',exact:true}).click();
+  await expect(page.getByRole('region',{name:'项目汇总'})).toBeVisible();
+  await page.getByRole('link',{name:'日程',exact:true}).click();
+  await expect(page.getByRole('region',{name:'项目日历'})).toBeVisible();
+  await page.getByRole('link',{name:'汇总',exact:true}).click();
+  await page.getByRole('link',{name:'任务',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'所有任务'})).toBeVisible();
+});
