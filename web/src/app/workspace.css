@@ -172,3 +172,40 @@ label,.filters label { color:#6b7079; }
   .sidebar-heading { display:flex; margin:14px 2px 6px; }
   .project-options > div { left:auto; right:0; }
 }
+/* The calendar establishes the time horizon; the task list spans every active project. */
+.workbench { max-width:1500px; }
+.workbench-summary { color:#626874; font-size:12px; }
+.workbench-calendar { border:1px solid var(--border); border-radius:8px; padding:20px; --fc-border-color:#e8e9ed; --fc-button-bg-color:#fff; --fc-button-border-color:#dfe2e8; --fc-button-text-color:#414854; --fc-button-hover-bg-color:#f2f3f5; --fc-button-hover-border-color:#b8c0cf; --fc-button-active-bg-color:#243b63; --fc-button-active-border-color:#243b63; --fc-today-bg-color:#f5f7fb; --fc-event-bg-color:#edf1f8; --fc-event-border-color:#edf1f8; --fc-event-text-color:#243b63; }
+.workbench-calendar .desk-section-heading { justify-content:space-between; }
+.workbench-calendar .desk-section-heading > span { font-size:11px; color:#626874; }
+.workbench-calendar .fc-toolbar-title { font-size:17px; font-weight:600; }
+.workbench-calendar .fc-button { font-size:11px; box-shadow:none!important; }
+.workbench-calendar .fc-button-active { color:white!important; }
+.workbench-calendar .fc-col-header-cell { font-size:11px; font-weight:500; color:#626874; padding:6px 0; }
+.workbench-calendar .fc-daygrid-day-number { font-size:11px; padding:6px 8px; }
+.workbench-calendar .fc-daygrid-event { padding:3px 5px; gap:5px; border-radius:3px; font-size:11px; }
+.workbench-event-time { font-variant-numeric:tabular-nums; opacity:.8; }
+.workbench-event-title { overflow:hidden; text-overflow:ellipsis; }
+.workbench-event-title small { display:block; font-size:9px; opacity:.75; overflow:hidden; text-overflow:ellipsis; }
+.calendar-status { font-size:11px; color:#626874; }
+.workbench-tasks { margin-top:32px; border-top:2px solid #252a33; }
+.workbench-task-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 0 16px; }
+.workbench-task-heading h2 { font-size:18px; margin-bottom:5px; }
+.workbench-task-heading > div > span { color:#626874; font-size:11px; }
+.workbench-task-heading [role="group"] { display:flex; gap:4px; }
+.workbench-task-heading button { border:0; background:transparent; font-size:11px; color:#626874; }
+.workbench-task-heading button[aria-pressed="true"] { color:#243b63; background:#edf1f8; font-weight:600; }
+.workbench-tasks .desk-task-row { padding:14px 8px; }
+.workbench-tasks .task-overdue { color:#8e453c; }
+@media(max-width:650px) {
+ .workbench-summary { font-size:10px; }
+ .workbench-calendar { padding:12px; }
+ .workbench-calendar .fc-toolbar { flex-wrap:wrap; gap:12px; }
+ .workbench-calendar .fc-toolbar-title { font-size:14px; }
+ .workbench-task-heading { align-items:start; flex-direction:column; }
+ .workbench .desk-task-row time { display:block; }
+ .workbench-event-time,.workbench-event-title small { display:none; }
+}
+.workbench-recent { border-top:1px solid var(--border); margin-top:28px; }
+.workbench-recent ul { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px 24px; }
+@media(max-width:650px) { .workbench-recent ul { grid-template-columns:1fr; } }

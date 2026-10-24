@@ -189,6 +189,10 @@ func New(db *sql.DB, c config.Config) http.Handler {
 
 	ws := workspace.New(db, c.Timezone, nil)
 	bin := trash.New(db)
+	mux.HandleFunc("GET /api/v1/workspace", func(w http.ResponseWriter, r *http.Request) {
+		v, e := ws.Dashboard(r.Context(), r.URL.Query().Get("from"), r.URL.Query().Get("to"))
+		respond(w, 200, v, e)
+	})
 	mux.HandleFunc("GET /api/v1/workspace/today", func(w http.ResponseWriter, r *http.Request) { v, e := ws.Today(r.Context()); respond(w, 200, v, e) })
 	mux.HandleFunc("GET /api/v1/search", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()

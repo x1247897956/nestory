@@ -1,4 +1,9 @@
-import { DateTime } from "luxon";
+import { useState } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import luxonPlugin from "@fullcalendar/luxon3";
+import zhCN from "@fullcalendar/core/locales/zh-cn";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../app/api";
@@ -11,6 +16,7 @@ export type Item = {
   parent_title?: string;
   path?: string;
   archived: boolean;
+  stage?: string;
   due_date?: string;
   start_at?: string;
   end_at?: string;
@@ -65,47 +71,47 @@ export function ItemList({
     </ul>
   );
 }
-type Today = { date: string; timezone: string; today: Item[]; overdue: Item[]; events: Item[] };
+type Dashboard = { date: string; timezone: string; tasks: Item[]; events: Item[] };
 const itemUrl = (item: Item) => `/projects/${item.project_id}${item.type === "projects" ? "" : `/${item.type}/${item.id}`}`;
 
 export function Workspace() {
-  const today = useQuery({ queryKey: ["today"], queryFn: () => api<Today>("/workspace/today") });
+  const [range, setRange] = useState<{ from: string; to: string }>();
+  const [filter, setFilter] = useState("all");
+  const config = useQuery({ queryKey: ["config"], queryFn: () => api<{ timezone: string }>("/config") });
+  const dashboard = useQuery({
+    queryKey: ["workspace", range],
+    queryFn: () => api<Dashboard>("/workspace?" + new URLSearchParams(range!)),
+    enabled: !!range,
+  });
   const recent = useQuery({ queryKey: ["recent"], queryFn: () => api<Item[]>("/recent") });
-  const data = today.data;
-  const overdue = data?.overdue ?? [], due = data?.today ?? [], events = data?.events ?? [];
-  const attention = overdue.length + due.length;
-  const timeLabel = (iso: string) => {
-    const value = DateTime.fromISO(iso).setZone(data?.timezone ?? "Asia/Shanghai");
-    return value.toFormat(value.toISODate() === data?.date ? "HH:mm" : "M/d HH:mm");
-  };
-  const taskRows = (items: Item[]) => <ul className="desk-task-list">{items.map(item => <li key={item.id}>
-    <Link to={itemUrl(item)} className="desk-task-row"><span className="desk-task-mark" aria-hidden="true" /><span className="desk-row-content"><strong>{item.title}</strong><small>{item.project_title}{item.parent_title ? ` / ${item.parent_title}` : ""}</small></span><time>{item.due_date}</time><span className="desk-arrow" aria-hidden="true">↗</span></Link>
-  </li>)}</ul>;
-
-  return <section className="desk" aria-label="今日工作台">
-    <header className="desk-header"><div><span className="desk-date">{data ? DateTime.fromISO(data.date).setLocale("zh-cn").toFormat("M月d日 · cccc") : "正在加载日期…"}</span><h1>今日工作台</h1></div></header>
-    {today.isError && <p className="desk-error" role="alert">工作台刷新失败{data ? "，当前内容仍保留。" : "。"}<button onClick={() => void today.refetch()}>重试</button></p>}
-    <div className="desk-layout">
-      <section className="desk-focus" aria-label="优先处理" aria-busy={today.isPending}>
-        <header className="desk-focus-heading"><div><span className="desk-kicker">优先处理</span><h2>{today.isPending ? "正在整理待办…" : today.isError && !data ? "暂时无法加载" : attention ? `${attention} 项需要关注` : "今天没有到期任务"}</h2></div><span className="desk-focus-symbol" aria-hidden="true">↗</span></header>
-        <div className="desk-focus-body">
-          {today.isPending ? <p role="status" className="desk-empty">正在加载待处理任务…</p> : !data ? <p className="desk-empty">请重试以获取今天的任务。</p> : <>
-            <div className="desk-group-title"><h3>逾期任务</h3><span className={overdue.length ? "desk-count urgent" : "desk-count"}>{overdue.length}</span></div>
-            {overdue.length ? taskRows(overdue) : <p className="desk-empty">没有逾期任务。</p>}
-            <div className="desk-group-title today-group"><h3>今日到期</h3><span className="desk-count">{due.length}</span></div>
-            {due.length ? taskRows(due) : <p className="desk-empty">今日没有到期任务，可以继续推进项目。</p>}
-          </>}
-        </div>
-      </section>
-      <div className="desk-secondary">
-        <section className="desk-schedule" aria-label="今日日程"><header className="desk-section-heading"><h2>今日日程</h2><span className="desk-count">{events.length}</span></header>
-          {today.isPending ? <p role="status" className="desk-empty">正在加载日程…</p> : !data ? <p className="desk-empty">日程暂时不可用。</p> : events.length ? <ol className="desk-timeline">{events.map(item => <li key={item.id}><Link to={itemUrl(item)}><time>{timeLabel(item.start_at!)}<small>{timeLabel(item.end_at!)}</small></time><span><strong>{item.title}</strong><small>{item.project_title}</small></span></Link></li>)}</ol> : <p className="desk-empty">今天没有日程安排。</p>}
-        </section>
-        <section className="desk-recent" aria-label="最近访问"><header className="desk-section-heading"><h2>最近访问</h2></header>
-          {recent.isError && <p role="alert" className="desk-error">最近访问加载失败<button onClick={() => void recent.refetch()}>重试</button></p>}
-          {recent.isPending ? <p role="status" className="desk-empty">加载最近访问…</p> : recent.data?.length ? <ul>{recent.data.slice(0,6).map(item => <li key={item.type + item.id}><Link to={itemUrl(item)}><span className="desk-recent-icon" aria-hidden="true">{item.type === "projects" ? "▦" : "▤"}</span><span><strong>{item.title}</strong><small>{item.type === "projects" ? "项目" : item.project_title}</small></span><span className="desk-arrow" aria-hidden="true">↗</span></Link></li>)}</ul> : !recent.isError && <p className="desk-empty">打开项目或笔记后，会在这里留下快捷入口。</p>}
-        </section>
-      </div>
-    </div>
+  const data = dashboard.data;
+  const tasks = (data?.tasks ?? []).filter(item => filter === "all" || (filter === "overdue" ? !!item.due_date && item.due_date < data!.date : item.due_date === data!.date));
+  const overdue = (data?.tasks ?? []).filter(item => item.due_date && item.due_date < data!.date).length;
+  const zone = config.data?.timezone;
+  return <section className="desk workbench" aria-label="工作台">
+    <header className="desk-header"><div><span className="desk-date">个人工作空间</span><h1>工作台</h1></div><span className="workbench-summary">{data ? `${data.tasks.length} 项待推进${overdue ? ` · ${overdue} 项逾期` : ""}` : "项目、行动与时间"}</span></header>
+    <section className="workbench-calendar" aria-label="日程日历">
+      <header className="desk-section-heading"><h2>日程</h2><span>所有未归档项目</span></header>
+      {config.isError ? <p role="alert" className="desk-error">日历配置加载失败 <button onClick={() => void config.refetch()}>重试</button></p> : !zone ? <p role="status" className="desk-empty">正在加载日历…</p> : <FullCalendar
+        plugins={[dayGridPlugin, timeGridPlugin, luxonPlugin]}
+        locale={zhCN} timeZone={zone} initialView="dayGridMonth" firstDay={1}
+        headerToolbar={{ left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek" }}
+        buttonText={{ today: "今天", month: "月", week: "周" }}
+        height="auto" dayMaxEvents={3} eventDisplay="block"
+        datesSet={info => setRange(old => old?.from === info.startStr && old.to === info.endStr ? old : { from: info.startStr, to: info.endStr })}
+        events={(data?.events ?? []).map(item => ({ id: item.id, title: item.title, start: item.start_at, end: item.end_at, url: itemUrl(item), extendedProps: { project: item.project_title } }))}
+        eventContent={info => <><span className="workbench-event-time">{info.timeText}</span><span className="workbench-event-title" title={`${info.event.title} · ${info.event.extendedProps.project}`}>{info.event.title}<small>{info.event.extendedProps.project}</small></span></>}
+      />}
+      {dashboard.isFetching && <p role="status" className="calendar-status">正在同步日程…</p>}
+      {dashboard.isError && <p role="alert" className="desk-error">工作台加载失败 <button onClick={() => void dashboard.refetch()}>重试</button></p>}
+      {data && !dashboard.isFetching && !data.events.length && <p className="desk-empty">此日期范围暂无日程，可在项目的日程中添加。</p>}
+    </section>
+    <section className="workbench-tasks" aria-label="任务列表">
+      <header className="workbench-task-heading"><div><h2>任务</h2><span>跨项目推进每一步</span></div><div role="group" aria-label="任务范围">{[["all", "全部未完成"], ["overdue", "逾期"], ["today", "今日到期"]].map(([value, label]) => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</button>)}</div></header>
+      {!data ? <p className="desk-empty">{dashboard.isError ? "暂时无法加载任务，请重试。" : "正在加载任务…"}</p> : tasks.length ? <ul className="desk-task-list">{tasks.map(item => <li key={item.id}><Link to={itemUrl(item)} className="desk-task-row"><span className={`stage-dot ${item.stage ?? "todo"}`} aria-hidden="true"/><span className="desk-row-content"><strong>{item.title}</strong><small>{item.project_title}{item.parent_title ? ` / ${item.parent_title}` : ""}</small></span><time className={item.due_date && item.due_date < data.date ? "task-overdue" : ""}>{item.due_date ?? "未设日期"}</time><span className="desk-arrow" aria-hidden="true">↗</span></Link></li>)}</ul> : <p className="desk-empty">{filter === "all" ? "暂无未完成任务，前往项目安排下一步行动。" : filter === "overdue" ? "没有逾期任务。" : "今日没有到期任务。"}</p>}
+    </section>
+    <section className="desk-recent workbench-recent" aria-label="最近访问"><header className="desk-section-heading"><h2>最近访问</h2></header>
+      {recent.isError ? <p role="alert" className="desk-error">最近访问加载失败 <button onClick={() => void recent.refetch()}>重试</button></p> : recent.isPending ? <p role="status" className="desk-empty">正在加载…</p> : recent.data?.length ? <ul>{recent.data.slice(0,6).map(item => <li key={item.type + item.id}><Link to={itemUrl(item)}><span className="desk-recent-icon" aria-hidden="true">▤</span><span><strong>{item.title}</strong><small>{item.type === "projects" ? "项目" : item.project_title}</small></span></Link></li>)}</ul> : <p className="desk-empty">打开项目或笔记后，会在这里显示。</p>}
+    </section>
   </section>;
 }

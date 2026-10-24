@@ -20,16 +20,7 @@ test('project opens overview and links to tasks pages and events', async ({page,
   await page.getByRole('link',{name:'汇总',exact:true}).click();
   await page.reload();
   await expect(page.getByRole('region',{name:'项目汇总'})).toBeVisible();
-  const add = page.getByRole('button',{name:'添加任务',exact:true});
-  const headingBox = await page.getByRole('region',{name:'项目汇总'}).boundingBox();
-  const addBox = await add.boundingBox();
-  expect(addBox!.x).toBeGreaterThan(headingBox!.x);
-  await add.click();
-  await page.getByLabel('新任务标题').fill('从汇总添加');
-  await page.getByRole('button',{name:'创建任务',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'从汇总添加',exact:true})).toBeVisible();
-  await page.getByRole('link',{name:'汇总',exact:true}).click();
-  await expect(page.getByRole('link',{name:/从汇总添加/})).toBeVisible();
+  await expect(page.getByRole('button',{name:'添加任务',exact:true})).toHaveCount(0);
   await page.getByRole('link',{name:"任务",exact:true}).click();
   await expect(page).toHaveURL(new RegExp(`/projects/${p.id}/tasks$`));
   const filtersBox = await page.getByLabel('筛选阶段').boundingBox();

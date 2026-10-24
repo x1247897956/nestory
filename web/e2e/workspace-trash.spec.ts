@@ -117,7 +117,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   await expect(
     page.getByText("项目已归档，请先取消归档再恢复。").first(),
   ).toBeVisible();
-  await page.getByRole("link", { name: "今日工作台", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "今日到期" })).toBeVisible();
+  await page.getByRole("link", { name: "工作台", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "工作台", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "最近访问" })).toBeVisible();
 });

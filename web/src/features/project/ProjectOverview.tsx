@@ -7,9 +7,9 @@ type Item = { id: string; type: string; title: string; path?: string; start_at?:
 const isOpen = (task: Task) => task.stage !== "done" && task.stage !== "cancelled";
 const stageNames = new Map<string, string>(stages);
 
-export function ProjectOverview({ projectId, tasks, loadingTasks, tasksError, retryTasks, archived, onCreateTask }: {
+export function ProjectOverview({ projectId, tasks, loadingTasks, tasksError, retryTasks, archived }: {
   projectId: string; tasks: Task[]; loadingTasks: boolean; tasksError: boolean;
-  retryTasks: () => void; archived: boolean; onCreateTask: () => void;
+  retryTasks: () => void; archived: boolean;
 }) {
   // Independent requests run in parallel and reuse the detail views' query cache.
   const objects = useQuery({ queryKey: ["relation-options", projectId], queryFn: () => api<Item[]>(`/projects/${projectId}/relation-options`) });
@@ -30,7 +30,6 @@ export function ProjectOverview({ projectId, tasks, loadingTasks, tasksError, re
   return <section className="project-overview" aria-label="项目汇总">
     <div className="overview-toolbar">
       <span className="overview-status">{loadingTasks ? "加载中…" : `${pending} 项待推进`}{archived ? " · 只读" : ""}</span>
-      {!archived && <button className="primary" onClick={onCreateTask}><span aria-hidden="true">＋ </span>添加任务</button>}
     </div>
     <div className="overview-grid">
       <article className="overview-card">

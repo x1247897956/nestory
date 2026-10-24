@@ -136,3 +136,38 @@ func TestDSTAndPagination(t *testing.T) {
 		t.Fatal(literal, e)
 	}
 }
+
+func TestDashboardIncludesFutureAndUndatedTasksAndRangeEvents(t *testing.T) {
+	ctx := context.Background()
+	db, err := database.Open(ctx, filepath.Join(t.TempDir(), "dashboard.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	exec := func(q string, args ...any) {
+		t.Helper()
+		if _, err := db.Exec(q, args...); err != nil {
+			t.Fatal(err)
+		}
+	}
+	exec(`INSERT INTO projects(id,title,created_at,updated_at) VALUES('p','P',1,1),('arch','Archived',1,1)`)
+	exec(`UPDATE projects SET archived_at=1 WHERE id='arch'`)
+	exec(`INSERT INTO tasks(id,project_id,title,stage,due_date,created_at,updated_at) VALUES('future','p','Future','todo','2026-11-12',1,1),('undated','p','Undated','todo',NULL,1,1),('done','p','Done','done',NULL,1,1),('hidden','arch','Hidden','todo',NULL,1,1)`)
+	exec(`INSERT INTO tasks(id,project_id,title,deleted_at,created_at,updated_at) VALUES('deleted','p','Deleted',1,1,1)`)
+	a, _ := time.Parse(time.RFC3339, "2026-11-12T09:00:00+08:00")
+	exec(`INSERT INTO events(id,project_id,title,start_at,end_at,created_at,updated_at) VALUES('e','p','Future event',?,?,1,1),('hidden','arch','Hidden',?,?,1,1)`, a.UnixMilli(), a.Add(time.Hour).UnixMilli(), a.UnixMilli(), a.Add(time.Hour).UnixMilli())
+	s := New(db, "Asia/Shanghai", nil)
+	v, err := s.Dashboard(ctx, "2026-11-01T00:00:00+08:00", "2026-12-01T00:00:00+08:00")
+	if err != nil || len(v.Tasks) != 2 || v.Tasks[0].ID != "future" || len(v.Events) != 1 || v.Events[0].ID != "e" {
+		t.Fatalf("%+v %v", v, err)
+	}
+	v, err = s.Dashboard(ctx, a.Add(time.Hour).Format(time.RFC3339), a.Add(2*time.Hour).Format(time.RFC3339))
+	if err != nil || len(v.Events) != 0 {
+		t.Fatalf("exclusive end: %+v %v", v, err)
+	}
+	for _, r := range [][2]string{{"bad", "bad"}, {"2026-11-01T00:00:00Z", "2026-11-01T00:00:00Z"}, {"2026-01-01T00:00:00Z", "2028-01-01T00:00:00Z"}} {
+		if _, err := s.Dashboard(ctx, r[0], r[1]); err == nil {
+			t.Fatal("invalid range accepted", r)
+		}
+	}
+}

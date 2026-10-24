@@ -199,7 +199,7 @@ export function App() {
         </Link>
         <div className="sidebar-label">你的工作空间</div>
         <Link className="nav-item" to="/" aria-current={path === "/" ? "page" : undefined}>
-          今日工作台
+          工作台
         </Link>
         <Link className="nav-item" to="/search" aria-current={path === "/search" ? "page" : undefined}>
           搜索
@@ -244,7 +244,7 @@ export function App() {
         <div className="topbar">
           <span>
             工作空间 <span className="slash">/</span>{" "}
-            {projectId ? <><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link><span className="slash">/</span><span>{overview ? "概览" : notes ? "笔记" : calendar ? "日程" : "任务"}</span></> : "总览"}
+            {projectId ? <><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link><span className="slash">/</span><span>{overview ? "概览" : notes ? "笔记" : calendar ? "日程" : "任务"}</span></> : path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}
           </span>
           <span className="private-tag">本地 · 私有</span>
         </div>
@@ -316,7 +316,7 @@ export function App() {
               </p>
             )}
             {overview ? (
-              <ProjectOverview projectId={projectId} tasks={all} loadingTasks={tasks.isPending} tasksError={tasks.isError} retryTasks={() => void tasks.refetch()} archived={readOnly} onCreateTask={() => openCreate()} />
+              <ProjectOverview projectId={projectId} tasks={all} loadingTasks={tasks.isPending} tasksError={tasks.isError} retryTasks={() => void tasks.refetch()} archived={readOnly} />
             ) : calendar ? (
               <Events
                 projectId={projectId}

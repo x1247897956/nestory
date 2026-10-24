@@ -14,6 +14,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await page.getByLabel("项目说明").fill("阅读与思考");
   await page.getByRole("button", { name: "保存项目" }).click();
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
+  await page.getByRole("link", { name: "任务", exact: true }).click();
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
   await page.getByLabel("新任务标题").fill("读论文");
   await page.getByRole("button", { name: "创建任务", exact: true }).click();

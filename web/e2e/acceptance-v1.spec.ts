@@ -121,7 +121,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
         page.getByRole("link", { name: label, exact: true }),
       ).toBeVisible();
     }
-    await page.getByRole("link", { name: "今日工作台", exact: true }).click();
+    await page.getByRole("link", { name: "工作台", exact: true }).click();
     await expect(
       page.locator('a[href="/projects/' + pid + '/tasks/' + tid + '"]'),
     ).toBeVisible();
