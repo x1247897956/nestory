@@ -144,6 +144,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 
 	events := event.New(db)
 	relations := relation.New(db)
+	registerObjects(mux, p, t, pg, events, relations)
 	mux.HandleFunc("GET /api/v1/projects/{id}/relation-options", func(w http.ResponseWriter, r *http.Request) {
 		v, e := relations.Candidates(r.Context(), r.PathValue("id"))
 		respond(w, 200, v, e)

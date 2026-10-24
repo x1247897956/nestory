@@ -259,3 +259,20 @@ label,.filters label { color:#6b7079; }
 .object-actions .delete-control > p { position:absolute; top:100%; right:0; background:white; z-index:40; padding:10px; max-width:100%; }
 .note-parent-property .page-controls { position:absolute; z-index:30; left:0; top:calc(100% + 8px); width:min(420px,100%); padding:16px; border:1px solid var(--border); background:#fff; border-radius:8px; box-shadow:0 12px 36px #19223418; }
 .property-zone { color:#737986; font-size:10px; }
+/* Explicit intrinsic-property grid, shared by every object type. */
+.object-property-section { margin-top:20px; padding:16px 18px; border:1px solid #e4e7ed; border-radius:7px; background:#fafbfc; }
+.object-property-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.object-property-heading h3 { font-size:12px; font-weight:600; color:#4e5868; margin:0; }
+.object-property-heading .delete-control > button { padding:4px 6px; border:0; background:transparent; color:#737986; font-size:10px; }
+.object-property-heading .delete-control { position:relative; }
+.object-property-heading .delete-control > [role="dialog"] { position:absolute; top:100%; right:0; z-index:40; width:min(340px,75vw); border:1px solid var(--border); border-radius:7px; padding:16px; background:#fff; box-shadow:0 12px 36px #19223418; font-size:12px; }
+.object-property-section .object-properties { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); align-items:start; gap:18px 22px; }
+.object-property-cell { min-width:0; }
+.object-property-label { display:block; color:#707784; font-size:11px; margin-bottom:7px; }
+.object-property-value { display:block; font-size:12px; padding:8px 0; color:#343d4c; }
+.editor .object-property-cell .task-property { padding:0; margin:0; border:0; min-height:32px; }
+.editor .object-property-cell .task-property input,.editor .object-property-cell .task-property select { max-width:100%; }
+.object-property-cell .note-parent-property > summary,.object-property-cell .relation-property > summary { padding:7px 4px; width:fit-content; max-width:100%; }
+.property-zone { display:block; margin-top:10px; }
+.property-error { font-size:11px; color:#994d42; }
+@media(max-width:650px) { .object-property-section { padding:14px; } .object-property-section .object-properties { grid-template-columns:minmax(0,1fr); gap:12px; } .object-property-cell { display:grid; grid-template-columns:78px minmax(0,1fr); gap:8px; align-items:center; } .object-property-label { margin:0; } }

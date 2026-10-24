@@ -315,10 +315,9 @@ export function EventEditor({
     >
       <header className="task-inline-header">
         <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="日程标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
-        <ObjectProperties projectId={event.project_id} type="events" id={event.id} archived={archived}>
+        <ObjectProperties projectId={event.project_id} type="events" id={event.id} version={event.version} archived={archived}>
       {(["start_at", "end_at"] as const).map((key) => (
-        <label key={key} className="task-property">
-          <span>{key === "start_at" ? "开始时间" : "结束时间"}</span>
+        <label key={key} className="task-property" data-property={key}>
           <input
             aria-label={key === "start_at" ? "开始时间" : "结束时间"}
             type="datetime-local"
@@ -330,8 +329,8 @@ export function EventEditor({
           />
         </label>
       ))}
-        <span className="property-zone" title="日程的显示与输入时区">{zone}</span>
         </ObjectProperties>
+        <small className="property-zone">日程显示与输入时区：{zone}</small>
       </header>
       <MarkdownEditor
         projectId={event.project_id}

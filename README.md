@@ -89,3 +89,9 @@ scripts/restore.sh --volume noteapp-restored \
 恢复只写预先创建的空卷，禁止覆盖；先使用清单里的同一image ID。脚本先核对SHA与只读SQLite完整性/外键/计数，再恢复并重新读取目标核对正文所在文件、所有关系计数和每个附件SHA。保留原卷，不要覆盖源数据。按 [运维手册](docs/operations.md) 启动恢复检查实例并验证浏览器，再切换正式卷。升级前备份；不承诺自动schema降级。
 
 [最终验收记录](docs/acceptance-v1.md) 区分正式多阶段构建与早期开发替代验证，附实际命令、镜像版本和证据。当前前端大包约1.65MB（gzip526KB），首次加载性能仍可优化。
+
+## 对象与固有属性
+
+任务、笔记、日程共同实现 `internal/object.Entity`，提供统一的对象身份、类型、项目、标题、正文、版本和固有属性视图。`GET /api/v1/object-types/{tasks|pages|events}` 返回后端定义的固定属性及修改方式；`GET /api/v1/objects/{type}/{id}` 返回对象值、关联属性和归档只读状态。前端属性栏直接使用后端定义排列与标注字段。
+
+属性仍通过各类型既有的 PATCH、move 和 relation 接口修改，继续执行版本检查、同项目约束、父级防循环和归档只读校验。现有 SQLite 专用表与数据保持兼容，无需数据迁移；这里没有引入自定义字段或通用属性存储引擎。

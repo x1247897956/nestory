@@ -12,6 +12,9 @@ test('all object types share collapsed relation properties with keyboard and mob
   const properties=page.getByRole('group',{name:'对象属性'});
   const toggle=properties.locator('.relation-property > summary');
   const panel=properties.getByRole('region',{name:'关联对象列表'});
+  await expect(properties.getByText(type==='tasks'?'阶段':type==='pages'?'父笔记':'开始时间',{exact:true})).toBeVisible();
+  if(type==='events') { await expect(properties.getByLabel('开始时间',{exact:true})).toHaveValue('2026-10-25T09:00'); await expect(properties.getByLabel('结束时间',{exact:true})).toHaveValue('2026-10-25T10:00'); }
+  if(type==='pages') { await expect(properties.locator('.object-property-label').filter({hasText:'顺序'})).toBeVisible(); }
   await expect(toggle).toBeVisible();
   await expect(panel).toBeHidden();
   await toggle.click();

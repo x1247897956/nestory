@@ -221,8 +221,8 @@ function PageEditor({
     >
       <header className="task-inline-header">
         <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="笔记标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
-        <ObjectProperties projectId={page.project_id} type="pages" id={page.id} archived={archived}>
-          <details className="note-parent-property"><summary>父笔记 · {nodes.find(n => n.id === page.parent_id)?.title ?? "顶层笔记"}</summary>
+        <ObjectProperties projectId={page.project_id} type="pages" id={page.id} version={page.version} archived={archived}>
+          <details className="note-parent-property" data-property="parent_id"><summary>{nodes.find(n => n.id === page.parent_id)?.title ?? "顶层笔记"}</summary>
       {!archived && (
         <div className="page-controls">
           <select

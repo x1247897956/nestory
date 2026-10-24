@@ -48,11 +48,11 @@ export function TaskEditor({
     <section className="editor" data-dirty={dirty || busy} aria-label="任务详情">
       <header className="task-inline-header">
         <h2 aria-label={draft.title}><input className="task-inline-title" aria-label="任务标题" value={draft.title} onChange={e => change("title", e.target.value)} disabled={archived} placeholder="任务标题" /></h2>
-        <ObjectProperties projectId={task.project_id} type="tasks" id={task.id} archived={archived}>
-          <label className="task-property stage-property"><i className={"stage-dot " + draft.stage} aria-hidden="true"/><select aria-label="阶段" value={draft.stage} onChange={e => change("stage",e.target.value)} disabled={archived}>{stages.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
-          <label className="task-property"><span>优先级</span><select aria-label="优先级" value={draft.priority} onChange={e => change("priority",e.target.value)} disabled={archived}>{priorities.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
-          <label className="task-property"><span>截止</span><input aria-label="截止日期" type="date" value={draft.due_date} onChange={e => change("due_date",e.target.value)} disabled={archived}/></label>
-          {parent && <span className="task-property parent-property"><span>父任务</span><Link to={`/projects/${task.project_id}/tasks/${parent.id}`}>{parent.title}</Link></span>}
+        <ObjectProperties projectId={task.project_id} type="tasks" id={task.id} version={task.version} archived={archived}>
+          <label className="task-property stage-property" data-property="stage"><i className={"stage-dot " + draft.stage} aria-hidden="true"/><select aria-label="阶段" value={draft.stage} onChange={e => change("stage",e.target.value)} disabled={archived}>{stages.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
+          <label className="task-property" data-property="priority"><select aria-label="优先级" value={draft.priority} onChange={e => change("priority",e.target.value)} disabled={archived}>{priorities.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
+          <label className="task-property" data-property="due_date"><input aria-label="截止日期" type="date" value={draft.due_date} onChange={e => change("due_date",e.target.value)} disabled={archived}/></label>
+          {parent && <span className="task-property parent-property" data-property="parent_id"><Link to={`/projects/${task.project_id}/tasks/${parent.id}`}>{parent.title}</Link></span>}
         </ObjectProperties>
       </header>
       <div className="body-label">
