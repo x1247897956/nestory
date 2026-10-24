@@ -43,6 +43,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
         mimeType: "image/png",
         buffer: png,
       });
+    await page.getByRole("button", {name:"源码",exact:true}).click();
     await expect(page.getByLabel("Markdown 正文")).toContainText(
       "/api/v1/assets/",
     );
@@ -222,6 +223,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       ).toBe(a.sha256);
     }
     await page.goto("/projects/" + f.project_id + "/pages/" + f.page_id);
+    await page.getByRole("button", {name:"源码",exact:true}).click();
     await expect(page.getByLabel("Markdown 正文")).toContainText("# 真实验收");
     await page.getByRole("button", { name: "预览", exact: true }).click();
     await expect(page.locator(".markdown-preview img")).toBeVisible();

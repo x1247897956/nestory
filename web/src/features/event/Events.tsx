@@ -97,8 +97,8 @@ export function Events({
     }
   };
   return (
-    <div className="calendar-workspace">
-      <section aria-label="项目日历">
+    <div className={"calendar-workspace " + (eventId ? "object-detail-page" : "")}>
+      {!eventId && <section aria-label="项目日历">
         <p>显示与输入时区：{zone}</p>
         <FullCalendar
           plugins={[
@@ -224,14 +224,14 @@ export function Events({
           </form>
         )}
         {error && <p role="alert">{error}</p>}
-      </section>
+      </section>}
       {eventId && (
         <aside className="detail-pane">
           <button
             aria-label="关闭日程详情"
             onClick={() => nav("/projects/" + projectId + "/events")}
           >
-            ×
+            ← 返回日历
           </button>
           {detail.data?.project_id === projectId ? (
             <>

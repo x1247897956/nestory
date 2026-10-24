@@ -257,7 +257,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		e := bin.Restore(r.Context(), r.PathValue("batch"))
 		respond(w, 200, map[string]bool{"ok": true}, e)
 	})
-	for _, typ := range []string{"tasks", "pages", "events"} {
+	for _, typ := range []string{"projects", "tasks", "pages", "events"} {
 		mux.HandleFunc("GET /api/v1/"+typ+"/{id}/delete-preview", func(w http.ResponseWriter, r *http.Request) {
 			v, e := bin.Preview(r.Context(), typ, r.PathValue("id"))
 			respond(w, 200, v, e)

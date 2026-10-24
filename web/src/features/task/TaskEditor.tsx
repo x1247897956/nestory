@@ -56,7 +56,6 @@ export function TaskEditor({
         </ObjectProperties>
       </header>
       <div className="body-label">
-        Markdown 正文
         <MarkdownEditor
           value={draft.body}
           onChange={(v) => change("body", v)}

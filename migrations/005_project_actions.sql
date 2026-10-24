@@ -1,0 +1,3 @@
+ALTER TABLE projects ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0 CHECK(pinned IN (0,1));
+ALTER TABLE projects ADD COLUMN deleted_at INTEGER;
+ALTER TABLE projects ADD COLUMN delete_batch_id TEXT;

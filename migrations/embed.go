@@ -13,3 +13,6 @@ var EventsRelations string
 
 //go:embed 004_workspace_trash.sql
 var WorkspaceTrash string
+
+//go:embed 005_project_actions.sql
+var ProjectActions string

@@ -276,3 +276,28 @@ label,.filters label { color:#6b7079; }
 .property-zone { display:block; margin-top:10px; }
 .property-error { font-size:11px; color:#994d42; }
 @media(max-width:650px) { .object-property-section { padding:14px; } .object-property-section .object-properties { grid-template-columns:minmax(0,1fr); gap:12px; } .object-property-cell { display:grid; grid-template-columns:78px minmax(0,1fr); gap:8px; align-items:center; } .object-property-label { margin:0; } }
+.sidebar-project-row { display:flex; align-items:center; position:relative; }
+.sidebar-project-row .project-link { flex:1; min-width:0; }
+.project-menu-trigger { padding:4px 6px; border:0; background:transparent; color:#737986; flex-shrink:0; }
+.project-row-menu { position:fixed; margin:0; width:180px; padding:5px; border:1px solid var(--border); border-radius:7px; background:#fff; box-shadow:0 8px 26px #18223520; }
+.project-row-menu > button,.project-row-menu .delete-control > button { display:block; width:100%; text-align:left; padding:8px 10px; border:0; font-size:12px; background:transparent; }
+.project-row-menu button:hover { background:#f2f4f7; }
+.project-row-menu .delete-control > button { color:#994d42; }
+.project-row-menu [role="dialog"] { padding:10px; font-size:12px; }
+.object-property-section { position:relative; margin-top:8px; padding:4px 0; border:0; background:transparent; border-radius:0; }
+.object-property-heading { position:absolute; right:0; top:-42px; margin:0; }
+.object-property-section .object-properties { display:flex; align-items:center; flex-wrap:wrap; gap:6px 18px; }
+.object-property-cell { display:flex; align-items:center; gap:7px; }
+.object-property-label { margin:0; font-size:11px; }
+.object-property-cell .task-property,.editor .object-property-cell .task-property { min-height:28px; }
+.object-property-value { padding:5px 0; }
+.task-inline-header { padding:6px 0 14px; margin-bottom:16px; }
+.task-inline-header h2 { margin-bottom:10px; }
+.page-workspace.object-detail-page,.calendar-workspace.object-detail-page { display:block; padding:24px 28px; }
+.object-detail-page .detail-pane { padding:0; border:0; background:transparent; width:100%; }
+.object-back { display:inline-block; margin-bottom:18px; color:#626874; font-size:12px; }
+.object-property-section .object-property-heading .delete-control { position:static; }
+@media(max-width:650px){.object-property-section .object-properties { gap:5px 12px; }.object-property-cell { display:flex; }.page-workspace.object-detail-page,.calendar-workspace.object-detail-page { padding:20px 18px; }.object-property-heading { top:-38px; }}
+.project-row-menu:has([role="dialog"]) { top:50%!important; left:50%!important; transform:translate(-50%,-50%); width:min(380px,calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto; }
+.project-row-menu [role="dialog"] ul { max-height:35vh; overflow:auto; }
+.object-detail-page .detail-pane { box-shadow:none; }

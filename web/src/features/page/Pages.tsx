@@ -71,8 +71,8 @@ export function Pages({
     for (const page of children) stack.push({ page, depth: item.depth + 1 });
   }
   return (
-    <div className="page-workspace">
-      <section className="page-tree" aria-label="笔记树">
+    <div className={"page-workspace " + (pageId ? "object-detail-page" : "")}>
+      {!pageId && <section className="page-tree" aria-label="笔记树">
         <h2>笔记</h2>
         {flat.map(({ page, depth }) => (
           <Link
@@ -141,15 +141,15 @@ export function Pages({
           </form>
         )}
         {error && <p role="alert">{error}</p>}
-      </section>
+      </section>}
       <section>
+        {pageId && <Link className="object-back" to={`/projects/${projectId}/pages`}>← 返回笔记列表</Link>}
         {pageId ? (
           detail.data && detail.data.project_id === projectId ? (
             <>
               <PageEditor
                 key={pageId + ":" + epoch}
                 page={detail.data}
-                nodes={nodes}
                 archived={archived}
                 onSave={async (draft, version) => {
                   const next = await api<Page>("/pages/" + pageId, "PATCH", {
@@ -158,16 +158,6 @@ export function Pages({
                   });
                   qc.setQueryData(["page", pageId], next);
                   await refresh();
-                }}
-                onMove={async (parent_id, position, version) => {
-                  const next = await api<Page>(
-                    "/pages/" + pageId + "/move",
-                    "POST",
-                    { parent_id, position, version },
-                  );
-                  qc.setQueryData(["page", pageId], next);
-                  await refresh();
-                  setEpoch((n) => n + 1);
                 }}
                 onReload={async () => {
                   await detail.refetch({ throwOnError: true });
@@ -191,17 +181,13 @@ export function Pages({
 }
 function PageEditor({
   page,
-  nodes,
   archived,
   onSave,
-  onMove,
   onReload,
 }: {
   page: Page;
-  nodes: Page[];
   archived: boolean;
   onSave: (d: { title: string; body: string }, v: number) => Promise<void>;
-  onMove: (p: string | null, pos: number, v: number) => Promise<void>;
   onReload: () => Promise<void>;
 }) {
   const a = useAutosave(
@@ -210,8 +196,6 @@ function PageEditor({
     onSave,
     archived,
   );
-  const [parent, setParent] = useState(page.parent_id ?? "");
-  const [position, setPosition] = useState(page.position);
   const [error, setError] = useState("");
   return (
     <article
@@ -221,48 +205,7 @@ function PageEditor({
     >
       <header className="task-inline-header">
         <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="笔记标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
-        <ObjectProperties projectId={page.project_id} type="pages" id={page.id} version={page.version} archived={archived}>
-          <details className="note-parent-property" data-property="parent_id"><summary>{nodes.find(n => n.id === page.parent_id)?.title ?? "顶层笔记"}</summary>
-      {!archived && (
-        <div className="page-controls">
-          <select
-            aria-label="移动到父笔记"
-            value={parent}
-            onChange={(e) => setParent(e.target.value)}
-          >
-            <option value="">顶层笔记</option>
-            {nodes.map((n) => (
-              <option key={n.id} value={n.id}>
-                {n.title}
-              </option>
-            ))}
-          </select>
-          <label>
-            顺序
-            <input
-              aria-label="笔记顺序"
-              type="number"
-              min="0"
-              value={position}
-              onChange={(e) => setPosition(Number(e.target.value))}
-            />
-          </label>
-          <button
-            disabled={a.dirty || a.busy}
-            onClick={async () => {
-              setError("");
-              try {
-                await onMove(parent || null, position, a.version);
-              } catch (e) {
-                setError((e as Error).message);
-              }
-            }}
-          >
-            移动笔记
-          </button>
-        </div>
-      )}          </details>
-        </ObjectProperties>
+        <ObjectProperties projectId={page.project_id} type="pages" id={page.id} version={page.version} archived={archived}/>
       </header>
       <MarkdownEditor
         projectId={page.project_id}

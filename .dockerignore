@@ -4,3 +4,5 @@ web/dist
 data
 web/test-results
 web/playwright-report
+
+backups

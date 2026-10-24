@@ -1,3 +1,4 @@
+import { ProjectMenu } from "../features/project/ProjectMenu";
 import { flushSync } from "react-dom";
 import { Workspace } from "../features/workspace/Workspace";
 import { Search } from "../features/search/Search";
@@ -26,6 +27,7 @@ export function App() {
   const qc = useQueryClient();
   const [archived, setArchived] = useState(false);
   const activeProjectHeading = useRef<HTMLDivElement>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectForm, setProjectForm] = useState<"new" | "edit" | null>(null);
   const [stage, setStage] = useState("all");
   const [priority, setPriority] = useState("all");
@@ -77,6 +79,7 @@ export function App() {
     queryFn: () => api<Task>("/tasks/" + taskId),
     enabled: !!taskId,
   });
+  const objectTitle = useQuery({queryKey:[pageId ? "page" : "event",pageId ?? eventId],queryFn:()=>api<{title:string}>(`/${pageId ? "pages" : "events"}/${pageId ?? eventId}`),enabled:!!(pageId||eventId)});
   const path = useLocation().pathname;
   useEffect(() => {
     setNewTitle("");
@@ -218,11 +221,12 @@ export function App() {
         </div>
         <nav aria-label="项目列表">
           {navigationProjects.map(project => <div className="sidebar-project" key={project.id}>
-            <div ref={project.id === projectId ? activeProjectHeading : undefined}>
+            <div className="sidebar-project-row" ref={project.id === projectId ? activeProjectHeading : undefined}>
               <Link className={"project-link " + (project.id === projectId ? "active" : "")} to={"/projects/" + project.id}>
                 <span className="project-icon" aria-hidden="true">{project.title.slice(0, 1)}</span>
-                <span>{project.title}</span>
+                <span>{project.pinned ? "⌃ " : ""}{project.title}</span>
               </Link>
+              <ProjectMenu project={project} onRename={() => { setEditingProject(project); setProjectForm("edit"); }}/>
             </div>
           </div>)}
         </nav>
@@ -244,9 +248,9 @@ export function App() {
           <nav className="breadcrumbs" aria-label="面包屑">
             <Link to="/">工作空间</Link><span className="slash" aria-hidden="true">/</span>
             {projectId ? <>
-              <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link><span className="slash" aria-hidden="true">/</span>
-              <Link to={overview ? `/projects/${projectId}` : `/projects/${projectId}/${notes ? "pages" : calendar ? "events" : "tasks"}`} aria-current={!taskId && !pageId && !eventId ? "page" : undefined}>{overview ? "概览" : notes ? "笔记" : calendar ? "日程" : "任务"}</Link>
-              {(taskId || pageId || eventId) && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{taskId ? detail.data?.title ?? "任务详情" : pageId ? "笔记详情" : "日程详情"}</span></>}
+              <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link>
+              {(taskId || pageId || eventId) ? <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{taskId ? detail.data?.title ?? "加载中…" : objectTitle.data?.title ?? "加载中…"}</span></> : !overview && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
+
             </> : <span aria-current="page">{path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
           </nav>
           <span className="private-tag">本地 · 私有</span>
@@ -276,7 +280,7 @@ export function App() {
                 <h1>{p?.title}</h1>
                 <div>
                   {!readOnly && (
-                    <button onClick={() => setProjectForm("edit")}>
+                    <button onClick={() => { setEditingProject(null); setProjectForm("edit"); }}>
                       修改项目
                     </button>
                   )}{" "}
@@ -528,11 +532,11 @@ export function App() {
       </dialog>}
       {projectForm && (
         <ProjectForm
-          project={projectForm === "edit" ? p : undefined}
-          onClose={() => setProjectForm(null)}
+          project={projectForm === "edit" ? editingProject ?? p : undefined}
+          onClose={() => {setProjectForm(null);setEditingProject(null)}}
           onSubmit={async (title, description, version) => {
             const next = await api<Project>(
-              projectForm === "new" ? "/projects" : "/projects/" + projectId,
+              projectForm === "new" ? "/projects" : "/projects/" + (editingProject?.id ?? projectId),
               projectForm === "new" ? "POST" : "PATCH",
               {
                 title,
@@ -541,6 +545,7 @@ export function App() {
               },
             );
             setProjectForm(null);
+            setEditingProject(null);
             setArchived(false);
             await invalidate();
             nav("/projects/" + next.id);

@@ -8,10 +8,14 @@ type Preview = {
   members?: { id: string; title: string }[];
 };
 export function DeleteButton({
+  disabled = false,
+  label = "移入回收站",
   type,
   id,
   projectId,
 }: {
+  disabled?: boolean;
+  label?: string;
   type: string;
   id: string;
   projectId: string;
@@ -36,7 +40,7 @@ export function DeleteButton({
   return (
     <div className="delete-control">
       <button
-        disabled={busy}
+        disabled={busy || disabled}
         onClick={() => {
           if (document.querySelector('[data-dirty="true"]')) {
             setError("请先保存或放弃未保存更改，再删除。");
@@ -45,7 +49,7 @@ export function DeleteButton({
           void load();
         }}
       >
-        移入回收站
+        {label}
       </button>
       {preview && (
         <div role="dialog" aria-label="确认删除">
@@ -69,7 +73,7 @@ export function DeleteButton({
                 await api(url, "DELETE", preview);
                 setPreview(null);
                 nav(
-                  "/projects/" +
+                  type === "projects" ? "/" : "/projects/" +
                     projectId +
                     (type === "tasks" ? "" : "/" + type),
                 );

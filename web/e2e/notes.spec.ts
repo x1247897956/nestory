@@ -14,6 +14,7 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
     ["B", "A"],
     ["C", "B"],
   ]) {
+    await page.goto("/projects/" + p.id + "/pages");
     await page.getByLabel("新笔记标题").fill(title);
     if (parent) {
       const opts = await page
@@ -46,9 +47,11 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   await page.getByRole("button", { name: "分屏", exact: true }).click();
   await expect(page.getByRole("checkbox")).toHaveCount(2);
   await page.getByRole("checkbox").nth(1).check();
+  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toContainText("- [x] 同名");
   await expect(page.getByRole("status")).toHaveText("已保存");
   await page.reload();
+  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toContainText("- [x] 同名");
   await page.route("**/api/v1/pages/" + c.id, async (route) => {
     if (route.request().method() === "PATCH")
@@ -61,11 +64,13 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   });
   await page.getByLabel("Markdown 正文").fill("失败时全文保留");
   await expect(page.getByRole("alert")).toContainText("模拟保存失败");
+  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");
   const dialog = page.waitForEvent("dialog");
   const navigation = page.getByRole("link", {name:"汇总", exact:true}).click();
   await (await dialog).dismiss();
   await navigation;
+  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");
   await page.unroute("**/api/v1/pages/" + c.id);
   await page.getByRole("button", { name: "重试保存" }).click();
@@ -96,6 +101,7 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
         "base64",
       ),
     });
+  await page.getByRole("button", {name:"源码",exact:true}).click();
   await expect(page.getByLabel("Markdown 正文")).toContainText(
     "/api/v1/assets/",
   );

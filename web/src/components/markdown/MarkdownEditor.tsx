@@ -1,3 +1,4 @@
+import { liveMarkdown } from "./liveMarkdown";
 import { useState, useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { EditorView } from "@codemirror/view";
@@ -17,13 +18,14 @@ export function MarkdownEditor({
 }) {
   const latest = useRef(value);
   latest.current = value;
-  const [mode, setMode] = useState("source");
+  const [mode, setMode] = useState("live");
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   return (
     <div className="markdown-editor">
       <div className="markdown-toolbar">
         {[
+          ["live", "即时"],
           ["source", "源码"],
           ["preview", "预览"],
           ["split", "分屏"],
@@ -38,8 +40,8 @@ export function MarkdownEditor({
           </button>
         ))}
         {projectId && !disabled && (
-          <label>
-            上传附件
+          <label className="attachment-button">
+            ＋ 附件
             <input
               aria-label="上传附件"
               type="file"
@@ -94,15 +96,16 @@ export function MarkdownEditor({
             onChange={onChange}
             extensions={[
               markdown(),
+              ...(mode === "live" ? [liveMarkdown] : []),
               EditorView.contentAttributes.of({
                 "aria-label": "Markdown 正文",
               }),
             ]}
             editable={!disabled}
-            basicSetup={{ lineNumbers: true }}
+            basicSetup={{ lineNumbers: mode !== "live", foldGutter: mode !== "live" }}
           />
         )}
-        {mode !== "source" && (
+        {(mode === "preview" || mode === "split") && (
           <MarkdownPreview
             value={value}
             onChange={onChange}

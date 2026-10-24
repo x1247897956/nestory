@@ -35,7 +35,9 @@ type Batch struct {
 	DeletedAt int64    `json:"deleted_at"`
 }
 
-func valid(typ string) bool { return typ == "tasks" || typ == "pages" || typ == "events" }
+func valid(typ string) bool {
+	return typ == "projects" || typ == "tasks" || typ == "pages" || typ == "events"
+}
 
 type query interface {
 	QueryRowContext(context.Context, string, ...any) *sql.Row
@@ -48,12 +50,40 @@ func preview(ctx context.Context, q query, typ, key string) (Preview, string, st
 	if !valid(typ) {
 		return v, pid, title, apperr.Invalid("无效对象类型")
 	}
-	e := q.QueryRowContext(ctx, "SELECT version,project_id,title FROM "+typ+" WHERE id=? AND deleted_at IS NULL", key).Scan(&v.Version, &pid, &title)
+	projectColumn := "project_id"
+	if typ == "projects" {
+		projectColumn = "id"
+	}
+	e := q.QueryRowContext(ctx, "SELECT version,"+projectColumn+",title FROM "+typ+" WHERE id=? AND deleted_at IS NULL", key).Scan(&v.Version, &pid, &title)
 	if errors.Is(e, sql.ErrNoRows) {
 		e = apperr.NotFound
 	}
 	if e != nil {
 		return v, pid, title, e
+	}
+	if typ == "projects" {
+		v.Members = []Member{{ID: key, Title: title}}
+		for _, table := range []string{"tasks", "pages", "events"} {
+			rows, err := q.QueryContext(ctx, "SELECT id,title FROM "+table+" WHERE project_id=? AND deleted_at IS NULL ORDER BY id", key)
+			if err != nil {
+				return v, pid, title, err
+			}
+			for rows.Next() {
+				var m Member
+				if err = rows.Scan(&m.ID, &m.Title); err != nil {
+					rows.Close()
+					return v, pid, title, err
+				}
+				v.Members = append(v.Members, m)
+			}
+			err = rows.Err()
+			rows.Close()
+			if err != nil {
+				return v, pid, title, err
+			}
+		}
+		v.Count = len(v.Members)
+		return v, pid, title, nil
 	}
 	if typ == "events" {
 		v.Count = 1
@@ -110,6 +140,17 @@ func (s *Service) Delete(ctx context.Context, typ, key string, in Preview) (stri
 	if e != nil {
 		return "", e
 	}
+	if typ == "projects" {
+		for _, table := range []string{"tasks", "pages", "events"} {
+			if _, e = tx.ExecContext(ctx, "UPDATE "+table+" SET deleted_at=?,delete_batch_id=?,updated_at=?,version=version+1 WHERE project_id=? AND deleted_at IS NULL", now, batch, now, key); e != nil {
+				return "", e
+			}
+		}
+		if _, e = tx.ExecContext(ctx, "UPDATE projects SET deleted_at=?,delete_batch_id=?,updated_at=?,version=version+1 WHERE id=?", now, batch, now, key); e != nil {
+			return "", e
+		}
+		return batch, tx.Commit()
+	}
 	scope := "id=?"
 	if typ != "events" {
 		scope = "id IN (WITH RECURSIVE tree(id) AS (SELECT id FROM " + typ + " WHERE id=? UNION ALL SELECT o.id FROM " + typ + " o JOIN tree ON o.parent_id=tree.id) SELECT id FROM tree)"
@@ -140,7 +181,13 @@ func (s *Service) List(ctx context.Context) ([]Batch, error) {
 		return nil, e
 	}
 	for i := range out {
-		members, e := s.db.QueryContext(ctx, "SELECT id,title FROM "+out[i].Type+" WHERE delete_batch_id=? ORDER BY id", out[i].ID)
+		memberQuery := "SELECT id,title FROM " + out[i].Type + " WHERE delete_batch_id=? ORDER BY id"
+		args := []any{out[i].ID}
+		if out[i].Type == "projects" {
+			memberQuery = "SELECT id,title FROM projects WHERE delete_batch_id=? UNION ALL SELECT id,title FROM tasks WHERE delete_batch_id=? UNION ALL SELECT id,title FROM pages WHERE delete_batch_id=? UNION ALL SELECT id,title FROM events WHERE delete_batch_id=?"
+			args = []any{out[i].ID, out[i].ID, out[i].ID, out[i].ID}
+		}
+		members, e := s.db.QueryContext(ctx, memberQuery, args...)
 		if e != nil {
 			return nil, e
 		}
@@ -174,6 +221,24 @@ func (s *Service) Restore(ctx context.Context, batch string) error {
 	}
 	if e != nil {
 		return e
+	}
+	if typ == "projects" {
+		for _, table := range []string{"projects", "tasks", "pages", "events"} {
+			if _, e = tx.ExecContext(ctx, "UPDATE "+table+" SET deleted_at=NULL,delete_batch_id=NULL,updated_at=?,version=version+1 WHERE delete_batch_id=?", clock.Now(), batch); e != nil {
+				return e
+			}
+		}
+		if _, e = tx.ExecContext(ctx, "UPDATE delete_batches SET restored_at=? WHERE id=?", clock.Now(), batch); e != nil {
+			return e
+		}
+		return tx.Commit()
+	}
+	var projectDeleted *int64
+	if e = tx.QueryRowContext(ctx, "SELECT deleted_at FROM projects WHERE id=?", pid).Scan(&projectDeleted); e != nil {
+		return e
+	}
+	if projectDeleted != nil {
+		return apperr.Conflict("请先恢复所属项目")
 	}
 	if e = project.Writable(ctx, tx, pid); e != nil {
 		return e

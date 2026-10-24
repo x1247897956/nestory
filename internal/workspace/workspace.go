@@ -102,7 +102,7 @@ type SearchResult struct {
 	Offset int    `json:"offset"`
 }
 
-const union = `SELECT 'projects' type,p.id,p.title,p.description body,p.id project_id,p.title project_title,p.archived_at,p.updated_at FROM projects p UNION ALL SELECT 'tasks',o.id,o.title,o.body,p.id,p.title,p.archived_at,o.updated_at FROM tasks o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL UNION ALL SELECT 'pages',o.id,o.title,o.body,p.id,p.title,p.archived_at,o.updated_at FROM pages o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL UNION ALL SELECT 'events',o.id,o.title,o.body,p.id,p.title,p.archived_at,o.updated_at FROM events o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL`
+const union = `SELECT 'projects' type,p.id,p.title,p.description body,p.id project_id,p.title project_title,p.archived_at,p.updated_at FROM projects p WHERE p.deleted_at IS NULL UNION ALL SELECT 'tasks',o.id,o.title,o.body,p.id,p.title,p.archived_at,o.updated_at FROM tasks o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL UNION ALL SELECT 'pages',o.id,o.title,o.body,p.id,p.title,p.archived_at,o.updated_at FROM pages o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL UNION ALL SELECT 'events',o.id,o.title,o.body,p.id,p.title,p.archived_at,o.updated_at FROM events o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL`
 
 func (s *Service) Search(ctx context.Context, q string, archived bool, limit, offset int) (SearchResult, error) {
 	if limit < 1 || limit > 100 || offset < 0 {
@@ -172,7 +172,7 @@ func (s *Service) Visit(ctx context.Context, typ, key string) error {
 	} else if typ != "project" {
 		return apperr.Invalid("无效访问类型")
 	}
-	condition := ""
+	condition := " AND deleted_at IS NULL"
 	if typ == "page" {
 		condition = " AND deleted_at IS NULL"
 	}

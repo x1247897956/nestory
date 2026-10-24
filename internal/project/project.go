@@ -11,6 +11,7 @@ import (
 )
 
 type Project struct {
+	Pinned      bool   `json:"pinned"`
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -20,6 +21,7 @@ type Project struct {
 	Version     int64  `json:"version"`
 }
 type Input struct {
+	Pinned      *bool   `json:"pinned"`
 	Title       *string `json:"title"`
 	Description *string `json:"description"`
 	Archived    *bool   `json:"archived"`
@@ -35,7 +37,7 @@ type querier interface {
 
 func Read(ctx context.Context, q querier, pid string) (Project, error) {
 	var p Project
-	err := q.QueryRowContext(ctx, "SELECT id,title,description,archived_at,created_at,updated_at,version FROM projects WHERE id=?", pid).Scan(&p.ID, &p.Title, &p.Description, &p.ArchivedAt, &p.CreatedAt, &p.UpdatedAt, &p.Version)
+	err := q.QueryRowContext(ctx, "SELECT id,title,description,archived_at,created_at,updated_at,version,pinned FROM projects WHERE id=? AND deleted_at IS NULL", pid).Scan(&p.ID, &p.Title, &p.Description, &p.ArchivedAt, &p.CreatedAt, &p.UpdatedAt, &p.Version, &p.Pinned)
 	if errors.Is(err, sql.ErrNoRows) {
 		return p, apperr.NotFound
 	}
@@ -43,7 +45,7 @@ func Read(ctx context.Context, q querier, pid string) (Project, error) {
 }
 func (s *Service) Get(ctx context.Context, pid string) (Project, error) { return Read(ctx, s.db, pid) }
 func (s *Service) List(ctx context.Context, archived bool) ([]Project, error) {
-	rows, err := s.db.QueryContext(ctx, "SELECT id,title,description,archived_at,created_at,updated_at,version FROM projects WHERE (archived_at IS NOT NULL)=? ORDER BY created_at,id", archived)
+	rows, err := s.db.QueryContext(ctx, "SELECT id,title,description,archived_at,created_at,updated_at,version,pinned FROM projects WHERE deleted_at IS NULL AND (archived_at IS NOT NULL)=? ORDER BY pinned DESC,created_at,id", archived)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +53,7 @@ func (s *Service) List(ctx context.Context, archived bool) ([]Project, error) {
 	out := []Project{}
 	for rows.Next() {
 		var p Project
-		if err = rows.Scan(&p.ID, &p.Title, &p.Description, &p.ArchivedAt, &p.CreatedAt, &p.UpdatedAt, &p.Version); err != nil {
+		if err = rows.Scan(&p.ID, &p.Title, &p.Description, &p.ArchivedAt, &p.CreatedAt, &p.UpdatedAt, &p.Version, &p.Pinned); err != nil {
 			return nil, err
 		}
 		out = append(out, p)
@@ -110,8 +112,11 @@ func (s *Service) Update(ctx context.Context, pid string, in Input) (Project, er
 			p.ArchivedAt = &n
 		}
 	}
+	if in.Pinned != nil {
+		p.Pinned = *in.Pinned
+	}
 	p.UpdatedAt = clock.Now()
-	res, err := tx.ExecContext(ctx, "UPDATE projects SET title=?,description=?,archived_at=?,updated_at=?,version=version+1 WHERE id=? AND version=?", p.Title, p.Description, p.ArchivedAt, p.UpdatedAt, p.ID, in.Version)
+	res, err := tx.ExecContext(ctx, "UPDATE projects SET title=?,description=?,archived_at=?,updated_at=?,pinned=?,version=version+1 WHERE id=? AND version=?", p.Title, p.Description, p.ArchivedAt, p.UpdatedAt, p.Pinned, p.ID, in.Version)
 	if err != nil {
 		return p, err
 	}

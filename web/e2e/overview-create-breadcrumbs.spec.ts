@@ -8,7 +8,7 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await page.getByRole('dialog').getByRole('button',{name:'创建任务',exact:true}).click();
  await expect(page.getByLabel('任务标题',{exact:true})).toHaveValue('栏内创建任务');
  const crumbs=page.getByRole('navigation',{name:'面包屑'});
- await crumbs.getByRole('link',{name:'任务',exact:true}).click();
+ await page.getByRole('link',{name:'返回任务列表'}).click();
  await expect(page).toHaveURL(base+'/tasks');
  await crumbs.getByRole('link',{name:'汇总',exact:true}).click();
  await page.getByRole('link',{name:'创建笔记',exact:true}).click();
@@ -16,14 +16,14 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await page.getByLabel('新笔记标题').fill('栏内创建笔记');
  await page.getByRole('button',{name:'新建笔记',exact:true}).click();
  await expect(page.getByLabel('笔记标题',{exact:true})).toHaveValue('栏内创建笔记');
- await crumbs.getByRole('link',{name:'笔记',exact:true}).click();
+ await page.getByRole('link',{name:'返回笔记列表'}).click();
  await expect(page).toHaveURL(base+'/pages');
  await crumbs.getByRole('link',{name:'汇总',exact:true}).click();
  await page.getByRole('link',{name:'创建日程',exact:true}).click();
  await page.getByLabel('新日程标题').fill('栏内创建日程');
  await page.getByRole('button',{name:'创建日程',exact:true}).click();
  await expect(page.getByLabel('日程标题',{exact:true})).toHaveValue('栏内创建日程');
- await crumbs.getByRole('link',{name:'日程',exact:true}).click();
+ await page.getByRole('button',{name:'关闭日程详情'}).click();
  await expect(page).toHaveURL(base+'/events');
  await crumbs.getByRole('link',{name:'汇总',exact:true}).click();
  await page.getByRole('button',{name:'归档项目',exact:true}).click();

@@ -1,4 +1,5 @@
 export type Project = {
+  pinned?: boolean;
   id: string;
   title: string;
   description: string;

@@ -30,7 +30,7 @@ export function Trash() {
         <article key={x.id}>
           <h2>{x.title}</h2>
           <p>
-            {x.type} · {x.count} 个对象 ·{" "}
+            {{projects:"项目",tasks:"任务",pages:"笔记",events:"日程"}[x.type] ?? x.type} · {x.count} 个对象 ·{" "}
             {new Date(x.deleted_at).toLocaleString()}
           </p>
           {x.archived && <p>项目已归档，请先取消归档再恢复。</p>}

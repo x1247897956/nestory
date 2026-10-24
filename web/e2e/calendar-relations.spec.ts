@@ -73,7 +73,9 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await page.getByLabel("Markdown 正文").fill("# 讨论\n\n- [ ] 方案");
       await expect(page.getByRole("status")).toHaveText("已保存");
       await page.reload();
+      await page.getByRole("button", {name:"源码",exact:true}).click();
       await expect(page.getByLabel("Markdown 正文")).toContainText("# 讨论");
+      await page.getByRole("button", {name:"关闭日程详情"}).click();
       await page.getByRole("button", { name: "周", exact: true }).click();
       await expect(page.locator(".fc-timegrid-event")).toHaveCount(2);
       await expect(page.locator(".fc-timegrid-event").first()).toContainText(
@@ -82,6 +84,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await expect(page.locator(".fc-timegrid-event").nth(1)).toContainText(
         "01:00",
       );
+      await page.goto("/projects/"+p.id+"/events/"+eventId);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await page
         .getByLabel("关联目标")
