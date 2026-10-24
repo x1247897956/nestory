@@ -2,7 +2,7 @@ package workspace
 
 import (
 	"context"
-	"noteapp/internal/platform/httpx"
+	"noteapp/internal/apperr"
 	"time"
 )
 
@@ -18,13 +18,14 @@ func (s *Service) Dashboard(ctx context.Context, from, to string) (Dashboard, er
 	v := Dashboard{Date: s.now().In(s.loc).Format("2006-01-02"), Timezone: s.loc.String(), Tasks: []Item{}, Events: []Item{}}
 	a, err := time.Parse(time.RFC3339Nano, from)
 	if err != nil {
-		return v, httpx.Invalid("查询起始时间无效")
+		return v, apperr.Invalid("查询起始时间无效")
 	}
 	b, err := time.Parse(time.RFC3339Nano, to)
 	if err != nil || !b.After(a) || b.Sub(a) > 366*24*time.Hour {
-		return v, httpx.Invalid("查询区间必须大于零且不超过366天")
+		return v, apperr.Invalid("查询区间必须大于零且不超过366天")
 	}
-	rows, err := s.db.QueryContext(ctx, `SELECT t.id,t.title,t.project_id,p.title,coalesce(a.title,''),t.stage,t.due_date FROM tasks t JOIN projects p ON p.id=t.project_id LEFT JOIN tasks a ON a.id=t.parent_id WHERE t.deleted_at IS NULL AND p.archived_at IS NULL AND t.stage NOT IN ('done','cancelled') ORDER BY t.due_date IS NULL,t.due_date,t.id`)
+	stageFilter, stageArgs := openTaskStages()
+	rows, err := s.db.QueryContext(ctx, `SELECT t.id,t.title,t.project_id,p.title,coalesce(a.title,''),t.stage,t.due_date FROM tasks t JOIN projects p ON p.id=t.project_id LEFT JOIN tasks a ON a.id=t.parent_id WHERE t.deleted_at IS NULL AND p.archived_at IS NULL AND `+stageFilter+` ORDER BY t.due_date IS NULL,t.due_date,t.id`, stageArgs...)
 	if err != nil {
 		return v, err
 	}

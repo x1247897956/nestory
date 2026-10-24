@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"noteapp/internal/apperr"
 	"noteapp/internal/platform/clock"
-	"noteapp/internal/platform/httpx"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
 	"strings"
@@ -45,7 +45,7 @@ func scan(row scanner) (Page, error) {
 	var t Page
 	err := row.Scan(&t.ID, &t.ProjectID, &t.ParentID, &t.Title, &t.Body, &t.Position, &t.CreatedAt, &t.UpdatedAt, &t.Version)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = httpx.NotFound
+		err = apperr.NotFound
 	}
 	return t, err
 }
@@ -82,7 +82,7 @@ func apply(t *Page, in Input) error {
 		t.Title = strings.TrimSpace(*in.Title)
 	}
 	if t.Title == "" {
-		return httpx.Invalid("页面标题不能为空")
+		return apperr.Invalid("页面标题不能为空")
 	}
 	if in.Body != nil {
 		t.Body = *in.Body
@@ -95,19 +95,19 @@ func parentOK(ctx context.Context, tx *sql.Tx, t Page, parentID *string) error {
 		return nil
 	}
 	p, err := read(ctx, tx, *parentID)
-	if errors.Is(err, httpx.NotFound) {
-		return httpx.Conflict("父页面不存在")
+	if errors.Is(err, apperr.NotFound) {
+		return apperr.Conflict("父页面不存在")
 	}
 	if err != nil {
 		return err
 	}
 	if p.ProjectID != t.ProjectID {
-		return httpx.Conflict("父页面必须在同一项目")
+		return apperr.Conflict("父页面必须在同一项目")
 	}
 	seen := map[string]bool{t.ID: true}
 	for {
 		if seen[p.ID] {
-			return httpx.Conflict("页面不能形成循环")
+			return apperr.Conflict("页面不能形成循环")
 		}
 		seen[p.ID] = true
 		if p.ParentID == nil {
@@ -154,10 +154,10 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Page, error
 func (s *Service) Update(ctx context.Context, tid string, in Input) (Page, error) {
 	var t Page
 	if in.Version < 1 {
-		return t, httpx.Invalid("version 必填")
+		return t, apperr.Invalid("version 必填")
 	}
 	if in.ParentID != nil {
-		return t, httpx.Invalid("请使用移动接口调整父级")
+		return t, apperr.Invalid("请使用移动接口调整父级")
 	}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -172,7 +172,7 @@ func (s *Service) Update(ctx context.Context, tid string, in Input) (Page, error
 		return t, err
 	}
 	if t.Version != in.Version {
-		return t, httpx.Conflict("内容已更新，请重新加载；本地草稿已保留")
+		return t, apperr.Conflict("内容已更新，请重新加载；本地草稿已保留")
 	}
 	if err = apply(&t, in); err != nil {
 		return t, err
@@ -194,14 +194,14 @@ func changed(res sql.Result) error {
 		return err
 	}
 	if n != 1 {
-		return httpx.Conflict("内容已更新，请重新加载")
+		return apperr.Conflict("内容已更新，请重新加载")
 	}
 	return nil
 }
 func (s *Service) Move(ctx context.Context, tid string, in MoveInput) (Page, error) {
 	var t Page
 	if in.Version < 1 || in.Position < 0 {
-		return t, httpx.Invalid("version 必填且 position 不能为负")
+		return t, apperr.Invalid("version 必填且 position 不能为负")
 	}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -216,7 +216,7 @@ func (s *Service) Move(ctx context.Context, tid string, in MoveInput) (Page, err
 		return t, err
 	}
 	if t.Version != in.Version {
-		return t, httpx.Conflict("内容已更新，请重新加载")
+		return t, apperr.Conflict("内容已更新，请重新加载")
 	}
 	if err = parentOK(ctx, tx, t, in.ParentID); err != nil {
 		return t, err

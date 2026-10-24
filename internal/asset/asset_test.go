@@ -3,12 +3,15 @@ package asset
 import (
 	"bytes"
 	"context"
+	"io"
 	"net/http/httptest"
 	"noteapp/internal/platform/database"
 	"noteapp/internal/project"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestUpload(t *testing.T) {
@@ -91,4 +94,66 @@ func TestRestartAndDownloadPolicy(t *testing.T) {
 	if _, e = s.Upload(ctx, p.ID, "no.txt", strings.NewReader("a")); e == nil {
 		t.Fatal("archived upload allowed")
 	}
+}
+
+// An upload waiting on the client must not occupy SQLite's only connection.
+func TestUploadDoesNotHoldConnectionWhileReadingAndRechecksArchive(t *testing.T) {
+	ctx := context.Background()
+	db, err := database.Open(ctx, filepath.Join(t.TempDir(), "db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	title := "p"
+	p, err := project.New(db).Create(ctx, project.Input{Title: &title})
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	s := New(db, dir, 1024)
+	started, release := make(chan struct{}), make(chan struct{})
+	reader := &waitingReader{started: started, release: release}
+	done := make(chan error, 1)
+	go func() { _, err := s.Upload(ctx, p.ID, "slow.txt", reader); done <- err }()
+	select {
+	case <-started:
+	case err := <-done:
+		t.Fatalf("upload failed before reading: %v", err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("upload did not start")
+	}
+	queryCtx, cancel := context.WithTimeout(ctx, time.Second)
+	_, queryErr := db.ExecContext(queryCtx, "UPDATE projects SET archived_at=1 WHERE id=?", p.ID)
+	cancel()
+	close(release)
+	uploadErr := <-done
+	if queryErr != nil {
+		t.Fatalf("upload held the database connection: %v", queryErr)
+	}
+	if uploadErr == nil {
+		t.Fatal("project archived during upload was accepted")
+	}
+	var count int
+	if err = db.QueryRow("SELECT count(*) FROM assets").Scan(&count); err != nil || count != 0 {
+		t.Fatalf("metadata leaked: %d %v", count, err)
+	}
+	files, err := os.ReadDir(filepath.Join(dir, "assets"))
+	if err != nil || len(files) != 0 {
+		t.Fatalf("files leaked: %v %v", files, err)
+	}
+}
+
+type waitingReader struct {
+	started, release chan struct{}
+	sent             bool
+}
+
+func (r *waitingReader) Read(p []byte) (int, error) {
+	if r.sent {
+		return 0, io.EOF
+	}
+	r.sent = true
+	close(r.started)
+	<-r.release
+	return copy(p, "hello"), nil
 }

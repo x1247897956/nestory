@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"noteapp/internal/apperr"
 	"noteapp/internal/platform/clock"
-	"noteapp/internal/platform/httpx"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
 	"strings"
@@ -43,7 +43,7 @@ func scan(r scanner) (Event, error) {
 	var a, b int64
 	e := r.Scan(&v.ID, &v.ProjectID, &v.Title, &v.Body, &a, &b, &v.CreatedAt, &v.UpdatedAt, &v.Version)
 	if errors.Is(e, sql.ErrNoRows) {
-		e = httpx.NotFound
+		e = apperr.NotFound
 	}
 	v.StartAt = time.UnixMilli(a).UTC().Format(time.RFC3339Nano)
 	v.EndAt = time.UnixMilli(b).UTC().Format(time.RFC3339Nano)
@@ -61,14 +61,14 @@ func (s *Service) Get(ctx context.Context, key string) (Event, error) { return r
 func interval(a, b string) (int64, int64, error) {
 	x, e := time.Parse(time.RFC3339Nano, a)
 	if e != nil {
-		return 0, 0, httpx.Invalid("时间必须为带偏移的 RFC3339")
+		return 0, 0, apperr.Invalid("时间必须为带偏移的 RFC3339")
 	}
 	y, e := time.Parse(time.RFC3339Nano, b)
 	if e != nil {
-		return 0, 0, httpx.Invalid("时间必须为带偏移的 RFC3339")
+		return 0, 0, apperr.Invalid("时间必须为带偏移的 RFC3339")
 	}
 	if y.UnixMilli() <= x.UnixMilli() {
-		return 0, 0, httpx.Invalid("结束时间必须晚于开始时间")
+		return 0, 0, apperr.Invalid("结束时间必须晚于开始时间")
 	}
 	return x.UnixMilli(), y.UnixMilli(), nil
 }
@@ -78,7 +78,7 @@ func (s *Service) List(ctx context.Context, pid, from, to string) ([]Event, erro
 		return nil, e
 	}
 	if b-a > 366*24*60*60*1000 {
-		return nil, httpx.Invalid("查询区间不能超过366天")
+		return nil, apperr.Invalid("查询区间不能超过366天")
 	}
 	if _, e = project.Read(ctx, s.db, pid); e != nil {
 		return nil, e
@@ -103,7 +103,7 @@ func apply(v *Event, in Input) (int64, int64, error) {
 		v.Title = strings.TrimSpace(*in.Title)
 	}
 	if v.Title == "" {
-		return 0, 0, httpx.Invalid("日程标题不能为空")
+		return 0, 0, apperr.Invalid("日程标题不能为空")
 	}
 	if in.Body != nil {
 		v.Body = *in.Body
@@ -145,7 +145,7 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Event, erro
 func (s *Service) Update(ctx context.Context, key string, in Input) (Event, error) {
 	var v Event
 	if in.Version < 1 {
-		return v, httpx.Invalid("version 必填")
+		return v, apperr.Invalid("version 必填")
 	}
 	tx, e := s.db.BeginTx(ctx, nil)
 	if e != nil {
@@ -160,7 +160,7 @@ func (s *Service) Update(ctx context.Context, key string, in Input) (Event, erro
 		return v, e
 	}
 	if v.Version != in.Version {
-		return v, httpx.Conflict("内容已更新，请重新加载；本地草稿已保留")
+		return v, apperr.Conflict("内容已更新，请重新加载；本地草稿已保留")
 	}
 	a, b, e := apply(&v, in)
 	if e != nil {
@@ -176,7 +176,7 @@ func (s *Service) Update(ctx context.Context, key string, in Input) (Event, erro
 		return v, e
 	}
 	if n != 1 {
-		return v, httpx.Conflict("内容已更新，请重新加载")
+		return v, apperr.Conflict("内容已更新，请重新加载")
 	}
 	v.Version++
 	v.StartAt = time.UnixMilli(a).UTC().Format(time.RFC3339Nano)

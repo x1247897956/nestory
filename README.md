@@ -95,3 +95,5 @@ scripts/restore.sh --volume noteapp-restored \
 任务、笔记、日程共同实现 `internal/object.Entity`，提供统一的对象身份、类型、项目、标题、正文、版本和固有属性视图。`GET /api/v1/object-types/{tasks|pages|events}` 返回后端定义的固定属性及修改方式；`GET /api/v1/objects/{type}/{id}` 返回对象值、关联属性和归档只读状态。前端属性栏直接使用后端定义排列与标注字段。
 
 属性仍通过各类型既有的 PATCH、move 和 relation 接口修改，继续执行版本检查、同项目约束、父级防循环和归档只读校验。现有 SQLite 专用表与数据保持兼容，无需数据迁移；这里没有引入自定义字段或通用属性存储引擎。
+
+后端模块职责、事务边界及对象版本语义见 [后端结构](docs/architecture.md)。对象读取由 `objectquery` 编排；`taskmeta` 集中任务元数据，`apperr` 与 HTTP 状态映射分离。附件流接收在数据库事务外完成，提交时重新检查项目可写性。

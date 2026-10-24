@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"noteapp/internal/apperr"
 	"noteapp/internal/platform/clock"
-	"noteapp/internal/platform/httpx"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
 )
@@ -46,11 +46,11 @@ func preview(ctx context.Context, q query, typ, key string) (Preview, string, st
 	var v Preview
 	var pid, title string
 	if !valid(typ) {
-		return v, pid, title, httpx.Invalid("无效对象类型")
+		return v, pid, title, apperr.Invalid("无效对象类型")
 	}
 	e := q.QueryRowContext(ctx, "SELECT version,project_id,title FROM "+typ+" WHERE id=? AND deleted_at IS NULL", key).Scan(&v.Version, &pid, &title)
 	if errors.Is(e, sql.ErrNoRows) {
-		e = httpx.NotFound
+		e = apperr.NotFound
 	}
 	if e != nil {
 		return v, pid, title, e
@@ -99,7 +99,7 @@ func (s *Service) Delete(ctx context.Context, typ, key string, in Preview) (stri
 		return "", e
 	}
 	if v.Version != in.Version || v.Count != in.Count {
-		return "", httpx.Conflict("内容或删除数量已变化，请重新预览并确认")
+		return "", apperr.Conflict("内容或删除数量已变化，请重新预览并确认")
 	}
 	batch, e := id.New()
 	if e != nil {
@@ -170,7 +170,7 @@ func (s *Service) Restore(ctx context.Context, batch string) error {
 	var typ, pid string
 	e = tx.QueryRowContext(ctx, `SELECT object_type,project_id FROM delete_batches WHERE id=? AND restored_at IS NULL`, batch).Scan(&typ, &pid)
 	if errors.Is(e, sql.ErrNoRows) {
-		return httpx.NotFound
+		return apperr.NotFound
 	}
 	if e != nil {
 		return e
@@ -185,7 +185,7 @@ func (s *Service) Restore(ctx context.Context, batch string) error {
 			return e
 		}
 		if required.Valid {
-			return httpx.Conflict("请先恢复仍在回收站的父对象，所需批次：" + required.String)
+			return apperr.Conflict("请先恢复仍在回收站的父对象，所需批次：" + required.String)
 		}
 	}
 
@@ -196,7 +196,7 @@ func (s *Service) Restore(ctx context.Context, batch string) error {
 			return e
 		}
 		if n > 0 {
-			return httpx.Conflict("恢复会产生多层子任务，请先将父任务移回顶层")
+			return apperr.Conflict("恢复会产生多层子任务，请先将父任务移回顶层")
 		}
 	}
 	_, e = tx.ExecContext(ctx, "UPDATE "+typ+" SET deleted_at=NULL,delete_batch_id=NULL,updated_at=?,version=version+1 WHERE delete_batch_id=?", clock.Now(), batch)

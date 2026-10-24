@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"noteapp/internal/apperr"
 )
 
 type Error struct {
@@ -15,10 +16,12 @@ type Error struct {
 }
 
 func (e *Error) Error() string { return e.Message }
-func Invalid(s string) error   { return &Error{400, "invalid", s} }
-func Conflict(s string) error  { return &Error{409, "conflict", s} }
 
-var NotFound = &Error{404, "not_found", "对象不存在"}
+// Compatibility helpers preserve callers at the HTTP boundary.
+func Invalid(s string) error  { return apperr.Invalid(s) }
+func Conflict(s string) error { return apperr.Conflict(s) }
+
+var NotFound = apperr.NotFound
 
 func JSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -26,12 +29,30 @@ func JSON(w http.ResponseWriter, status int, v any) {
 	_ = json.NewEncoder(w).Encode(v)
 }
 func Fail(w http.ResponseWriter, err error) {
-	var e *Error
-	if !errors.As(err, &e) {
-		slog.Error("request failed", "error", err)
-		e = &Error{500, "internal", "服务器内部错误"}
+	var domain *apperr.Error
+	var transport *Error
+	status, code, message := 500, "internal", "服务器内部错误"
+	if errors.As(err, &domain) {
+		switch domain.Code {
+		case "invalid":
+			status = 400
+		case "conflict":
+			status = 409
+		case "not_found":
+			status = 404
+		case "too_large":
+			status = 413
+		}
+		if status != 500 {
+			code, message = domain.Code, domain.Message
+		}
+	} else if errors.As(err, &transport) {
+		status, code, message = transport.Status, transport.Code, transport.Message
 	}
-	JSON(w, e.Status, map[string]any{"error": map[string]string{"code": e.Code, "message": e.Message}})
+	if status == 500 {
+		slog.Error("request failed", "error", err)
+	}
+	JSON(w, status, map[string]any{"error": map[string]string{"code": code, "message": message}})
 }
 func Decode(w http.ResponseWriter, r *http.Request, v any) error {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)

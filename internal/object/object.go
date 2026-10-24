@@ -3,7 +3,10 @@
 // and storage; properties are not user-defined fields or an EAV persistence model.
 package object
 
-import "noteapp/internal/platform/httpx"
+import (
+	"noteapp/internal/apperr"
+	"noteapp/internal/taskmeta"
+)
 
 type Type string
 
@@ -14,11 +17,12 @@ const (
 )
 
 type PropertyDefinition struct {
-	Key      string `json:"key"`
-	Label    string `json:"label"`
-	Kind     string `json:"kind"`
-	Default  any    `json:"default"`
-	Mutation string `json:"mutation"`
+	Key      string            `json:"key"`
+	Label    string            `json:"label"`
+	Kind     string            `json:"kind"`
+	Default  any               `json:"default"`
+	Mutation string            `json:"mutation"`
+	Options  []taskmeta.Option `json:"options,omitempty"`
 }
 type Definition struct {
 	Type       Type                 `json:"type"`
@@ -28,6 +32,9 @@ type Definition struct {
 
 // Entity is implemented by each concrete domain object.
 type Entity interface{ AsObject() Object }
+
+// Object is a shared read view. Version tracks the native object row; relation
+// changes use their own idempotent operations and do not increment that version.
 type Object struct {
 	ID         string         `json:"id"`
 	Type       Type           `json:"type"`
@@ -46,16 +53,21 @@ func Describe(typ Type) (Definition, error) {
 	switch typ {
 	case Task:
 		d.Name = "任务"
-		d.Properties = []PropertyDefinition{{"stage", "阶段", "stage", "todo", "update"}, {"priority", "优先级", "priority", "none", "update"}, {"due_date", "截止日期", "date", nil, "update"}, {"parent_id", "父任务", "task", nil, "move"}}
+		d.Properties = []PropertyDefinition{
+			{Key: "stage", Label: "阶段", Kind: "stage", Default: taskmeta.DefaultStage, Mutation: "update", Options: taskmeta.StageOptions()},
+			{Key: "priority", Label: "优先级", Kind: "priority", Default: taskmeta.DefaultPriority, Mutation: "update", Options: taskmeta.Priorities()},
+			{Key: "due_date", Label: "截止日期", Kind: "date", Mutation: "update"},
+			{Key: "parent_id", Label: "父任务", Kind: "task", Mutation: "move"},
+		}
 	case Note:
 		d.Name = "笔记"
-		d.Properties = []PropertyDefinition{{"parent_id", "父笔记", "note", nil, "move"}, {"position", "顺序", "number", 0, "move"}}
+		d.Properties = []PropertyDefinition{{Key: "parent_id", Label: "父笔记", Kind: "note", Mutation: "move"}, {Key: "position", Label: "顺序", Kind: "number", Default: 0, Mutation: "move"}}
 	case Event:
 		d.Name = "日程"
-		d.Properties = []PropertyDefinition{{"start_at", "开始时间", "datetime", nil, "update"}, {"end_at", "结束时间", "datetime", nil, "update"}}
+		d.Properties = []PropertyDefinition{{Key: "start_at", Label: "开始时间", Kind: "datetime", Mutation: "update"}, {Key: "end_at", Label: "结束时间", Kind: "datetime", Mutation: "update"}}
 	default:
-		return d, httpx.Invalid("无效对象类型")
+		return d, apperr.Invalid("无效对象类型")
 	}
-	d.Properties = append(d.Properties, PropertyDefinition{"relations", "关联对象", "relations", []any{}, "relation"})
+	d.Properties = append(d.Properties, PropertyDefinition{Key: "relations", Label: "关联对象", Kind: "relations", Default: []any{}, Mutation: "relation"})
 	return d, nil
 }

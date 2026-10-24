@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"io/fs"
 	"log/slog"
@@ -8,12 +9,15 @@ import (
 	"net/url"
 	"noteapp/internal/asset"
 	"noteapp/internal/event"
+	"noteapp/internal/object"
+	"noteapp/internal/objectquery"
 	"noteapp/internal/page"
 	"noteapp/internal/platform/config"
 	"noteapp/internal/platform/httpx"
 	"noteapp/internal/project"
 	"noteapp/internal/relation"
 	"noteapp/internal/task"
+	"noteapp/internal/taskmeta"
 	"noteapp/internal/trash"
 	"noteapp/internal/workspace"
 	"noteapp/web"
@@ -38,7 +42,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		httpx.JSON(w, 200, map[string]string{"status": "ready"})
 	})
 	mux.HandleFunc("GET /api/v1/config", func(w http.ResponseWriter, r *http.Request) {
-		httpx.JSON(w, 200, map[string]any{"timezone": c.Timezone, "stages": task.Stages})
+		httpx.JSON(w, 200, map[string]any{"timezone": c.Timezone, "stages": taskmeta.Stages(), "priorities": taskmeta.Priorities()})
 	})
 	mux.HandleFunc("GET /api/v1/projects", func(w http.ResponseWriter, r *http.Request) {
 		a := r.URL.Query().Get("archived")
@@ -144,7 +148,23 @@ func New(db *sql.DB, c config.Config) http.Handler {
 
 	events := event.New(db)
 	relations := relation.New(db)
-	registerObjects(mux, p, t, pg, events, relations)
+	registerObjects(mux, objectquery.New(map[object.Type]objectquery.Reader{
+		object.Task: func(ctx context.Context, id string) (object.Object, error) {
+			v, err := t.Get(ctx, id)
+			return v.AsObject(), err
+		},
+		object.Note: func(ctx context.Context, id string) (object.Object, error) {
+			v, err := pg.Get(ctx, id)
+			return v.AsObject(), err
+		},
+		object.Event: func(ctx context.Context, id string) (object.Object, error) {
+			v, err := events.Get(ctx, id)
+			return v.AsObject(), err
+		},
+	}, func(ctx context.Context, pid string) (bool, error) {
+		v, err := p.Get(ctx, pid)
+		return v.ArchivedAt != nil, err
+	}, relations.List))
 	mux.HandleFunc("GET /api/v1/projects/{id}/relation-options", func(w http.ResponseWriter, r *http.Request) {
 		v, e := relations.Candidates(r.Context(), r.PathValue("id"))
 		respond(w, 200, v, e)

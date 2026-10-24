@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"noteapp/internal/platform/httpx"
+	"noteapp/internal/apperr"
 	"strings"
 	"time"
 )
@@ -55,7 +55,8 @@ func (s *Service) Today(ctx context.Context) (Today, error) {
 	start := time.Date(n.Year(), n.Month(), n.Day(), 0, 0, 0, 0, s.loc)
 	next := start.AddDate(0, 0, 1)
 	v := Today{Date: start.Format("2006-01-02"), Timezone: s.loc.String(), Today: []Item{}, Overdue: []Item{}, Events: []Item{}}
-	rows, e := s.db.QueryContext(ctx, `SELECT t.id,t.title,t.project_id,p.title,coalesce(a.title,''),t.stage,t.due_date FROM tasks t JOIN projects p ON p.id=t.project_id LEFT JOIN tasks a ON a.id=t.parent_id WHERE t.deleted_at IS NULL AND p.archived_at IS NULL AND t.stage NOT IN ('done','cancelled') AND t.due_date<=? ORDER BY t.due_date,t.id`, v.Date)
+	stageFilter, stageArgs := openTaskStages()
+	rows, e := s.db.QueryContext(ctx, `SELECT t.id,t.title,t.project_id,p.title,coalesce(a.title,''),t.stage,t.due_date FROM tasks t JOIN projects p ON p.id=t.project_id LEFT JOIN tasks a ON a.id=t.parent_id WHERE t.deleted_at IS NULL AND p.archived_at IS NULL AND `+stageFilter+` AND t.due_date<=? ORDER BY t.due_date,t.id`, append(stageArgs, v.Date)...)
 	if e != nil {
 		return v, e
 	}
@@ -105,7 +106,7 @@ const union = `SELECT 'projects' type,p.id,p.title,p.description body,p.id proje
 
 func (s *Service) Search(ctx context.Context, q string, archived bool, limit, offset int) (SearchResult, error) {
 	if limit < 1 || limit > 100 || offset < 0 {
-		return SearchResult{}, httpx.Invalid("分页范围无效")
+		return SearchResult{}, apperr.Invalid("分页范围无效")
 	}
 	v := SearchResult{Items: []Item{}, Limit: limit, Offset: offset}
 	q = strings.TrimSpace(q)
@@ -169,7 +170,7 @@ func (s *Service) Visit(ctx context.Context, typ, key string) error {
 	if typ == "page" {
 		table = "pages"
 	} else if typ != "project" {
-		return httpx.Invalid("无效访问类型")
+		return apperr.Invalid("无效访问类型")
 	}
 	condition := ""
 	if typ == "page" {
@@ -178,7 +179,7 @@ func (s *Service) Visit(ctx context.Context, typ, key string) error {
 	var n int
 	e := s.db.QueryRowContext(ctx, "SELECT 1 FROM "+table+" WHERE id=?"+condition, key).Scan(&n)
 	if errors.Is(e, sql.ErrNoRows) {
-		return httpx.NotFound
+		return apperr.NotFound
 	}
 	if e != nil {
 		return e

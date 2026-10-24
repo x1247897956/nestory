@@ -4,10 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"noteapp/internal/apperr"
 	"noteapp/internal/platform/clock"
-	"noteapp/internal/platform/httpx"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
+	"noteapp/internal/taskmeta"
 	"strings"
 	"time"
 )
@@ -40,14 +41,6 @@ type MoveInput struct {
 	Position int64   `json:"position"`
 	Version  int64   `json:"version"`
 }
-type Stage struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Terminal bool   `json:"terminal"`
-}
-
-var Stages = []Stage{{"todo", "Todo", false}, {"in_plan", "InPlan", false}, {"in_process", "InProcess", false}, {"done", "Done", true}, {"cancelled", "Cancelled", true}}
-
 type Service struct{ db *sql.DB }
 
 func New(db *sql.DB) *Service { return &Service{db} }
@@ -60,7 +53,7 @@ func scan(row scanner) (Task, error) {
 	var t Task
 	err := row.Scan(&t.ID, &t.ProjectID, &t.ParentID, &t.Title, &t.Body, &t.Stage, &t.Priority, &t.DueDate, &t.Position, &t.CreatedAt, &t.UpdatedAt, &t.Version)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = httpx.NotFound
+		err = apperr.NotFound
 	}
 	return t, err
 }
@@ -97,7 +90,7 @@ func apply(t *Task, in Input) error {
 		t.Title = strings.TrimSpace(*in.Title)
 	}
 	if t.Title == "" {
-		return httpx.Invalid("任务标题不能为空")
+		return apperr.Invalid("任务标题不能为空")
 	}
 	if in.Body != nil {
 		t.Body = *in.Body
@@ -105,29 +98,21 @@ func apply(t *Task, in Input) error {
 	if in.Stage != nil {
 		t.Stage = *in.Stage
 	}
-	valid := false
-	for _, s := range Stages {
-		if s.ID == t.Stage {
-			valid = true
-		}
-	}
-	if !valid {
-		return httpx.Invalid("无效任务阶段")
+	if !taskmeta.ValidStage(t.Stage) {
+		return apperr.Invalid("无效任务阶段")
 	}
 	if in.Priority != nil {
 		t.Priority = *in.Priority
 	}
-	switch t.Priority {
-	case "none", "low", "medium", "high":
-	default:
-		return httpx.Invalid("无效优先级")
+	if !taskmeta.ValidPriority(t.Priority) {
+		return apperr.Invalid("无效优先级")
 	}
 	if in.DueDate != nil {
 		if *in.DueDate == "" {
 			t.DueDate = nil
 		} else {
 			if _, err := time.Parse("2006-01-02", *in.DueDate); err != nil {
-				return httpx.Invalid("截止日期必须为 YYYY-MM-DD")
+				return apperr.Invalid("截止日期必须为 YYYY-MM-DD")
 			}
 			t.DueDate = in.DueDate
 		}
@@ -139,26 +124,26 @@ func parentOK(ctx context.Context, tx *sql.Tx, t Task, parentID *string) error {
 		return nil
 	}
 	p, err := read(ctx, tx, *parentID)
-	if errors.Is(err, httpx.NotFound) {
-		return httpx.Conflict("父任务不存在")
+	if errors.Is(err, apperr.NotFound) {
+		return apperr.Conflict("父任务不存在")
 	}
 	if err != nil {
 		return err
 	}
 	if p.ID == t.ID || p.ProjectID != t.ProjectID || p.ParentID != nil {
-		return httpx.Conflict("父任务必须为同项目的顶层任务")
+		return apperr.Conflict("父任务必须为同项目的顶层任务")
 	}
 	var n int
 	if err = tx.QueryRowContext(ctx, "SELECT count(*) FROM tasks WHERE parent_id=? AND deleted_at IS NULL", t.ID).Scan(&n); err != nil {
 		return err
 	}
 	if n > 0 {
-		return httpx.Conflict("含子任务的任务不能降为子任务")
+		return apperr.Conflict("含子任务的任务不能降为子任务")
 	}
 	return nil
 }
 func (s *Service) Create(ctx context.Context, pid string, in Input) (Task, error) {
-	t := Task{ProjectID: pid, ParentID: in.ParentID, Stage: "todo", Priority: "none", CreatedAt: clock.Now(), UpdatedAt: clock.Now(), Version: 1}
+	t := Task{ProjectID: pid, ParentID: in.ParentID, Stage: taskmeta.DefaultStage, Priority: taskmeta.DefaultPriority, CreatedAt: clock.Now(), UpdatedAt: clock.Now(), Version: 1}
 	if err := apply(&t, in); err != nil {
 		return t, err
 	}
@@ -190,10 +175,10 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Task, error
 func (s *Service) Update(ctx context.Context, tid string, in Input) (Task, error) {
 	var t Task
 	if in.Version < 1 {
-		return t, httpx.Invalid("version 必填")
+		return t, apperr.Invalid("version 必填")
 	}
 	if in.ParentID != nil {
-		return t, httpx.Invalid("请使用移动接口调整父级")
+		return t, apperr.Invalid("请使用移动接口调整父级")
 	}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -208,7 +193,7 @@ func (s *Service) Update(ctx context.Context, tid string, in Input) (Task, error
 		return t, err
 	}
 	if t.Version != in.Version {
-		return t, httpx.Conflict("内容已更新，请重新加载；本地草稿已保留")
+		return t, apperr.Conflict("内容已更新，请重新加载；本地草稿已保留")
 	}
 	if err = apply(&t, in); err != nil {
 		return t, err
@@ -230,14 +215,14 @@ func changed(res sql.Result) error {
 		return err
 	}
 	if n != 1 {
-		return httpx.Conflict("内容已更新，请重新加载")
+		return apperr.Conflict("内容已更新，请重新加载")
 	}
 	return nil
 }
 func (s *Service) Move(ctx context.Context, tid string, in MoveInput) (Task, error) {
 	var t Task
 	if in.Version < 1 || in.Position < 0 {
-		return t, httpx.Invalid("version 必填且 position 不能为负")
+		return t, apperr.Invalid("version 必填且 position 不能为负")
 	}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -252,7 +237,7 @@ func (s *Service) Move(ctx context.Context, tid string, in MoveInput) (Task, err
 		return t, err
 	}
 	if t.Version != in.Version {
-		return t, httpx.Conflict("内容已更新，请重新加载")
+		return t, apperr.Conflict("内容已更新，请重新加载")
 	}
 	if err = parentOK(ctx, tx, t, in.ParentID); err != nil {
 		return t, err

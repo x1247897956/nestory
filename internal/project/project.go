@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"noteapp/internal/apperr"
 	"noteapp/internal/platform/clock"
-	"noteapp/internal/platform/httpx"
 	"noteapp/internal/platform/id"
 	"strings"
 )
@@ -37,7 +37,7 @@ func Read(ctx context.Context, q querier, pid string) (Project, error) {
 	var p Project
 	err := q.QueryRowContext(ctx, "SELECT id,title,description,archived_at,created_at,updated_at,version FROM projects WHERE id=?", pid).Scan(&p.ID, &p.Title, &p.Description, &p.ArchivedAt, &p.CreatedAt, &p.UpdatedAt, &p.Version)
 	if errors.Is(err, sql.ErrNoRows) {
-		return p, httpx.NotFound
+		return p, apperr.NotFound
 	}
 	return p, err
 }
@@ -61,7 +61,7 @@ func (s *Service) List(ctx context.Context, archived bool) ([]Project, error) {
 func (s *Service) Create(ctx context.Context, in Input) (Project, error) {
 	var p Project
 	if in.Title == nil || strings.TrimSpace(*in.Title) == "" {
-		return p, httpx.Invalid("项目名称不能为空")
+		return p, apperr.Invalid("项目名称不能为空")
 	}
 	pid, err := id.New()
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *Service) Create(ctx context.Context, in Input) (Project, error) {
 func (s *Service) Update(ctx context.Context, pid string, in Input) (Project, error) {
 	var p Project
 	if in.Version < 1 {
-		return p, httpx.Invalid("version 必填")
+		return p, apperr.Invalid("version 必填")
 	}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -89,15 +89,15 @@ func (s *Service) Update(ctx context.Context, pid string, in Input) (Project, er
 		return p, err
 	}
 	if p.Version != in.Version {
-		return p, httpx.Conflict("内容已更新，请重新加载")
+		return p, apperr.Conflict("内容已更新，请重新加载")
 	}
 	if p.ArchivedAt != nil && (in.Title != nil || in.Description != nil || in.Archived == nil || *in.Archived) {
-		return p, httpx.Conflict("项目已归档，请先取消归档")
+		return p, apperr.Conflict("项目已归档，请先取消归档")
 	}
 	if in.Title != nil {
 		p.Title = strings.TrimSpace(*in.Title)
 		if p.Title == "" {
-			return p, httpx.Invalid("项目名称不能为空")
+			return p, apperr.Invalid("项目名称不能为空")
 		}
 	}
 	if in.Description != nil {
@@ -120,7 +120,7 @@ func (s *Service) Update(ctx context.Context, pid string, in Input) (Project, er
 		return p, err
 	}
 	if n != 1 {
-		return p, httpx.Conflict("内容已更新，请重新加载")
+		return p, apperr.Conflict("内容已更新，请重新加载")
 	}
 	p.Version++
 	return p, tx.Commit()
@@ -131,7 +131,7 @@ func Writable(ctx context.Context, tx *sql.Tx, pid string) error {
 		return err
 	}
 	if p.ArchivedAt != nil {
-		return httpx.Conflict("项目已归档，请先取消归档")
+		return apperr.Conflict("项目已归档，请先取消归档")
 	}
 	return nil
 }

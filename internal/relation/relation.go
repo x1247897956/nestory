@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"noteapp/internal/platform/httpx"
+	"noteapp/internal/apperr"
 	"noteapp/internal/project"
 	"time"
 )
@@ -36,7 +36,7 @@ func endpoint(ctx context.Context, tx *sql.Tx, table, key string) (string, error
 	var deleted *int64
 	e := tx.QueryRowContext(ctx, "SELECT project_id,deleted_at FROM "+table+" WHERE id=?", key).Scan(&p, &deleted)
 	if errors.Is(e, sql.ErrNoRows) || deleted != nil {
-		return "", httpx.Conflict("关联端点不存在或已删除")
+		return "", apperr.Conflict("关联端点不存在或已删除")
 	}
 	return p, e
 }
@@ -48,7 +48,7 @@ func (s *Service) Change(ctx context.Context, kind, left, right string, add bool
 		}
 	}
 	if sp == nil {
-		return httpx.Invalid("无效关联类型")
+		return apperr.Invalid("无效关联类型")
 	}
 	tx, e := s.db.BeginTx(ctx, nil)
 	if e != nil {
@@ -64,7 +64,7 @@ func (s *Service) Change(ctx context.Context, kind, left, right string, add bool
 		return e
 	}
 	if p != q {
-		return httpx.Conflict("只能关联同项目对象")
+		return apperr.Conflict("只能关联同项目对象")
 	}
 	if e = project.Writable(ctx, tx, p); e != nil {
 		return e
@@ -81,12 +81,12 @@ func (s *Service) Change(ctx context.Context, kind, left, right string, add bool
 }
 func (s *Service) List(ctx context.Context, typ, key string) ([]Item, error) {
 	if typ != "tasks" && typ != "pages" && typ != "events" {
-		return nil, httpx.Invalid("无效对象类型")
+		return nil, apperr.Invalid("无效对象类型")
 	}
 	var pid string
 	e := s.db.QueryRowContext(ctx, "SELECT project_id FROM "+typ+" WHERE id=? AND deleted_at IS NULL", key).Scan(&pid)
 	if errors.Is(e, sql.ErrNoRows) {
-		return nil, httpx.NotFound
+		return nil, apperr.NotFound
 	}
 	if e != nil {
 		return nil, e
