@@ -10,58 +10,127 @@ type Batch = {
   archived: boolean;
   members: { id: string; title: string }[];
 };
+const names: Record<string, string> = {
+  projects: "项目",
+  tasks: "任务",
+  pages: "笔记",
+  events: "日程",
+};
 export function Trash() {
   const qc = useQueryClient();
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const r = useQuery({
     queryKey: ["trash"],
     queryFn: () => api<Batch[]>("/trash"),
   });
   return (
-    <section className="global-view">
-      <h1>回收站</h1>
-      {r.isError && (
-        <p role="alert">
-          加载失败<button onClick={() => r.refetch()}>重试</button>
+    <section className="global-view trash-view" aria-label="回收站">
+      <header className="trash-heading">
+        <h1>回收站</h1>
+        {r.data && <span>{r.data.length} 条记录</span>}
+      </header>
+      {r.isPending && (
+        <p role="status" className="trash-message">
+          正在加载…
         </p>
       )}
-      {r.data?.map((x) => (
-        <article key={x.id}>
-          <h2>{x.title}</h2>
-          <p>
-            {{projects:"项目",tasks:"任务",pages:"笔记",events:"日程"}[x.type] ?? x.type} · {x.count} 个对象 ·{" "}
-            {new Date(x.deleted_at).toLocaleString()}
-          </p>
-          {x.archived && <p>项目已归档，请先取消归档再恢复。</p>}
-          <details>
-            <summary>查看批次成员</summary>
-            <ul>
-              {x.members.map((m) => (
-                <li key={m.id}>{m.title}</li>
-              ))}
-            </ul>
-          </details>
-          <button
-            disabled={busy || x.archived}
-            onClick={async () => {
-              setBusy(true);
-              setError("");
-              try {
-                await api("/trash/" + x.id + "/restore", "POST");
-                await qc.invalidateQueries();
-              } catch (e) {
-                setError((e as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            恢复 {x.title}
-          </button>
-        </article>
-      ))}
-      {error && <p role="alert">{error}</p>}
+      {r.isError && (
+        <p role="alert" className="trash-message">
+          回收站加载失败 <button onClick={() => r.refetch()}>重试</button>
+        </p>
+      )}
+      {r.isSuccess && !r.data.length && (
+        <p className="trash-message">回收站为空</p>
+      )}
+      {!!r.data?.length && (
+        <ul className="trash-list" aria-label="已删除的对象">
+          {r.data.map((x) => (
+            <li key={x.id} className="trash-item">
+              <div className="trash-row">
+                <button
+                  className="trash-title"
+                  title={x.title}
+                  aria-expanded={expanded === x.id}
+                  aria-controls={"trash-members-" + x.id}
+                  onClick={() => setExpanded(expanded === x.id ? null : x.id)}
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 16 16"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="m6 4 4 4-4 4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                  <span>{x.title}</span>
+                </button>
+                <span className="trash-kind">{names[x.type] ?? x.type}</span>
+                <span className="trash-count">{x.count} 个对象</span>
+                <time
+                  dateTime={new Date(x.deleted_at).toISOString()}
+                  title={new Date(x.deleted_at).toLocaleString("zh-CN")}
+                >
+                  {new Date(x.deleted_at).toLocaleString("zh-CN", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </time>
+                <button
+                  className="trash-restore"
+                  aria-label={"恢复 " + x.title}
+                  disabled={!!busy || x.archived}
+                  onClick={async () => {
+                    setBusy(x.id);
+                    setError("");
+                    try {
+                      await api("/trash/" + x.id + "/restore", "POST");
+                      await qc.invalidateQueries();
+                    } catch (e) {
+                      setError((e as Error).message);
+                    } finally {
+                      setBusy(null);
+                    }
+                  }}
+                >
+                  {busy === x.id ? "恢复中…" : "恢复"}
+                </button>
+              </div>
+              {x.archived && (
+                <p className="trash-blocked">
+                  项目已归档，请先取消归档再恢复。
+                </p>
+              )}
+              {expanded === x.id && (
+                <ul
+                  className="trash-members"
+                  id={"trash-members-" + x.id}
+                  aria-label="删除批次明细"
+                >
+                  {x.members.map((m) => (
+                    <li key={m.id}>{m.title}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && (
+        <p role="alert" className="trash-message">
+          {error}
+        </p>
+      )}
     </section>
   );
 }

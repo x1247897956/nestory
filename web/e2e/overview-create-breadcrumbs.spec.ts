@@ -30,6 +30,6 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await expect(page.getByRole('button',{name:'创建任务',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'创建笔记',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'创建日程',exact:true})).toHaveCount(0);
- await crumbs.getByRole('link',{name:'工作空间',exact:true}).click();
+ await page.getByRole('link',{name:'工作台',exact:true}).click();
  await expect(page).toHaveURL('/');
 });

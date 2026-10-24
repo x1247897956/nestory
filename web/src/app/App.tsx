@@ -27,6 +27,7 @@ export function App() {
   const qc = useQueryClient();
   const [archived, setArchived] = useState(false);
   const activeProjectHeading = useRef<HTMLDivElement>(null);
+  const projectOptions = useRef<HTMLDetailsElement>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectForm, setProjectForm] = useState<"new" | "edit" | null>(null);
   const [stage, setStage] = useState("all");
@@ -81,6 +82,26 @@ export function App() {
   });
   const objectTitle = useQuery({queryKey:[pageId ? "page" : "event",pageId ?? eventId],queryFn:()=>api<{title:string}>(`/${pageId ? "pages" : "events"}/${pageId ?? eventId}`),enabled:!!(pageId||eventId)});
   const path = useLocation().pathname;
+  useEffect(() => {
+    const dismiss = (event: PointerEvent) => {
+      const menu = projectOptions.current;
+      if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;
+    };
+    const escape = (event: KeyboardEvent) => {
+      const menu = projectOptions.current;
+      if (event.key === "Escape" && menu?.open) {
+        menu.open = false;
+        menu.querySelector("summary")?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, []);
+  useEffect(() => { if (projectOptions.current) projectOptions.current.open = false; }, [path]);
   useEffect(() => {
     setNewTitle("");
     setNewParent("");
@@ -212,7 +233,7 @@ export function App() {
         <div className="sidebar-heading">
           <span>{archived ? "已归档" : "项目"} <span className="project-count">{projects.data?.length ?? 0}</span></span>
           <div className="project-heading-actions">
-            <details className="project-options" onKeyDown={event => { if (event.key === "Escape") event.currentTarget.open = false; }}>
+            <details ref={projectOptions} className="project-options">
               <summary aria-label="项目选项">⋯</summary>
               <div><button onClick={event => { setArchived(!archived); event.currentTarget.closest("details")!.open = false; }}>{archived ? "返回项目列表" : "查看已归档项目"}</button></div>
             </details>
@@ -246,7 +267,6 @@ export function App() {
       <main>
         <div className="topbar">
           <nav className="breadcrumbs" aria-label="面包屑">
-            <Link to="/">工作空间</Link><span className="slash" aria-hidden="true">/</span>
             {projectId ? <>
               <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link>
               {(taskId || pageId || eventId) ? <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{taskId ? detail.data?.title ?? "加载中…" : objectTitle.data?.title ?? "加载中…"}</span></> : !overview && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
