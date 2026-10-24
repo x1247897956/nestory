@@ -134,3 +134,73 @@
 .block-action-menu button {display:block;width:100%;border:0;text-align:left;background:transparent;padding:8px 10px;font-size:13px;}
 .block-action-menu button:hover {background:#f3f4f6;}
 .block-action-menu .danger {color:#9b3a3a;}
+/* Slash commands share the workspace's quiet, compact control language.
+   Keep the floating wrapper's available-height limit and native listbox behavior. */
+.bn-ariakit .bn-suggestion-menu {
+  box-sizing:border-box;
+  width:312px;
+  min-width:0;
+  max-width:calc(100vw - 32px);
+  padding:6px;
+  gap:2px;
+  background:#fff;
+  color:#25282e;
+  border:1px solid #e5e7ec;
+  border-radius:10px;
+  box-shadow:0 8px 24px -8px #18213226;
+  font-family:"Avenir Next","PingFang SC","Microsoft YaHei",sans-serif;
+  scrollbar-width:thin;
+  scrollbar-color:#cbd0d9 transparent;
+  overscroll-behavior:contain;
+}
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-label {
+  padding:12px 9px 5px;
+  font-size:11px;
+  font-weight:500;
+  line-height:16px;
+  color:#737986;
+  opacity:1;
+}
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-label:first-child {padding-top:5px;}
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-item {
+  min-height:44px;
+  gap:10px;
+  padding:6px 8px;
+  border-radius:5px;
+  color:#25282e;
+  background:transparent;
+  cursor:pointer;
+  scroll-margin:6px;
+}
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-item:hover {background:#f5f6f8;}
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-item[aria-selected="true"] {background:#edf1f8;color:#243b63;}
+.bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-section[data-position="left"] {
+  flex:0 0 30px;
+  height:30px;
+  padding:0;
+  border:1px solid #e5e7ec;
+  border-radius:5px;
+  background:#fff;
+  color:#626b7a;
+}
+.bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-section svg {width:17px;height:17px;}
+.bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-body {min-width:0;}
+.bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-title {font-size:13px;font-weight:500;line-height:19px;}
+.bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-subtitle {font-size:11px;line-height:16px;color:#737986;}
+.bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-section[data-position="right"] {
+  flex-shrink:0;
+  padding:0;
+  border:0;
+  box-shadow:none;
+  font-family:inherit;
+  font-size:10px;
+  color:#737986;
+  white-space:nowrap;
+}
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-item[aria-selected="true"] .bn-ak-suggestion-menu-item-subtitle,
+.bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-item[aria-selected="true"] .bn-ak-suggestion-menu-item-section {color:#425879;}
+@media(max-width:600px){
+  .bn-ariakit .bn-suggestion-menu {width:280px;}
+  .bn-ariakit .bn-suggestion-menu .bn-suggestion-menu-item {min-height:44px;}
+  .bn-ariakit .bn-suggestion-menu .bn-ak-suggestion-menu-item-section[data-position="right"] {display:none;}
+}

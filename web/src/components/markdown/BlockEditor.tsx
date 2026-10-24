@@ -28,6 +28,16 @@ type Props = DocumentFields & {
   disabled?: boolean;
   projectId?: string;
 };
+function FileCommandIcon({ action }: { action: "upload" | "import" | "export" }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {action === "upload" ? <path d="M8 12.5l6-6a3.5 3.5 0 015 5l-8 8a5 5 0 01-7-7l8-8M7 15l8-8" /> : <>
+        <path d="M14 2H5v20h14V7zM14 2v5h5" />
+        {action === "import" ? <path d="M12 11v7m-3-3l3 3 3-3" /> : <path d="M12 18v-7m-3 3l3-3 3 3" />}
+      </>}
+    </svg>
+  );
+}
 function download(text: string, name: string) {
   const url = URL.createObjectURL(
     new Blob([text], { type: "text/markdown;charset=utf-8" }),
@@ -154,6 +164,7 @@ const EditorCanvas = memo(function EditorCanvas({
                 ...getDefaultReactSlashMenuItems(editor),
                 {
                   title: "上传附件",
+                  icon: <FileCommandIcon action="upload" />,
                   subtext: "插入图片或文件",
                   aliases: ["attachment", "upload", "附件"],
                   group: "文件",
@@ -161,6 +172,7 @@ const EditorCanvas = memo(function EditorCanvas({
                 },
                 {
                   title: "导入 Markdown",
+                  icon: <FileCommandIcon action="import" />,
                   subtext: "在当前光标处插入 .md 文件",
                   aliases: ["import", "markdown"],
                   group: "文件",
@@ -168,6 +180,7 @@ const EditorCanvas = memo(function EditorCanvas({
                 },
                 {
                   title: "导出 Markdown",
+                  icon: <FileCommandIcon action="export" />,
                   subtext: "下载当前正文的 Markdown 副本",
                   aliases: ["export", "markdown"],
                   group: "文件",

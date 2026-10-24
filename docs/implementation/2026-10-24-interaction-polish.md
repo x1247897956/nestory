@@ -44,3 +44,9 @@ python3 scripts/operations.py smoke --url http://127.0.0.1:18084
 ## 部署结果
 
 最终Docker build退出0；镜像`noteapp:interaction-polish-20261024`，ID `sha256:ae4665766658c165c0f14a351c85d8920971211a9973deea401814351b3ba832`。Compose重建成功，实际挂载仍为`noteapp-v1-check:/data`，18084只读smoke7/7通过；重建前后活跃项目ID集合一致（1个），静态JS/CSS指纹对应最终构建。原有用户对象没有用于测试。资源验证首次使用无尾斜杠的URL得到400，补全`/`后验证通过。
+
+## 斜杠菜单视觉补充
+
+用户反馈默认`/`菜单难看。针对共享BlockNote菜单覆盖样式：312px浮层、44px项目、统一图标容器、清晰的标题/说明层级、浅灰分组、淡蓝选中状态、弱化快捷键；为附件/Markdown导入导出补齐SVG图标。不改变默认命令、分组内容、过滤、键盘选择、滚动定位及可用高度计算；样式在任务/笔记/日程中共享。桌面1176×827与手机390×844截图检查通过（`/tmp/noteapp-slash-desktop.png`、`/tmp/noteapp-slash-mobile.png`）。构建通过；块编辑与Markdown互通浏览器回归4/4通过（22.5秒），包括三类对象、斜杠键盘选择、附件、导入导出、只读和块拖动。未新增依赖或改动用户数据。
+
+斜杠菜单镜像`noteapp:slash-menu-20261024`构建退出0，ID `sha256:41afadaea01f3d879febf6c3b439c6ca233f25989bf0fe0d12ff5c05ecef05c8`。原卷Compose重建成功，18084部署后smoke7/7通过，JS/CSS指纹与本次构建一致。
