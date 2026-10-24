@@ -1,5 +1,9 @@
+import "./events.css";
+import { SaveIndicator } from "../../components/markdown/SaveIndicator";
+import type { EventChangeArg } from "@fullcalendar/core";
 import type { BodyDocument } from "../../app/document";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FullCalendar from "@fullcalendar/react";
@@ -25,7 +29,18 @@ export type CalendarEvent = {
   end_at: string;
   version: number;
 };
-type Draft = { title: string; body: string; body_document?: BodyDocument | null; start_at: string; end_at: string };
+function validTimes(start: string, end: string, zone: string) {
+  const a = DateTime.fromISO(start, { zone });
+  const b = DateTime.fromISO(end, { zone });
+  return a.isValid && b.isValid && b.toMillis() > a.toMillis();
+}
+type Draft = {
+  title: string;
+  body: string;
+  body_document?: BodyDocument | null;
+  start_at: string;
+  end_at: string;
+};
 export function Events({
   projectId,
   eventId,
@@ -44,15 +59,38 @@ export function Events({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [epoch, setEpoch] = useState(0);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const saving = useRef(false);
+  const mounted = useRef(false);
+  const context = useRef({ projectId, eventId });
+  context.current = { projectId, eventId };
   useEffect(() => {
-    if (!selection) return;
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const currentProject = useRef(projectId);
+  currentProject.current = projectId;
+  const dirty = !!selection && !!title.trim();
+  useEffect(() => {
+    if (selection && dialog.current && !dialog.current.open)
+      dialog.current.showModal();
+  }, [selection]);
+  useEffect(() => {
+    if (!dirty && !busy) return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [selection]);
+  }, [dirty, busy]);
+  useEffect(() => {
+    setSelection(undefined);
+    setTitle("");
+    setError("");
+  }, [projectId, eventId]);
   const config = useQuery({
     queryKey: ["config"],
     queryFn: () => api<{ timezone: string }>("/config"),
@@ -60,10 +98,16 @@ export function Events({
   const zone = config.data?.timezone;
   useEffect(() => {
     if (zone && params.get("create") === "1" && !archived && !eventId) {
-      const start = DateTime.now().setZone(zone).startOf("hour").plus({ hours: 1 });
-      setSelection({ start: toInput(start.toISO()!, zone), end: toInput(start.plus({ hours: 1 }).toISO()!, zone) });
+      const start = DateTime.now()
+        .setZone(zone)
+        .startOf("hour")
+        .plus({ hours: 1 });
+      setSelection({
+        start: toInput(start.toISO()!, zone),
+        end: toInput(start.plus({ hours: 1 }).toISO()!, zone),
+      });
     }
-  }, [zone, params, archived, eventId]);
+  }, [zone, params, archived, eventId, projectId]);
   const events = useQuery({
     queryKey: ["events", projectId, range],
     queryFn: () =>
@@ -84,6 +128,105 @@ export function Events({
       qc.invalidateQueries({ queryKey: ["relations"] }),
     ]);
   };
+  const createEvent = async () => {
+    if (
+      !zone ||
+      !selection ||
+      !title.trim() ||
+      !validTimes(selection.start, selection.end, zone) ||
+      saving.current ||
+      archived
+    )
+      return;
+    saving.current = true;
+    setBusy(true);
+    setError("");
+    const owner = projectId;
+    try {
+      const v = await api<CalendarEvent>(
+        "/projects/" + owner + "/events",
+        "POST",
+        {
+          title: title.trim(),
+          start_at: fromInput(selection.start, zone),
+          end_at: fromInput(selection.end, zone),
+        },
+      );
+      qc.setQueryData(["event", v.id], v);
+      if (
+        !mounted.current ||
+        currentProject.current !== owner ||
+        context.current.eventId
+      )
+        return;
+      await refresh();
+      if (
+        !mounted.current ||
+        currentProject.current !== owner ||
+        context.current.eventId
+      )
+        return;
+      flushSync(() => {
+        setTitle("");
+        setSelection(undefined);
+        setBusy(false);
+      });
+      nav("/projects/" + owner + "/events/" + v.id);
+    } catch (e) {
+      if (mounted.current && currentProject.current === owner)
+        setError((e as Error).message);
+    } finally {
+      saving.current = false;
+      if (mounted.current) setBusy(false);
+    }
+  };
+  useEffect(() => {
+    if (
+      !dirty ||
+      busy ||
+      error ||
+      !zone ||
+      !selection ||
+      !validTimes(selection.start, selection.end, zone)
+    )
+      return;
+    const timer = setTimeout(() => void createEvent(), 800);
+    return () => clearTimeout(timer);
+  }, [selection, title, busy, error, zone, archived]);
+  const changeEvent = async (info: EventChangeArg) => {
+    const original = events.data?.find((e) => e.id === info.event.id);
+    if (
+      !original ||
+      original.project_id !== projectId ||
+      archived ||
+      saving.current ||
+      !info.event.start ||
+      !info.event.end
+    ) {
+      info.revert();
+      return;
+    }
+    saving.current = true;
+    setBusy(true);
+    setError("");
+    const owner = projectId;
+    try {
+      const next = await api<CalendarEvent>("/events/" + original.id, "PATCH", {
+        start_at: info.event.start.toISOString(),
+        end_at: info.event.end.toISOString(),
+        version: original.version,
+      });
+      qc.setQueryData(["event", original.id], next);
+      if (currentProject.current === owner) await refresh();
+    } catch (e) {
+      info.revert();
+      if (mounted.current && currentProject.current === owner)
+        setError((e as Error).message);
+    } finally {
+      saving.current = false;
+      if (mounted.current) setBusy(false);
+    }
+  };
   if (!zone)
     return (
       <p role={config.isError ? "alert" : undefined}>
@@ -94,140 +237,201 @@ export function Events({
       </p>
     );
   const choose = (start: string, end: string) => {
-    if (!archived) {
+    if (!archived && !saving.current) {
       setSelection({ start: toInput(start, zone), end: toInput(end, zone) });
       setError("");
     }
   };
   return (
-    <div className={"calendar-workspace " + (eventId ? "object-detail-page" : "")}>
-      {!eventId && <section aria-label="项目日历">
-        <p>显示与输入时区：{zone}</p>
-        <FullCalendar
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin,
-            luxonPlugin,
-          ]}
-          locale={zhCN}
-          timeZone={zone}
-          initialView="timeGridWeek"
-          initialDate={detail.data?.start_at}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "timeGridWeek,dayGridMonth",
-          }}
-          buttonText={{ today: "今天", week: "周", month: "月" }}
-          height="auto"
-          selectable={!archived}
-          selectMirror
-          nowIndicator
-          events={(events.data ?? []).map((e) => ({
-            id: e.id,
-            title: e.title,
-            start: e.start_at,
-            end: e.end_at,
-            allDay: false,
-          }))}
-          datesSet={(a) =>
-            setRange((old) =>
-              old?.from === a.startStr && old?.to === a.endStr
-                ? old
-                : { from: a.startStr, to: a.endStr },
-            )
-          }
-          select={(a) => choose(a.startStr, a.endStr)}
-          dateClick={(a) => {
-            const d = DateTime.fromISO(a.dateStr, { zone });
-            choose(d.toISO()!, d.plus({ hours: 1 }).toISO()!);
-          }}
-          eventClick={(a) =>
-            nav("/projects/" + projectId + "/events/" + a.event.id)
-          }
-          eventTimeFormat={{
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }}
-          displayEventEnd
-        />
-        {events.isError && (
-          <p role="alert">
-            日程加载失败
-            <button onClick={() => void events.refetch()}>重试</button>
-          </p>
-        )}
-        {selection && !archived && (
-          <form
-            aria-label="新建日程"
-            data-dirty="true"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              setError("");
-              try {
-                const v = await api<CalendarEvent>(
-                  "/projects/" + projectId + "/events",
-                  "POST",
-                  {
-                    title,
-                    start_at: fromInput(selection.start, zone),
-                    end_at: fromInput(selection.end, zone),
-                  },
-                );
-                setTitle("");
-                setSelection(undefined);
-                await refresh();
-                nav("/projects/" + projectId + "/events/" + v.id);
-              } catch (e) {
-                setError((e as Error).message);
-              } finally {
-                setBusy(false);
-              }
+    <div
+      className={"calendar-workspace " + (eventId ? "object-detail-page" : "")}
+      data-dirty={busy}
+    >
+      {!eventId && (
+        <section aria-label="项目日历">
+          <div className="calendar-heading">
+            <div>
+              <h1>日程</h1>
+            </div>
+            {!archived && (
+              <button
+                className="calendar-new"
+                disabled={busy}
+                onClick={() => {
+                  const start = DateTime.now()
+                    .setZone(zone)
+                    .startOf("day")
+                    .set({ hour: 9 });
+                  choose(start.toISO()!, start.plus({ hours: 1 }).toISO()!);
+                }}
+              >
+                新建日程
+              </button>
+            )}
+          </div>
+          <FullCalendar
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              interactionPlugin,
+              luxonPlugin,
+            ]}
+            locale={zhCN}
+            timeZone={zone}
+            initialView="dayGridMonth"
+            initialDate={detail.data?.start_at}
+            headerToolbar={{
+              left: "prev,next today",
+              center: "title",
+              right: "timeGridWeek,dayGridMonth",
             }}
-          >
-            <h3>新建日程</h3>
-            <input
-              autoFocus
-                aria-label="新日程标题"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <label>
-              开始
-              <input
-                aria-label="新日程开始"
-                type="datetime-local"
-                required
-                value={selection.start}
-                onChange={(e) =>
-                  setSelection({ ...selection, start: e.target.value })
+            buttonText={{ today: "今天", week: "周", month: "月" }}
+            height="min(720px, calc(100vh - 220px))"
+            allDaySlot={false}
+            scrollTime="08:00:00"
+            editable={!archived && !busy}
+            eventChange={(info) => void changeEvent(info)}
+            selectable={!archived && !busy}
+            selectMirror
+            nowIndicator
+            events={(events.data ?? []).map((e) => ({
+              id: e.id,
+              title: e.title,
+              start: e.start_at,
+              end: e.end_at,
+              allDay: false,
+            }))}
+            datesSet={(a) =>
+              setRange((old) =>
+                old?.from === a.startStr && old?.to === a.endStr
+                  ? old
+                  : { from: a.startStr, to: a.endStr },
+              )
+            }
+            select={(a) => {
+              const start = DateTime.fromISO(a.startStr, { zone });
+              const chosen = a.allDay ? start.set({ hour: 9 }) : start;
+              choose(
+                chosen.toISO()!,
+                (a.allDay
+                  ? chosen.plus({ hours: 1 })
+                  : DateTime.fromISO(a.endStr, { zone })
+                ).toISO()!,
+              );
+            }}
+            dateClick={(a) => {
+              const parsed = DateTime.fromISO(a.dateStr, { zone });
+              const d = a.allDay ? parsed.set({ hour: 9 }) : parsed;
+              choose(d.toISO()!, d.plus({ hours: 1 }).toISO()!);
+            }}
+            eventClick={(a) =>
+              nav("/projects/" + projectId + "/events/" + a.event.id)
+            }
+            eventTimeFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }}
+            displayEventEnd
+          />
+          {events.isError && (
+            <p role="alert">
+              日程加载失败
+              <button onClick={() => void events.refetch()}>重试</button>
+            </p>
+          )}
+          {selection && !archived && (
+            <dialog
+              ref={dialog}
+              className="event-create-dialog"
+              aria-label="新建日程"
+              onCancel={(e) => {
+                e.preventDefault();
+                if (!busy && (!dirty || confirm("日程尚未保存，是否关闭？"))) {
+                  setSelection(undefined);
+                  setTitle("");
+                  setError("");
                 }
-              />
-            </label>
-            <label>
-              结束
-              <input
-                aria-label="新日程结束"
-                type="datetime-local"
-                required
-                value={selection.end}
-                onChange={(e) =>
-                  setSelection({ ...selection, end: e.target.value })
-                }
-              />
-            </label>
-            <button disabled={busy}>创建日程</button>
-            <button type="button" onClick={() => setSelection(undefined)}>
-              取消
-            </button>
-          </form>
-        )}
-        {error && <p role="alert">{error}</p>}
-      </section>}
+              }}
+            >
+              <form
+                aria-label="新建日程"
+                data-dirty={dirty || busy}
+                onSubmit={(e) => e.preventDefault()}
+              >
+                <header>
+                  <h2>新建日程</h2>
+                  <button
+                    type="button"
+                    aria-label="关闭新建日程"
+                    disabled={busy}
+                    onClick={() => {
+                      if (!dirty || confirm("日程尚未保存，是否关闭？")) {
+                        setSelection(undefined);
+                        setTitle("");
+                        setError("");
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                </header>
+                <input
+                  autoFocus
+                  aria-label="新日程标题"
+                  placeholder="日程标题"
+                  disabled={busy}
+                  value={title}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    setError("");
+                  }}
+                />
+                <div className="event-create-times">
+                  {(["start", "end"] as const).map((key) => (
+                    <label key={key}>
+                      {key === "start" ? "开始" : "结束"}
+                      <input
+                        aria-label={
+                          key === "start" ? "新日程开始" : "新日程结束"
+                        }
+                        type="datetime-local"
+                        disabled={busy}
+                        value={selection[key]}
+                        onChange={(e) => {
+                          setSelection({ ...selection, [key]: e.target.value });
+                          setError("");
+                        }}
+                      />
+                    </label>
+                  ))}
+                </div>
+                {!validTimes(selection.start, selection.end, zone) && (
+                  <p role="alert">结束时间必须晚于开始时间</p>
+                )}
+                {!dirty && !busy && !error ? (
+                  <div className="autosave-hint">输入标题后自动保存</div>
+                ) : (
+                  <SaveIndicator busy={busy} dirty={dirty} error={error} />
+                )}
+                {error && (
+                  <div role="alert">
+                    {error}
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void createEvent()}
+                    >
+                      重试保存
+                    </button>
+                  </div>
+                )}
+              </form>
+            </dialog>
+          )}
+          {error && !selection && <p role="alert">{error}</p>}
+        </section>
+      )}
       {eventId && (
         <aside className="detail-pane">
           <button
@@ -309,6 +513,7 @@ export function EventEditor({
         v,
       ),
     archived,
+    (d) => !!d.title.trim() && validTimes(d.start_at, d.end_at, zone),
   );
   const [error, setError] = useState("");
   return (
@@ -318,23 +523,38 @@ export function EventEditor({
       data-dirty={a.dirty || a.busy}
     >
       <header className="task-inline-header">
-        <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="日程标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
-        <ObjectProperties projectId={event.project_id} type="events" id={event.id} version={event.version} archived={archived}>
-      {(["start_at", "end_at"] as const).map((key) => (
-        <label key={key} className="task-property" data-property={key}>
+        <h2 aria-label={a.draft.title}>
           <input
-            aria-label={key === "start_at" ? "开始时间" : "结束时间"}
-            type="datetime-local"
+            className="task-inline-title"
+            aria-label="日程标题"
             disabled={archived}
-            value={a.draft[key]}
+            value={a.draft.title}
             onChange={(e) =>
-              a.setDraft((d) => ({ ...d, [key]: e.target.value }))
+              a.setDraft((d) => ({ ...d, title: e.target.value }))
             }
           />
-        </label>
-      ))}
+        </h2>
+        <ObjectProperties
+          projectId={event.project_id}
+          type="events"
+          id={event.id}
+          version={event.version}
+          archived={archived}
+        >
+          {(["start_at", "end_at"] as const).map((key) => (
+            <label key={key} className="task-property" data-property={key}>
+              <input
+                aria-label={key === "start_at" ? "开始时间" : "结束时间"}
+                type="datetime-local"
+                disabled={archived}
+                value={a.draft[key]}
+                onChange={(e) =>
+                  a.setDraft((d) => ({ ...d, [key]: e.target.value }))
+                }
+              />
+            </label>
+          ))}
         </ObjectProperties>
-        <small className="property-zone">日程显示与输入时区：{zone}</small>
       </header>
       <MarkdownEditor
         projectId={event.project_id}
@@ -342,24 +562,15 @@ export function EventEditor({
         body_document={a.draft.body_document}
         legacy_body={event.legacy_body}
         disabled={archived}
-        onChange={(body, body_document) => a.setDraft((d) => ({ ...d, body, body_document }))}
+        onChange={(body, body_document) =>
+          a.setDraft((d) => ({ ...d, body, body_document }))
+        }
       />
-      <div className="save-bar">
-        <span role="status">
-          {a.busy
-            ? "保存中…"
-            : a.error
-              ? "保存失败"
-              : a.dirty
-                ? "有未保存更改"
-                : "已保存"}
-        </span>
-        {!archived && (
-          <button disabled={a.busy || !a.dirty} onClick={() => void a.save()}>
-            保存日程
-          </button>
-        )}
-      </div>
+      {!a.draft.title.trim() && <p role="alert">请输入日程标题</p>}
+      {!validTimes(a.draft.start_at, a.draft.end_at, zone) && (
+        <p role="alert">结束时间必须晚于开始时间</p>
+      )}
+      <SaveIndicator busy={a.busy} dirty={a.dirty} error={a.error} />
       {(a.error || error) && (
         <div role="alert">
           {a.error || error}

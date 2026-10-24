@@ -1,6 +1,6 @@
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
-import { Link } from "react-router-dom";
+import { SaveIndicator } from "../../components/markdown/SaveIndicator";
 import { useState } from "react";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
 import { useAutosave } from "../../components/markdown/useAutosave";
@@ -25,12 +25,18 @@ const fromTask = (t: Task): TaskDraft => ({
 export function TaskEditor({
   task,
   parent,
+  parentOptions = [],
+  hasChildren = false,
+  onParentChange,
   archived,
   onSave,
   onReload,
 }: {
   task: Task;
   parent?: Task;
+  parentOptions?: Task[];
+  hasChildren?: boolean;
+  onParentChange?: (parentId: string, version: number) => Promise<void>;
   archived: boolean;
   onSave: (draft: TaskDraft, version: number) => Promise<void>;
   onReload: () => void | Promise<void>;
@@ -42,20 +48,125 @@ export function TaskEditor({
     error: saveError,
     dirty,
     save,
-  } = useAutosave(fromTask(task), task.version, onSave, archived);
+    version,
+  } = useAutosave(
+    fromTask(task),
+    task.version,
+    onSave,
+    archived,
+    (d) => !!d.title.trim(),
+  );
   const [error, setError] = useState("");
-  const saved = !dirty;
-  const change = (key: Exclude<keyof TaskDraft, "body_document">, value: string) =>
-    setDraft((d) => ({ ...d, [key]: value }));
+  const [moving, setMoving] = useState(false);
+  const locked = archived || moving;
+  const choices =
+    parent && !parentOptions.some((t) => t.id === parent.id)
+      ? [...parentOptions, parent]
+      : parentOptions;
+  const change = (
+    key: Exclude<keyof TaskDraft, "body_document">,
+    value: string,
+  ) => setDraft((d) => ({ ...d, [key]: value }));
   return (
-    <section className="editor" data-dirty={dirty || busy} aria-label="任务详情">
+    <section
+      className="editor"
+      data-dirty={dirty || busy || moving}
+      aria-label="任务详情"
+    >
       <header className="task-inline-header">
-        <h2 aria-label={draft.title}><input className="task-inline-title" aria-label="任务标题" value={draft.title} onChange={e => change("title", e.target.value)} disabled={archived} placeholder="任务标题" /></h2>
-        <ObjectProperties projectId={task.project_id} type="tasks" id={task.id} version={task.version} archived={archived}>
-          <label className="task-property stage-property" data-property="stage"><i className={"stage-dot " + draft.stage} aria-hidden="true"/><select aria-label="阶段" value={draft.stage} onChange={e => change("stage",e.target.value)} disabled={archived}>{stages.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
-          <label className="task-property" data-property="priority"><select aria-label="优先级" value={draft.priority} onChange={e => change("priority",e.target.value)} disabled={archived}>{priorities.map(([id,name]) => <option key={id} value={id}>{name}</option>)}</select></label>
-          <label className="task-property" data-property="due_date"><input aria-label="截止日期" type="date" value={draft.due_date} onChange={e => change("due_date",e.target.value)} disabled={archived}/></label>
-          {parent && <span className="task-property parent-property" data-property="parent_id"><Link to={`/projects/${task.project_id}/tasks/${parent.id}`}>{parent.title}</Link></span>}
+        <h2 aria-label={draft.title}>
+          <input
+            className="task-inline-title"
+            aria-label="任务标题"
+            value={draft.title}
+            onChange={(e) => change("title", e.target.value)}
+            disabled={locked}
+            placeholder="任务标题"
+          />
+        </h2>
+        <ObjectProperties
+          projectId={task.project_id}
+          type="tasks"
+          id={task.id}
+          version={task.version}
+          archived={archived}
+        >
+          <label className="task-property stage-property" data-property="stage">
+            <i className={"stage-dot " + draft.stage} aria-hidden="true" />
+            <select
+              aria-label="阶段"
+              value={draft.stage}
+              onChange={(e) => change("stage", e.target.value)}
+              disabled={locked}
+            >
+              {stages.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="task-property" data-property="priority">
+            <select
+              aria-label="优先级"
+              value={draft.priority}
+              onChange={(e) => change("priority", e.target.value)}
+              disabled={locked}
+            >
+              {priorities.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="task-property" data-property="due_date">
+            <input
+              aria-label="截止日期"
+              type="date"
+              value={draft.due_date}
+              onChange={(e) => change("due_date", e.target.value)}
+              disabled={locked}
+            />
+          </label>
+          <label
+            className="task-property parent-property"
+            data-property="parent_id"
+          >
+            <select
+              aria-label="父任务"
+              value={task.parent_id ?? ""}
+              disabled={
+                locked || dirty || busy || hasChildren || !onParentChange
+              }
+              title={
+                hasChildren
+                  ? "含子任务的任务不能设置父任务"
+                  : dirty || busy
+                    ? "正在保存正文，请稍候"
+                    : undefined
+              }
+              onChange={async (event) => {
+                const parentId = event.target.value;
+                setMoving(true);
+                setError("");
+                try {
+                  await onParentChange?.(parentId, version);
+                } catch (e) {
+                  setError("父任务调整失败：" + (e as Error).message);
+                } finally {
+                  setMoving(false);
+                }
+              }}
+            >
+              <option value="">无父任务</option>
+              {choices.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.title}
+                </option>
+              ))}
+            </select>
+          </label>
         </ObjectProperties>
       </header>
       <div className="body-label">
@@ -63,31 +174,18 @@ export function TaskEditor({
           value={draft.body}
           body_document={draft.body_document}
           legacy_body={task.legacy_body}
-          onChange={(body, body_document) => setDraft(d => ({...d, body, body_document}))}
-          disabled={archived}
+          onChange={(body, body_document) =>
+            setDraft((d) => ({ ...d, body, body_document }))
+          }
+          disabled={locked}
           projectId={task.project_id}
         />
       </div>
-      <div className="save-bar">
-        <span role="status">
-          {busy
-            ? "保存中…"
-            : dirty
-              ? "有未保存更改"
-              : saved
-                ? "已保存"
-                : "已同步"}
-        </span>
-        {!archived && (
-          <button
-            className="primary"
-            onClick={save}
-            disabled={busy || !dirty || !draft.title.trim()}
-          >
-            保存任务
-          </button>
-        )}
-      </div>
+      <SaveIndicator
+        busy={busy || moving}
+        dirty={dirty}
+        error={error || saveError}
+      />
       {(error || saveError) && (
         <div className="error" role="alert">
           {error || saveError}

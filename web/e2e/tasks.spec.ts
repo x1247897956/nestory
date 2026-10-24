@@ -26,7 +26,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   const projectID = parentURL.split("/")[4];
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
   await page.getByLabel("新任务标题").fill("读摘要");
-  await page.getByLabel("父任务", { exact: true }).selectOption(parentID);
+  await page.getByRole("dialog", { name: "添加任务" }).getByLabel("父任务", { exact: true }).selectOption(parentID);
   await page.getByRole("button", { name: "创建任务", exact: true }).click();
   await expect(page.getByLabel("任务标题", { exact: true })).toHaveValue(
     "读摘要",
@@ -37,7 +37,6 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await page.getByLabel("优先级", { exact: true }).selectOption("high");
   await page.getByLabel("截止日期", { exact: true }).fill("2026-10-25");
   await page.getByLabel("Markdown 正文").fill("- [ ] 阅读全文");
-  await page.getByRole("button", { name: "保存任务", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("已保存");
   const child = await (await request.get("/api/v1/tasks/" + childID)).json();
   expect(child.stage).toBe("todo");
@@ -54,10 +53,8 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await second.goto(parentURL);
   await expect(second.getByLabel("Markdown 正文")).toHaveText("- [ ] 阅读全文");
   await page.getByLabel("Markdown 正文").fill("first tab");
-  await page.getByRole("button", { name: "保存任务", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("已保存");
   await second.getByLabel("Markdown 正文").fill("second tab draft");
-  await second.getByRole("button", { name: "保存任务", exact: true }).click();
   await expect(second.getByRole("alert")).toContainText("内容已更新");
   await expect(second.getByLabel("Markdown 正文")).toHaveText(
     "second tab draft",
@@ -109,7 +106,6 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
     await route.continue();
   });
   await page.getByLabel("Markdown 正文").fill("snapshot B");
-  await page.getByRole("button", { name: "保存任务", exact: true }).click();
   await began;
   await page.getByLabel("Markdown 正文").fill("baseline A");
   const dialog = page.waitForEvent("dialog");

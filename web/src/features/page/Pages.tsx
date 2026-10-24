@@ -1,6 +1,7 @@
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
-import { flushSync } from "react-dom";
+import { SaveIndicator } from "../../components/markdown/SaveIndicator";
+import "./pages.css";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,18 +29,23 @@ export function Pages({
   archived: boolean;
 }) {
   const [params] = useSearchParams();
-  const titleInput = useRef<HTMLInputElement>(null);
-  useEffect(() => { if (params.get("create") === "1" && !archived) titleInput.current?.focus(); }, [params, archived]);
   const qc = useQueryClient();
   const nav = useNavigate();
-  const [title, setTitle] = useState("");
-  const [parent, setParent] = useState("");
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
+  const pending = useRef(false);
+  const mounted = useRef(false);
   useEffect(() => {
-    setTitle("");
-    setParent("");
-  }, [projectId, pageId]);
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const attempted = useRef("");
+  const createdId = useRef("");
+  const retryParent = useRef<string | null>(null);
+  const context = useRef({ projectId, pageId });
+  context.current = { projectId, pageId };
   const [epoch, setEpoch] = useState(0);
   const list = useQuery({
     queryKey: ["pages", projectId],
@@ -73,112 +79,154 @@ export function Pages({
       .sort((a, b) => b.position - a.position || b.id.localeCompare(a.id));
     for (const page of children) stack.push({ page, depth: item.depth + 1 });
   }
+  const createPage = async (parentId: string | null = null) => {
+    if (pending.current || archived) return;
+    pending.current = true;
+    retryParent.current = parentId;
+    setCreating(true);
+    setError("");
+    const originProject = projectId;
+    try {
+      const next = await api<Page>(
+        "/projects/" + originProject + "/pages",
+        "POST",
+        {
+          title: "无标题笔记",
+          parent_id: parentId,
+        },
+      );
+      qc.setQueryData(["page", next.id], next);
+      void refresh();
+      if (
+        mounted.current &&
+        context.current.projectId === originProject &&
+        !context.current.pageId
+      ) {
+        createdId.current = next.id;
+        nav("/projects/" + originProject + "/pages/" + next.id);
+      }
+    } catch (e) {
+      if (mounted.current && context.current.projectId === originProject)
+        setError((e as Error).message);
+    } finally {
+      pending.current = false;
+      if (mounted.current) setCreating(false);
+    }
+  };
+  useEffect(() => {
+    if (params.get("create") !== "1" || pageId || archived) {
+      attempted.current = "";
+      return;
+    }
+    if (attempted.current === projectId) return;
+    attempted.current = projectId;
+    void createPage();
+  }, [params, projectId, pageId, archived]);
   return (
-    <div className={"page-workspace " + (pageId ? "object-detail-page" : "")}>
-      {!pageId && <section className="page-tree" aria-label="笔记树">
-        <h2>笔记</h2>
-        {flat.map(({ page, depth }) => (
-          <Link
-            style={{ paddingLeft: Math.min(depth, 12) * 12 }}
-            key={page.id}
-            to={"/projects/" + projectId + "/pages/" + page.id}
-          >
-            {page.title}
-          </Link>
-        ))}
-        {list.isError && (
-          <p role="alert">
-            笔记加载失败<button onClick={() => list.refetch()}>重试</button>
-          </p>
-        )}
-        {!archived && (
-          <form
-            data-dirty={!!title.trim() || !!parent || creating}
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setError("");
-              setCreating(true);
-              try {
-                const p = await api<Page>(
-                  "/projects/" + projectId + "/pages",
-                  "POST",
-                  { title, parent_id: parent || null },
-                );
-                flushSync(() => {
-                  setTitle("");
-                  setParent("");
-                  setCreating(false);
-                });
-                await refresh();
-                nav("/projects/" + projectId + "/pages/" + p.id);
-              } catch (e) {
-                setError((e as Error).message);
-              } finally {
-                setCreating(false);
-              }
-            }}
-          >
-            <input
-              disabled={creating}
-              ref={titleInput}
-              aria-label="新笔记标题"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="笔记标题"
-            />
-            <select
-              disabled={creating}
-              aria-label="新笔记父级"
-              value={parent}
-              onChange={(e) => setParent(e.target.value)}
-            >
-              <option value="">顶层笔记</option>
-              {flat.map(({ page }) => (
-                <option key={page.id} value={page.id}>
-                  {page.title}
-                </option>
-              ))}
-            </select>
-            <button disabled={creating || !title.trim()}>新建笔记</button>
-          </form>
-        )}
-        {error && <p role="alert">{error}</p>}
-      </section>}
-      <section>
-        {pageId && <Link className="object-back" to={`/projects/${projectId}/pages`}>← 返回笔记列表</Link>}
-        {pageId ? (
-          detail.data && detail.data.project_id === projectId ? (
-            <>
-              <PageEditor
-                key={pageId + ":" + epoch}
-                page={detail.data}
-                archived={archived}
-                onSave={async (draft, version) => {
-                  const next = await api<Page>("/pages/" + pageId, "PATCH", {
-                    ...draft,
-                    version,
-                  });
-                  qc.setQueryData(["page", pageId], next);
-                  await refresh();
-                }}
-                onReload={async () => {
-                  await detail.refetch({ throwOnError: true });
-                  setEpoch((n) => n + 1);
-                }}
-              />
-            </>
-          ) : detail.isError ? (
+    <div
+      className={
+        "page-workspace " +
+        (pageId ? "object-detail-page" : "page-list-workspace")
+      }
+    >
+      {!pageId && (
+        <section className="page-tree" aria-label="笔记树">
+          <header className="page-list-header">
+            <h2>笔记</h2>
+            {!archived && (
+              <button disabled={creating} onClick={() => void createPage()}>
+                新建笔记
+              </button>
+            )}
+          </header>
+          {error && (
             <p role="alert">
-              笔记加载失败<button onClick={() => detail.refetch()}>重试</button>
+              {error}{" "}
+              <button
+                disabled={creating}
+                onClick={() => void createPage(retryParent.current)}
+              >
+                重试新建
+              </button>
             </p>
+          )}
+          <div className="page-list">
+            {flat.map(({ page, depth }) => (
+              <div
+                className="page-list-row"
+                key={page.id}
+                style={{ paddingLeft: 16 + Math.min(depth, 12) * 20 }}
+              >
+                <Link to={"/projects/" + projectId + "/pages/" + page.id}>
+                  {page.title}
+                </Link>
+                {!archived && (
+                  <button
+                    disabled={creating}
+                    aria-label={"新建子笔记 " + page.title}
+                    onClick={() => void createPage(page.id)}
+                  >
+                    新建子笔记
+                  </button>
+                )}
+              </div>
+            ))}
+            {list.isLoading && <p className="page-list-empty">加载笔记…</p>}
+            {!list.isLoading && !list.isError && !flat.length && (
+              <p className="page-list-empty">
+                还没有笔记，创建第一篇笔记开始记录。
+              </p>
+            )}
+          </div>
+          {list.isError && (
+            <p role="alert">
+              笔记加载失败<button onClick={() => list.refetch()}>重试</button>
+            </p>
+          )}
+        </section>
+      )}
+      {pageId && (
+        <section>
+          {pageId && (
+            <Link className="object-back" to={`/projects/${projectId}/pages`}>
+              ← 返回笔记列表
+            </Link>
+          )}
+          {pageId ? (
+            detail.data && detail.data.project_id === projectId ? (
+              <>
+                <PageEditor
+                  key={pageId + ":" + epoch}
+                  page={detail.data}
+                  archived={archived}
+                  focusTitle={createdId.current === pageId}
+                  onSave={async (draft, version) => {
+                    const next = await api<Page>("/pages/" + pageId, "PATCH", {
+                      ...draft,
+                      version,
+                    });
+                    qc.setQueryData(["page", pageId], next);
+                    await refresh();
+                  }}
+                  onReload={async () => {
+                    await detail.refetch({ throwOnError: true });
+                    setEpoch((n) => n + 1);
+                  }}
+                />
+              </>
+            ) : detail.isError ? (
+              <p role="alert">
+                笔记加载失败
+                <button onClick={() => detail.refetch()}>重试</button>
+              </p>
+            ) : (
+              <p>加载笔记…</p>
+            )
           ) : (
-            <p>加载笔记…</p>
-          )
-        ) : (
-          <p>选择或新建笔记，开始记录。</p>
-        )}
-      </section>
+            <p>选择或新建笔记，开始记录。</p>
+          )}
+        </section>
+      )}
     </div>
   );
 }
@@ -187,19 +235,36 @@ function PageEditor({
   archived,
   onSave,
   onReload,
+  focusTitle,
 }: {
   page: Page;
+  focusTitle: boolean;
   archived: boolean;
-  onSave: (d: { title: string; body: string; body_document?: BodyDocument | null }, v: number) => Promise<void>;
+  onSave: (
+    d: { title: string; body: string; body_document?: BodyDocument | null },
+    v: number,
+  ) => Promise<void>;
   onReload: () => Promise<void>;
 }) {
   const a = useAutosave(
-    { title: page.title, body: page.body, body_document: page.body_document ?? undefined },
+    {
+      title: page.title,
+      body: page.body,
+      body_document: page.body_document ?? undefined,
+    },
     page.version,
     onSave,
     archived,
+    (draft) => !!draft.title.trim(),
   );
   const [error, setError] = useState("");
+  const titleInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (focusTitle && !archived) {
+      titleInput.current?.focus();
+      titleInput.current?.select();
+    }
+  }, [focusTitle, archived]);
   return (
     <article
       className="editor"
@@ -207,33 +272,37 @@ function PageEditor({
       data-dirty={a.dirty || a.busy}
     >
       <header className="task-inline-header">
-        <h2 aria-label={a.draft.title}><input className="task-inline-title" aria-label="笔记标题" disabled={archived} value={a.draft.title} onChange={e => a.setDraft(d => ({ ...d, title: e.target.value }))}/></h2>
-        <ObjectProperties projectId={page.project_id} type="pages" id={page.id} version={page.version} archived={archived}/>
+        <h2 aria-label={a.draft.title}>
+          <input
+            ref={titleInput}
+            className="task-inline-title"
+            aria-label="笔记标题"
+            disabled={archived}
+            value={a.draft.title}
+            onChange={(e) =>
+              a.setDraft((d) => ({ ...d, title: e.target.value }))
+            }
+          />
+        </h2>
       </header>
+      <ObjectProperties
+        projectId={page.project_id}
+        type="pages"
+        id={page.id}
+        version={page.version}
+        archived={archived}
+      />
       <MarkdownEditor
         projectId={page.project_id}
         value={a.draft.body}
         body_document={a.draft.body_document}
         legacy_body={page.legacy_body}
         disabled={archived}
-        onChange={(body, body_document) => a.setDraft((d) => ({ ...d, body, body_document }))}
+        onChange={(body, body_document) =>
+          a.setDraft((d) => ({ ...d, body, body_document }))
+        }
       />
-      <div className="save-bar">
-        <span role="status">
-          {a.busy
-            ? "保存中…"
-            : a.error
-              ? "保存失败"
-              : a.dirty
-                ? "有未保存更改"
-                : "已保存"}
-        </span>
-        {!archived && (
-          <button onClick={() => a.save()} disabled={a.busy || !a.dirty}>
-            保存笔记
-          </button>
-        )}
-      </div>
+      <SaveIndicator busy={a.busy} dirty={a.dirty} error={a.error} />
       {(a.error || error) && (
         <div role="alert">
           {a.error || error}
@@ -262,7 +331,6 @@ function PageEditor({
           </button>
         </div>
       )}
-
     </article>
   );
 }

@@ -12,7 +12,10 @@ test("new Page and Task drafts guard routing and closing without flagging empty 
   ).json();
   await page.goto("/projects/" + p.id + "/pages");
   expect(await page.evaluate(mayClose)).toBe(true);
-  await page.getByLabel("新笔记标题").fill("未提交笔记");
+  await page.getByRole("button", { name: "新建笔记", exact: true }).click();
+  const title = page.getByLabel("笔记标题", { exact: true });
+  await expect(title).toHaveValue("无标题笔记");
+  await title.fill("");
   expect(await page.evaluate(mayClose)).toBe(false);
   let warned = false;
   page.once("dialog", async (d) => {
@@ -21,8 +24,9 @@ test("new Page and Task drafts guard routing and closing without flagging empty 
   });
   await page.getByRole("link", { name: "汇总", exact: true }).click();
   await expect.poll(() => warned).toBe(true);
-  await expect(page.getByLabel("新笔记标题")).toHaveValue("未提交笔记");
-  await page.getByLabel("新笔记标题").fill("");
+  await expect(title).toHaveValue("");
+  await title.fill("自动保存笔记");
+  await expect(page.getByRole("status")).toHaveText("已保存");
   await page.getByRole("link", { name: "汇总", exact: true }).click();
   await page.getByRole("link", { name: "任务", exact: true }).click();
   expect(await page.evaluate(mayClose)).toBe(true);

@@ -24,7 +24,7 @@ test('top-right create action and dedicated summaries for every task', async ({ 
   await page.goto(`/projects/${project.id}/tasks/${child.id}`);
   await expect(page).toHaveURL(new RegExp('/tasks/'+child.id+'$'));
   await expect(page.getByRole('heading',{name:'整理素材',exact:true})).toBeVisible();
-  await expect(page.getByRole('link',{name:'准备方案',exact:true})).toBeVisible();
+  await expect(page.getByLabel('父任务',{exact:true})).toHaveValue(parent.id);
   await expect(page.getByRole('heading',{name:'任务层级'})).toHaveCount(0);
   await expect(page.getByText('子任务',{exact:true})).toHaveCount(0);
   await page.getByRole('link',{name:'返回任务列表'}).click();

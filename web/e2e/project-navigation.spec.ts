@@ -16,7 +16,7 @@ test('flat sidebar and overview are the project entry point',async({page,request
   expect(second!.y).toBeGreaterThanOrEqual(first!.y+first!.height);
   await page.getByRole('link',{name:'笔记',exact:true}).click();
   await expect(page.getByRole('heading',{name:'笔记',exact:true})).toBeVisible();
-  await expect(page.getByLabel('新笔记标题')).toBeVisible();
+  await expect(page.getByRole('button',{name:'新建笔记',exact:true})).toBeVisible();
   await page.getByRole('link',{name:'汇总',exact:true}).click();
   await expect(page.getByRole('region',{name:'项目汇总'})).toBeVisible();
   await page.getByRole('link',{name:'日程',exact:true}).click();

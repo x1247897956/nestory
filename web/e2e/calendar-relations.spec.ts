@@ -35,34 +35,21 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
         .plus({ days: 1 })
         .toISODate()!;
       await page.goto("/projects/" + p.id + "/events");
-      await expect(
-        page.getByText("显示与输入时区：Asia/Shanghai"),
-      ).toBeVisible();
-      await expect(page.locator(".fc-timeGridWeek-view")).toBeVisible();
-      await page.getByRole("button", { name: "月", exact: true }).click();
+      await expect(page.getByText(/显示与输入时区/)).toHaveCount(0);
       await expect(page.locator(".fc-dayGridMonth-view")).toBeVisible();
       await page
         .locator(
           '.fc-daygrid-day[data-date="' + today + '"] .fc-daygrid-day-frame',
         )
         .click({ position: { x: 20, y: 35 } });
-      await page.getByLabel("新日程标题").fill("讨论方案");
-      let draftWarning = false;
-      page.once("dialog", async (dialog) => {
-        draftWarning = true;
-        await dialog.dismiss();
-      });
-      await page.getByRole("link", { name: "汇总", exact: true }).click();
-      await expect.poll(() => draftWarning).toBe(true);
-      expect(
-        await page.evaluate(() =>
-          window.dispatchEvent(new Event("beforeunload", { cancelable: true })),
-        ),
-      ).toBe(false);
-      await expect(page.getByLabel("新日程标题")).toHaveValue("讨论方案");
+      await expect(page.getByRole("dialog", {name:"新建日程"})).toBeVisible();
+      await expect(page.getByLabel("新日程开始")).toHaveValue(today + "T09:00");
+      await expect(page.getByLabel("新日程结束")).toHaveValue(today + "T10:00");
+      expect(await page.evaluate(() => window.dispatchEvent(new Event("beforeunload", { cancelable: true })))).toBe(true);
       await page.getByLabel("新日程开始").fill(today + "T23:00");
       await page.getByLabel("新日程结束").fill(tomorrow + "T01:00");
-      await page.getByRole("button", { name: "创建日程", exact: true }).click();
+      await page.getByLabel("新日程标题").fill("讨论方案");
+      await expect(page.getByRole("button", {name:"创建日程", exact:true})).toHaveCount(0);
       await expect(page.getByLabel("日程标题", { exact: true })).toHaveValue(
         "讨论方案",
       );

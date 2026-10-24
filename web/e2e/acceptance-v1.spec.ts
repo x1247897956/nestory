@@ -27,8 +27,9 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
     const pid = new URL(page.url()).pathname.split("/")[2];
     await page.getByRole("link", { name: "笔记", exact: true }).click();
-    await page.getByLabel("新笔记标题").fill("完整笔记");
     await page.getByRole("button", { name: "新建笔记", exact: true }).click();
+    await page.getByLabel("笔记标题", {exact:true}).fill("完整笔记");
+    await expect(page.getByRole("status")).toHaveText("已保存");
     await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       "完整笔记",
     );
@@ -75,7 +76,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(page.getByRole("status")).toHaveText("已保存");
     await page.getByRole("button", { name: "添加任务", exact: true }).click();
     await page.getByLabel("新任务标题").fill("读摘要");
-    await page.getByLabel("父任务", { exact: true }).selectOption(parent);
+    await page.getByRole("dialog", { name: "添加任务" }).getByLabel("父任务", { exact: true }).selectOption(parent);
     await page.getByRole("button", { name: "创建任务", exact: true }).click();
     await expect(page.getByLabel("任务标题", { exact: true })).toHaveValue(
       "读摘要",
@@ -104,7 +105,6 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await page
       .getByLabel("新日程结束")
       .fill(DateTime.fromISO(today).plus({ days: 1 }).toISODate() + "T01:30");
-    await page.getByRole("button", { name: "创建日程", exact: true }).click();
     await expect(page.getByLabel("日程标题", { exact: true })).toHaveValue(
       "完整讨论",
     );

@@ -1,0 +1,13 @@
+.page-workspace.page-list-workspace { display:block; width:100%; padding:24px 28px; }
+.page-list-workspace .page-tree { padding:0; background:transparent; width:100%; }
+.page-list-header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; }
+.page-list-header h2 { margin:0; font-size:20px; }
+.page-list-header button { background:#172b4d; color:white; border:1px solid #172b4d; border-radius:5px; padding:7px 12px; }
+.page-list { border-top:1px solid #e5e7eb; }
+.page-list-row { display:flex; align-items:center; min-height:52px; border-bottom:1px solid #e5e7eb; gap:16px; padding-right:12px; }
+.page-list-row:hover { background:#f8f9fb; }
+.page-tree .page-list-row a { display:block; flex:1; min-width:0; padding:15px 0; color:#1f2937; text-decoration:none; overflow-wrap:anywhere; }
+.page-list-row button { flex-shrink:0; background:transparent; border:0; color:#667085; font-size:12px; padding:6px; }
+.page-list-row button:hover { color:#172b4d; background:#eef1f5; }
+.page-list-empty { color:#667085; padding:28px 16px; }
+@media(max-width:650px) { .page-workspace.page-list-workspace { padding:20px 18px; } }

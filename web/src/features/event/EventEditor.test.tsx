@@ -25,7 +25,7 @@ it("edits in deployment time and preserves Markdown on conflict", async () => {
   fireEvent.change(screen.getByLabelText("Markdown 正文"), {
     target: { value: "本地草稿" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "保存日程" }));
+  expect(screen.queryByRole("button", { name: "保存日程" })).not.toBeInTheDocument();
   await waitFor(() =>
     expect(screen.getByRole("alert")).toHaveTextContent("内容已更新"),
   );
@@ -74,8 +74,17 @@ it("preserves the original fall-back offset while only Markdown changes", async 
   fireEvent.change(screen.getByLabelText("Markdown 正文"), {
     target: { value: "正文" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "保存日程" }));
-  await waitFor(() => expect(save).toHaveBeenCalledOnce());
+  expect(screen.queryByRole("button", { name: "保存日程" })).not.toBeInTheDocument();
+  await waitFor(() => expect(save).toHaveBeenCalledOnce(), { timeout: 2000 });
   expect(save.mock.calls[0][0].start_at).toBe("2026-11-01T01:30:30-05:00");
   expect(save.mock.calls[0][0].end_at).toBe("2026-11-01T02:30:45-05:00");
+});
+
+it("keeps invalid time drafts without saving", async () => {
+  const save = vi.fn();
+  render(<EventEditor event={{id:"invalid",project_id:"p",title:"讨论",body:"",start_at:"2026-10-24T01:00:00Z",end_at:"2026-10-24T02:00:00Z",version:1}} zone="Asia/Shanghai" archived={false} onSave={save} onReload={async()=>{}}/>);
+  fireEvent.change(screen.getByLabelText("结束时间"), {target:{value:"2026-10-24T08:00"}});
+  expect(screen.getByRole("alert")).toHaveTextContent("结束时间必须晚于开始时间");
+  await new Promise(resolve => setTimeout(resolve, 900));
+  expect(save).not.toHaveBeenCalled();
 });

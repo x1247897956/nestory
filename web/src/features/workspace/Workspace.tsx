@@ -89,7 +89,7 @@ export function Workspace() {
   const overdue = (data?.tasks ?? []).filter(item => item.due_date && item.due_date < data!.date).length;
   const zone = config.data?.timezone;
   return <section className="desk workbench" aria-label="工作台">
-    <header className="desk-header"><div><span className="desk-date">个人工作空间</span><h1>工作台</h1></div><span className="workbench-summary">{data ? `${data.tasks.length} 项待推进${overdue ? ` · ${overdue} 项逾期` : ""}` : "项目、行动与时间"}</span></header>
+    <header className="desk-header"><div><h1>工作台</h1></div><span className="workbench-summary">{data ? `${data.tasks.length} 项待推进${overdue ? ` · ${overdue} 项逾期` : ""}` : "项目、行动与时间"}</span></header>
     <section className="workbench-calendar" aria-label="日程日历">
       <header className="desk-section-heading"><h2>日程</h2><span>所有未归档项目</span></header>
       {config.isError ? <p role="alert" className="desk-error">日历配置加载失败 <button onClick={() => void config.refetch()}>重试</button></p> : !zone ? <p role="status" className="desk-empty">正在加载日历…</p> : <FullCalendar

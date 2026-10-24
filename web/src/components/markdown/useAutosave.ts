@@ -4,6 +4,7 @@ export function useAutosave<T>(
   initialVersion: number,
   onSave: (snapshot: T, version: number) => Promise<unknown>,
   disabled = false,
+  canSave: (draft: T) => boolean = () => true,
 ) {
   const [draft, setDraftState] = useState(initial);
   const [baseline, setBaseline] = useState(initial);
@@ -18,10 +19,12 @@ export function useAutosave<T>(
     error: "",
     disabled,
     onSave,
+    canSave,
   });
   const s = state.current;
   s.onSave = onSave;
   s.disabled = disabled;
+  s.canSave = canSave;
   const setDraft = (value: T | ((old: T) => T)) => {
     const next =
       typeof value === "function" ? (value as (old: T) => T)(s.draft) : value;
@@ -32,6 +35,7 @@ export function useAutosave<T>(
     if (
       s.busy ||
       s.disabled ||
+      !s.canSave(s.draft) ||
       JSON.stringify(s.draft) === JSON.stringify(s.baseline)
     )
       return;

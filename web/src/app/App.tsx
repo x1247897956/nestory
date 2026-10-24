@@ -220,7 +220,6 @@ export function App() {
             Noteapp<small>个人工作空间</small>
           </span>
         </Link>
-        <div className="sidebar-label">你的工作空间</div>
         <Link className="nav-item" to="/" aria-current={path === "/" ? "page" : undefined}>
           工作台
         </Link>
@@ -244,8 +243,7 @@ export function App() {
           {navigationProjects.map(project => <div className="sidebar-project" key={project.id}>
             <div className="sidebar-project-row" ref={project.id === projectId ? activeProjectHeading : undefined}>
               <Link className={"project-link " + (project.id === projectId ? "active" : "")} to={"/projects/" + project.id}>
-                <span className="project-icon" aria-hidden="true">{project.title.slice(0, 1)}</span>
-                <span>{project.pinned ? "⌃ " : ""}{project.title}</span>
+                <span>{project.title}</span>
               </Link>
               <ProjectMenu project={project} onRename={() => { setEditingProject(project); setProjectForm("edit"); }}/>
             </div>
@@ -294,7 +292,7 @@ export function App() {
           </div>
         ) : (
           <>
-            <header className="project-header">
+            <header className={"project-header" + (taskId || pageId || eventId ? " project-context-header" : "")}>
 
               <div className="header-title">
                 <h1>{p?.title}</h1>
@@ -468,6 +466,14 @@ export function App() {
                           key={taskId + ":" + editorEpoch}
                           task={detail.data}
                           parent={all.find(t => t.id === detail.data?.parent_id)}
+                          parentOptions={all.filter(t => !t.parent_id && t.id !== taskId)}
+                          hasChildren={all.some(t => t.parent_id === taskId)}
+                          onParentChange={async (parentId, version) => {
+                            const next = await api<Task>("/tasks/" + taskId + "/move", "POST", {parent_id: parentId || null, position: all.filter(t => (t.parent_id ?? "") === parentId && t.id !== taskId).length, version});
+                            qc.setQueryData(["task", taskId], next);
+                            await invalidate();
+                            setEditorEpoch(n => n + 1);
+                          }}
                           archived={readOnly}
                           onSave={saveTask}
                           onReload={async () => {

@@ -1,10 +1,5 @@
 import { renderObjectEditor as render } from "../test/renderObjectEditor";
-import {
-  act,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react";
+import { act, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { TaskEditor } from "../features/task/TaskEditor";
 import type { Task } from "./api";
@@ -36,12 +31,11 @@ describe("Task editor", () => {
     fireEvent.change(screen.getByLabelText("Markdown 正文"), {
       target: { value: "my draft" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "保存任务" }));
     await waitFor(() =>
       expect(screen.getByRole("alert")).toHaveTextContent("内容已更新"),
     );
     expect(screen.getByLabelText("Markdown 正文")).toHaveValue("my draft");
-    expect(screen.getByText("有未保存更改")).toBeVisible();
+    expect(screen.getByRole("status")).toHaveTextContent("保存失败");
   });
   it("makes archived tasks read only", () => {
     render(
@@ -65,8 +59,7 @@ it("keeps a conflict draft when explicit reload fails", async () => {
   fireEvent.change(screen.getByLabelText("Markdown 正文"), {
     target: { value: "keep me" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "保存任务" }));
-  await screen.findByRole("alert");
+  await screen.findByRole("alert", {}, { timeout: 2000 });
   fireEvent.click(screen.getByRole("button", { name: "重新载入" }));
   await waitFor(() =>
     expect(screen.getByRole("alert")).toHaveTextContent("network offline"),
@@ -111,7 +104,7 @@ it("guards navigation while a save is in flight after reverting to baseline", as
   fireEvent.change(screen.getByLabelText("Markdown 正文"), {
     target: { value: "in flight" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "保存任务" }));
+  await waitFor(() => expect(save).toHaveBeenCalled(), { timeout: 2000 });
   fireEvent.change(screen.getByLabelText("Markdown 正文"), {
     target: { value: task.body },
   });
@@ -120,4 +113,27 @@ it("guards navigation while a save is in flight after reverting to baseline", as
     "true",
   );
   await act(async () => resolve());
+});
+
+it("does not send an empty title, and automatically resumes when the title becomes valid", async () => {
+  const save = vi.fn().mockResolvedValue(undefined);
+  render(
+    <TaskEditor
+      task={task}
+      archived={false}
+      onSave={save}
+      onReload={() => {}}
+    />,
+  );
+  fireEvent.change(screen.getByLabelText("任务标题"), {
+    target: { value: "" },
+  });
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+  });
+  expect(save).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText("任务标题"), {
+    target: { value: "新标题" },
+  });
+  await waitFor(() => expect(save).toHaveBeenCalledOnce(), { timeout: 2000 });
 });

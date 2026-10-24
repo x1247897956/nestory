@@ -16,20 +16,12 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
     ["C", "B"],
   ]) {
     await page.goto("/projects/" + p.id + "/pages");
-    await page.getByLabel("新笔记标题").fill(title);
-    if (parent) {
-      const opts = await page
-        .getByLabel("新笔记父级")
-        .locator("option")
-        .allTextContents();
-      await page
-        .getByLabel("新笔记父级")
-        .selectOption({ label: opts.find((n) => n === parent)! });
-    }
-    await page.getByRole("button", { name: "新建笔记", exact: true }).click();
-    await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
-      title,
-    );
+    await page.getByRole("button", { name: parent ? `新建子笔记 ${parent}` : "新建笔记", exact: true }).click();
+    const titleField = page.getByLabel("笔记标题", { exact: true });
+    await expect(titleField).toHaveValue("无标题笔记");
+    await expect(titleField).toBeFocused();
+    await titleField.fill(title);
+    await expect(page.getByRole("status")).toHaveText("已保存");
   }
   const nodes = await (
     await request.get("/api/v1/projects/" + p.id + "/pages")
@@ -122,4 +114,30 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   await expect(page.getByRole("img")).toBeVisible();
   await expect(page.getByRole("button", { name: /删除/ })).toHaveCount(0);
   await page.screenshot({ path: "/tmp/noteapp-stage2.png", fullPage: true });
+});
+
+test("quick create retries failures and creates one blank note from overview entry", async ({ page, request }) => {
+  const project = await (await request.post("/api/v1/projects", { data: { title: "快捷笔记 " + Date.now() } })).json();
+  const endpoint = "**/api/v1/projects/" + project.id + "/pages";
+  let attempts = 0;
+  await page.route(endpoint, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    attempts++;
+    expect(route.request().postDataJSON()).toEqual({ title: "无标题笔记", parent_id: null });
+    if (attempts === 1) return route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { message: "模拟新建失败" } }) });
+    await route.continue();
+  });
+  await page.goto(`/projects/${project.id}/pages?create=1`);
+  await expect(page.getByRole("alert")).toContainText("模拟新建失败");
+  expect(attempts).toBe(1);
+  await expect(page.getByRole("button", { name: "新建笔记", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "重试新建" }).click();
+  const title = page.getByLabel("笔记标题", { exact: true });
+  await expect(title).toHaveValue("无标题笔记");
+  await expect(title).toBeFocused();
+  expect(await title.evaluate((input: HTMLInputElement) => input.selectionStart === 0 && input.selectionEnd === input.value.length)).toBe(true);
+  await expect(page.getByRole("button", { name: "保存笔记", exact: true })).toHaveCount(0);
+  const notes = await (await request.get(`/api/v1/projects/${project.id}/pages`)).json();
+  expect(notes).toHaveLength(1);
+  expect(attempts).toBe(2);
 });
