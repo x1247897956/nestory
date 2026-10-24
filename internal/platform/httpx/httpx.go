@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"noteapp/internal/apperr"
+	"noteapp/internal/document"
 )
 
 type Error struct {
@@ -54,14 +55,28 @@ func Fail(w http.ResponseWriter, err error) {
 	}
 	JSON(w, status, map[string]any{"error": map[string]string{"code": code, "message": message}})
 }
+
+const MaxJSONBytes = document.MaxBytes + (1 << 20)
+
+func decodeError(err error) error {
+	var too *http.MaxBytesError
+	if errors.As(err, &too) {
+		return apperr.TooLarge("请求超过 3 MiB；正文上限为 2 MiB，请缩减内容后重试")
+	}
+	return Invalid("无效 JSON 请求")
+}
+
 func Decode(w http.ResponseWriter, r *http.Request, v any) error {
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	r.Body = http.MaxBytesReader(w, r.Body, MaxJSONBytes)
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(v); err != nil {
-		return Invalid("无效 JSON 请求")
+		return decodeError(err)
 	}
 	if err := d.Decode(new(any)); err != io.EOF {
+		if err != nil {
+			return decodeError(err)
+		}
 		return Invalid("请求只能包含一个 JSON 对象")
 	}
 	return nil

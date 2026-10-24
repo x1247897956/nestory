@@ -165,3 +165,48 @@ func TestRestoreCannotCreateThirdTaskLevel(t *testing.T) {
 		t.Fatal("restore created third task level")
 	}
 }
+
+func TestFingerprintDetectsSameCountReplacementAndDescendantEdit(t *testing.T) {
+	ctx := context.Background()
+	db, e := database.Open(ctx, filepath.Join(t.TempDir(), "db"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer db.Close()
+	exec := func(q string) {
+		t.Helper()
+		if _, e := db.Exec(q); e != nil {
+			t.Fatal(e)
+		}
+	}
+	exec(`INSERT INTO projects(id,title,created_at,updated_at) VALUES('p','P',1,1)`)
+	exec(`INSERT INTO tasks(id,project_id,title,created_at,updated_at) VALUES('a','p','A',1,1)`)
+	s := New(db)
+	before, e := s.Preview(ctx, "projects", "p")
+	if e != nil {
+		t.Fatal(e)
+	}
+	exec(`DELETE FROM tasks WHERE id='a'`)
+	exec(`INSERT INTO tasks(id,project_id,title,created_at,updated_at) VALUES('c','p','C',1,1)`)
+	after, e := s.Preview(ctx, "projects", "p")
+	if e != nil {
+		t.Fatal(e)
+	}
+	if before.Count != after.Count || before.Version != after.Version {
+		t.Fatal("fixture must preserve root version/count")
+	}
+	if _, e = s.Delete(ctx, "projects", "p", before); e == nil {
+		t.Fatal("same count replacement accepted")
+	}
+	exec(`UPDATE tasks SET title='edited',version=version+1 WHERE id='c'`)
+	if _, e = s.Delete(ctx, "projects", "p", after); e == nil {
+		t.Fatal("descendant edit accepted")
+	}
+	fresh, e := s.Preview(ctx, "projects", "p")
+	if e != nil {
+		t.Fatal(e)
+	}
+	if _, e = s.Delete(ctx, "projects", "p", fresh); e != nil {
+		t.Fatal(e)
+	}
+}

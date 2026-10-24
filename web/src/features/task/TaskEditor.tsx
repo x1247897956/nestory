@@ -37,7 +37,7 @@ export function TaskEditor({
   onParentChange?: (parentId: string, version: number) => Promise<void>;
   archived: boolean;
   onSave: (draft: TaskDraft, version: number) => Promise<void>;
-  onReload: () => void | Promise<void>;
+  onReload: (beforeReset?: () => void) => void | Promise<void>;
 }) {
   const {
     draft,
@@ -47,15 +47,20 @@ export function TaskEditor({
     dirty,
     save,
     version,
+    discardRecovery,
+    canRecover,
+    recover,
   } = useAutosave(
     fromTask(task),
     task.version,
     onSave,
     archived,
     (d) => !!d.title.trim(),
+    `tasks:${task.project_id}:${task.id}`,
   );
   const [error, setError] = useState("");
   const [moving, setMoving] = useState(false);
+  const [bodyPending, setBodyPending] = useState(false);
   const locked = archived || moving;
   const choices =
     parent && !parentOptions.some((t) => t.id === parent.id)
@@ -68,7 +73,7 @@ export function TaskEditor({
   return (
     <section
       className="editor"
-      data-dirty={dirty || busy || moving}
+      data-dirty={dirty || busy || moving || bodyPending}
       aria-label="任务详情"
     >
       <header className="task-inline-header">
@@ -135,16 +140,17 @@ export function TaskEditor({
               aria-label="父任务"
               value={task.parent_id ?? ""}
               disabled={
-                locked || dirty || busy || hasChildren || !onParentChange
+                locked || dirty || busy || bodyPending || hasChildren || !onParentChange
               }
               title={
                 hasChildren
                   ? "含子任务的任务不能设置父任务"
-                  : dirty || busy
+                  : dirty || busy || bodyPending
                     ? "正在保存正文，请稍候"
                     : undefined
               }
               onChange={async (event) => {
+                if (bodyPending) return;
                 const parentId = event.target.value;
                 setMoving(true);
                 setError("");
@@ -174,6 +180,7 @@ export function TaskEditor({
             setDraft((d) => ({ ...d, body_document }))
           }
           disabled={locked}
+          onPendingChange={setBodyPending}
           projectId={task.project_id}
         />
       </div>
@@ -186,6 +193,7 @@ export function TaskEditor({
         <div className="error" role="alert">
           {error || saveError}
           <p>本地草稿已保留。可先复制正文，再重新载入。</p>
+          {canRecover && <button onClick={recover}>恢复本机草稿</button>}
           <button
             onClick={() =>
               navigator.clipboard
@@ -196,10 +204,11 @@ export function TaskEditor({
             复制草稿
           </button>{" "}
           <button
+            disabled={bodyPending || busy}
             onClick={async () => {
               if (window.confirm("重新载入会丢弃本地未保存更改，是否继续？"))
                 try {
-                  await onReload();
+                  await onReload(discardRecovery);
                 } catch (e) {
                   setError((e as Error).message);
                 }

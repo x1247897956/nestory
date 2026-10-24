@@ -10,7 +10,7 @@ vi.mock("@fullcalendar/react", () => ({
     return <div data-testid="calendar" />;
   },
 }));
-vi.mock("../../app/api", () => ({ api: vi.fn() }));
+vi.mock("../../app/api", () => ({ api: vi.fn(), abandonCreateIntent: vi.fn() }));
 beforeEach(() => {
   vi.mocked(api).mockReset();
   vi.mocked(api).mockImplementation(async (_path, method) =>
@@ -93,7 +93,7 @@ it("does not create invalid intervals and freezes a valid draft during its reque
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
   );
 });
-it("saves drag changes with only original version and times, and reverts a failed request", async () => {
+it("saves drag changes with only original version and times, and reconciles a failed response", async () => {
   const original = {
     id: "e",
     project_id: "p",
@@ -105,6 +105,7 @@ it("saves drag changes with only original version and times, and reverts a faile
   };
   vi.mocked(api).mockImplementation(async (_path, method) => {
     if (method === "PATCH") throw new Error("版本冲突");
+    if (_path === "/events/e") return { ...original, version: 8, start_at: "2026-10-24T03:00:00Z" } as any;
     return [original] as any;
   });
   render(<Events projectId="p" archived={false} />);
@@ -124,7 +125,8 @@ it("saves drag changes with only original version and times, and reverts a faile
       revert,
     }),
   );
-  await waitFor(() => expect(revert).toHaveBeenCalledOnce());
+  await waitFor(() => expect(calendar.props.events[0].start).toBe("2026-10-24T03:00:00Z"));
+  expect(revert).not.toHaveBeenCalled();
   expect(api).toHaveBeenCalledWith("/events/e", "PATCH", {
     start_at: "2026-10-24T03:00:00.000Z",
     end_at: "2026-10-24T04:00:00.000Z",
@@ -151,4 +153,30 @@ it("retains a failed creation draft and retries without a routine save button", 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
   );
   expect(api).toHaveBeenCalledTimes(2);
+});
+it("blocks dragging when reconciliation fails and resumes only after explicit synchronization", async () => {
+  const original = { id: "e", project_id: "p", title: "计划", body_document: { version: 1, blocks: [] }, start_at: "2026-10-24T01:00:00Z", end_at: "2026-10-24T02:00:00Z", version: 7 };
+  let online = false;
+  vi.mocked(api).mockImplementation(async (path, method) => {
+    if (method === "PATCH" || (path === "/events/e" && !online)) throw new Error("网络失败");
+    if (path === "/events/e") return { ...original, version: 8 } as any;
+    return [original] as any;
+  });
+  render(<Events projectId="p" archived={false} />);
+  const { act } = await import("@testing-library/react");
+  act(() => calendar.props.datesSet({ startStr: "2026-10-01", endStr: "2026-11-01" }));
+  await waitFor(() => expect(calendar.props.events).toHaveLength(1));
+  const revert = vi.fn();
+  act(() => calendar.props.eventChange({ event: { id: "e", start: new Date("2026-10-24T03:00:00Z"), end: new Date("2026-10-24T04:00:00Z") }, revert }));
+  await screen.findByRole("button", { name: "同步日程" });
+  expect(calendar.props.editable).toBe(false);
+  expect(revert).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "同步日程" }));
+  await screen.findByText("同步失败，保存结果仍未确认，请重试同步。");
+  expect(calendar.props.editable).toBe(false);
+  online = true;
+  fireEvent.click(screen.getByRole("button", { name: "同步日程" }));
+  await waitFor(() => expect(calendar.props.editable).toBe(true));
+  act(() => calendar.props.eventChange({ event: { id: "e", start: new Date("2026-10-24T03:00:00Z"), end: new Date("2026-10-24T04:00:00Z") }, revert }));
+  await waitFor(() => expect(api).toHaveBeenCalledWith("/events/e", "PATCH", expect.objectContaining({ version: 8 })));
 });

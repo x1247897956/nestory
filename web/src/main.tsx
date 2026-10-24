@@ -1,3 +1,4 @@
+import { initializeTabIdentity } from "./app/tabIdentity";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -18,6 +19,8 @@ const router = createBrowserRouter([
   { path: "/projects/:projectId/pages", element: <App /> },
   { path: "/projects/:projectId/pages/:pageId", element: <App /> },
 ]);
+// Recovery remains available with an explicit storage error if identity setup fails.
+void initializeTabIdentity().catch(() => undefined).then(() => {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={client}>
@@ -25,3 +28,5 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </React.StrictMode>,
 );
+
+});

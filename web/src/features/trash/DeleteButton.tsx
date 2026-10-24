@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "../../app/api";
 type Preview = {
+  fingerprint: string;
   version: number;
   count: number;
   members?: { id: string; title: string }[];

@@ -25,6 +25,7 @@ import type { BodyDocument, DocumentFields } from "../../app/document";
 type Props = DocumentFields & {
   onChange: (document: BodyDocument) => void;
   disabled?: boolean;
+  onPendingChange?: (pending: boolean) => void;
   projectId?: string;
 };
 function FileCommandIcon({ action }: { action: "upload" | "import" | "export" }) {
@@ -203,9 +204,11 @@ export function BlockEditor({
   onChange,
   disabled = false,
   projectId,
+  onPendingChange,
 }: Props) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(0);
+  useEffect(() => { onPendingChange?.(pending > 0); }, [pending, onPendingChange]);
   const locked = useRef(disabled);
   locked.current = disabled;
   const latest = useRef({

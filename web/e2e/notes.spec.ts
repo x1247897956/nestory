@@ -123,7 +123,7 @@ test("quick create retries failures and creates one blank note from overview ent
   await page.route(endpoint, async route => {
     if (route.request().method() !== "POST") return route.continue();
     attempts++;
-    expect(route.request().postDataJSON()).toEqual({ title: "无标题笔记", parent_id: null });
+    expect(route.request().postDataJSON()).toMatchObject({ title: "无标题笔记", parent_id: null, request_id: expect.any(String) });
     if (attempts === 1) return route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { message: "模拟新建失败" } }) });
     await route.continue();
   });

@@ -5,7 +5,7 @@ import "./pages.css";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../app/api";
+import { api, abandonCreateIntent } from "../../app/api";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
 import { useAutosave } from "../../components/markdown/useAutosave";
 export type Page = {
@@ -132,7 +132,7 @@ export function Pages({
           <header className="page-list-header">
             <h2>笔记</h2>
             {!archived && (
-              <button disabled={creating} onClick={() => void createPage()}>
+              <button disabled={creating || !!error} onClick={() => void createPage()}>
                 新建笔记
               </button>
             )}
@@ -146,6 +146,13 @@ export function Pages({
               >
                 重试新建
               </button>
+              <button disabled={creating} onClick={() => {
+                if (!confirm("上次新建可能已经完成。放弃此次重试并允许另建笔记？")) return;
+                try {
+                  abandonCreateIntent("/projects/" + projectId + "/pages", {title:"无标题笔记",parent_id:retryParent.current});
+                  setError("");
+                } catch(e) { setError((e as Error).message); }
+              }}>放弃此次新建</button>
             </p>
           )}
           <div className="page-list">
@@ -160,7 +167,7 @@ export function Pages({
                 </Link>
                 {!archived && (
                   <button
-                    disabled={creating}
+                    disabled={creating || !!error}
                     aria-label={"新建子笔记 " + page.title}
                     onClick={() => void createPage(page.id)}
                   >
@@ -206,8 +213,9 @@ export function Pages({
                     qc.setQueryData(["page", pageId], next);
                     await refresh();
                   }}
-                  onReload={async () => {
+                  onReload={async (beforeReset) => {
                     await detail.refetch({ throwOnError: true });
+                    beforeReset?.();
                     setEpoch((n) => n + 1);
                   }}
                 />
@@ -242,7 +250,7 @@ function PageEditor({
     d: { title: string; body_document: BodyDocument },
     v: number,
   ) => Promise<void>;
-  onReload: () => Promise<void>;
+  onReload: (beforeReset?: () => void) => Promise<void>;
 }) {
   const a = useAutosave(
     {
@@ -253,6 +261,7 @@ function PageEditor({
     onSave,
     archived,
     (draft) => !!draft.title.trim(),
+    `pages:${page.project_id}:${page.id}`,
   );
   const [error, setError] = useState("");
   const titleInput = useRef<HTMLInputElement>(null);
@@ -302,6 +311,7 @@ function PageEditor({
         <div role="alert">
           {a.error || error}
           <p>本地草稿已保留。</p>
+          {a.canRecover && <button onClick={a.recover}>恢复本机草稿</button>}
           <button onClick={() => a.save()}>重试保存</button>
           <button
             onClick={() =>
@@ -316,7 +326,7 @@ function PageEditor({
             onClick={async () => {
               if (confirm("重新载入会丢弃本地草稿，是否继续？"))
                 try {
-                  await onReload();
+                  await onReload(a.discardRecovery);
                 } catch (e) {
                   setError((e as Error).message);
                 }

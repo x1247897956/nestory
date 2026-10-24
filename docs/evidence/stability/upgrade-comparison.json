@@ -1,0 +1,20 @@
+{
+  "schema_from": 7,
+  "schema_to": 8,
+  "unchanged_tables": {
+    "projects": 35,
+    "tasks": 28,
+    "pages": 40,
+    "assets": 12,
+    "events": 19,
+    "task_pages": 6,
+    "task_events": 3,
+    "page_events": 3,
+    "recent_visits": 57,
+    "delete_batches": 45
+  },
+  "creation_requests": 0,
+  "assets_sha256_match": true,
+  "integrity_check": "ok",
+  "foreign_key_check": []
+}

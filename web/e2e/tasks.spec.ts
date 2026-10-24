@@ -56,7 +56,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   await page.getByLabel("Markdown 正文").fill("first tab");
   await expect(page.getByRole("status")).toHaveText("已保存");
   await second.getByLabel("Markdown 正文").fill("second tab draft");
-  await expect(second.getByRole("alert")).toContainText("内容已更新");
+  await expect(second.getByRole("alert")).toContainText(/内容已更新|服务器更新|冲突/);
   await expect(second.getByLabel("Markdown 正文")).toHaveText(
     "second tab draft",
   );

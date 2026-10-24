@@ -17,6 +17,7 @@ export function ProjectMenu({ project, onRename }: {
     setBusy(true);
     setError("");
     try {
+      if ("archived" in patch && !project.archived_at && document.querySelector('[data-dirty="true"]')) throw new Error("请先等待保存和文件处理完成，再归档项目。");
       await api(`/projects/${project.id}`, "PATCH", { version: project.version, ...patch });
       await qc.invalidateQueries();
       panel.current?.hidePopover();

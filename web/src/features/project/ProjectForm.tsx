@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { abandonCreateIntent } from "../../app/api";
 import type { Project } from "../../app/api";
 export function ProjectForm({
   project,
@@ -22,6 +23,7 @@ export function ProjectForm({
   const [description, setDescription] = useState(project?.description ?? "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const attempts = useRef<{title:string;description:string}[]>([]);
   return (
     <div className="modal-backdrop">
       <section
@@ -41,7 +43,10 @@ export function ProjectForm({
             e.preventDefault();
             setBusy(true);
             try {
+              if (!project) attempts.current.push({title,description});
               await onSubmit(title, description, version);
+              for (const input of attempts.current) abandonCreateIntent("/projects",input);
+              attempts.current = [];
             } catch (err) {
               setError((err as Error).message);
             } finally {
@@ -80,8 +85,13 @@ export function ProjectForm({
                   (title === initial.title &&
                     description === initial.description) ||
                   confirm("放弃未保存的项目草稿？")
-                )
-                  onClose();
+                ) {
+                  try {
+                    for (const input of attempts.current) abandonCreateIntent("/projects", input);
+                    attempts.current = [];
+                    onClose();
+                  } catch(err) { setError((err as Error).message); }
+                }
               }}
               disabled={busy}
             >

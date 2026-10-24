@@ -7,6 +7,7 @@ import (
 	"errors"
 	"noteapp/internal/apperr"
 	"noteapp/internal/document"
+	"noteapp/internal/idempotency"
 	"noteapp/internal/platform/clock"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
@@ -25,6 +26,7 @@ type Page struct {
 	Version      int64           `json:"version"`
 }
 type Input struct {
+	RequestID    *string         `json:"request_id,omitempty"`
 	Title        *string         `json:"title"`
 	BodyDocument json.RawMessage `json:"body_document"`
 	ParentID     *string         `json:"parent_id"`
@@ -126,6 +128,14 @@ func parentOK(ctx context.Context, tx *sql.Tx, t Page, parentID *string) error {
 	return nil
 }
 func (s *Service) Create(ctx context.Context, pid string, in Input) (Page, error) {
+	key := ""
+	if in.RequestID != nil {
+		key = *in.RequestID
+	}
+	in.RequestID = nil
+	return idempotency.Create(ctx, s.db, key, "page"+":"+pid, in, func(tx *sql.Tx) (Page, error) { return s.create(ctx, tx, pid, in) })
+}
+func (s *Service) create(ctx context.Context, tx *sql.Tx, pid string, in Input) (Page, error) {
 	t := Page{ProjectID: pid, ParentID: in.ParentID, CreatedAt: clock.Now(), UpdatedAt: clock.Now(), Version: 1}
 	if err := apply(&t, in); err != nil {
 		return t, err
@@ -135,11 +145,6 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Page, error
 	if err != nil {
 		return t, err
 	}
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return t, err
-	}
-	defer tx.Rollback()
 	if err = project.Writable(ctx, tx, pid); err != nil {
 		return t, err
 	}
@@ -153,10 +158,13 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Page, error
 	if err != nil {
 		return t, err
 	}
-	return t, tx.Commit()
+	return t, nil
 }
 func (s *Service) Update(ctx context.Context, tid string, in Input) (Page, error) {
 	var t Page
+	if in.RequestID != nil {
+		return t, apperr.Invalid("request_id 仅支持创建请求")
+	}
 	if in.Version < 1 {
 		return t, apperr.Invalid("version 必填")
 	}

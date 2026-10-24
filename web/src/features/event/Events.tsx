@@ -13,7 +13,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import luxonPlugin from "@fullcalendar/luxon3";
 import zhCN from "@fullcalendar/core/locales/zh-cn";
 import { DateTime } from "luxon";
-import { api } from "../../app/api";
+import { api, abandonCreateIntent } from "../../app/api";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
 import { useAutosave } from "../../components/markdown/useAutosave";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
@@ -55,9 +55,16 @@ export function Events({
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [unresolvedByProject, setUnresolvedByProject] = useState<Record<string, string>>({});
+  const unresolved = unresolvedByProject[projectId];
   const [epoch, setEpoch] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
   const saving = useRef(false);
+  const createAttempts = useRef<{path:string;input:object}[]>([]);
+  const abandonCreation = () => {
+    for (const attempted of createAttempts.current) abandonCreateIntent(attempted.path, attempted.input);
+    createAttempts.current = [];
+  };
   const mounted = useRef(false);
   const context = useRef({ projectId, eventId });
   context.current = { projectId, eventId };
@@ -140,15 +147,11 @@ export function Events({
     setError("");
     const owner = projectId;
     try {
-      const v = await api<CalendarEvent>(
-        "/projects/" + owner + "/events",
-        "POST",
-        {
-          title: title.trim(),
-          start_at: fromInput(selection.start, zone),
-          end_at: fromInput(selection.end, zone),
-        },
-      );
+      const input = {title: title.trim(), start_at: fromInput(selection.start, zone), end_at: fromInput(selection.end, zone)};
+      const path = "/projects/" + owner + "/events";
+      createAttempts.current.push({path,input});
+      const v = await api<CalendarEvent>(path,"POST",input);
+      abandonCreation();
       qc.setQueryData(["event", v.id], v);
       if (
         !mounted.current ||
@@ -190,12 +193,20 @@ export function Events({
     const timer = setTimeout(() => void createEvent(), 800);
     return () => clearTimeout(timer);
   }, [selection, title, busy, error, zone, archived]);
+  const reconcile = async (id: string, owner: string) => {
+    const next = await api<CalendarEvent>("/events/" + id);
+    qc.setQueryData(["event", id], next);
+    qc.setQueriesData<CalendarEvent[]>({ queryKey: ["events", owner] },
+      (old) => old?.map((item) => item.id === id ? next : item));
+    setUnresolvedByProject((old) => { const next = { ...old }; delete next[owner]; return next; });
+  };
   const changeEvent = async (info: EventChangeArg) => {
     const original = events.data?.find((e) => e.id === info.event.id);
     if (
       !original ||
       original.project_id !== projectId ||
       archived ||
+      unresolved ||
       saving.current ||
       !info.event.start ||
       !info.event.end
@@ -214,11 +225,18 @@ export function Events({
         version: original.version,
       });
       qc.setQueryData(["event", original.id], next);
+      qc.setQueriesData<CalendarEvent[]>({ queryKey: ["events", owner] }, (old) => old?.map((item) => item.id === next.id ? next : item));
       if (currentProject.current === owner) await refresh();
     } catch (e) {
-      info.revert();
-      if (mounted.current && currentProject.current === owner)
-        setError((e as Error).message);
+      try {
+        await reconcile(original.id, owner);
+        if (mounted.current && currentProject.current === owner) setError((e as Error).message);
+      } catch {
+        if (mounted.current) {
+          setUnresolvedByProject((old) => ({ ...old, [owner]: original.id }));
+          if (currentProject.current === owner) setError("保存结果尚未确认，请同步日程后继续拖动。");
+        }
+      }
     } finally {
       saving.current = false;
       if (mounted.current) setBusy(false);
@@ -286,7 +304,7 @@ export function Events({
             height="min(720px, calc(100vh - 220px))"
             allDaySlot={false}
             scrollTime="08:00:00"
-            editable={!archived && !busy}
+            editable={!archived && !busy && !unresolved}
             eventChange={(info) => void changeEvent(info)}
             selectable={!archived && !busy}
             selectMirror
@@ -345,6 +363,7 @@ export function Events({
               onCancel={(e) => {
                 e.preventDefault();
                 if (!busy && (!dirty || confirm("日程尚未保存，是否关闭？"))) {
+                  try { abandonCreation(); } catch(e) { setError((e as Error).message); return; }
                   setSelection(undefined);
                   setTitle("");
                   setError("");
@@ -364,6 +383,7 @@ export function Events({
                     disabled={busy}
                     onClick={() => {
                       if (!dirty || confirm("日程尚未保存，是否关闭？")) {
+                        try { abandonCreation(); } catch(e) { setError((e as Error).message); return; }
                         setSelection(undefined);
                         setTitle("");
                         setError("");
@@ -427,6 +447,12 @@ export function Events({
             </dialog>
           )}
           {error && !selection && <p role="alert">{error}</p>}
+          {unresolved && <button disabled={busy} onClick={async () => {
+            setBusy(true);
+            try { await reconcile(unresolved, projectId); setError(""); }
+            catch { setError("同步失败，保存结果仍未确认，请重试同步。"); }
+            finally { setBusy(false); }
+          }}>同步日程</button>}
         </section>
       )}
       {eventId && (
@@ -453,8 +479,9 @@ export function Events({
                   qc.setQueryData(["event", eventId], next);
                   await refresh();
                 }}
-                onReload={async () => {
+                onReload={async (beforeReset) => {
                   await detail.refetch({ throwOnError: true });
+                  beforeReset?.();
                   setEpoch((n) => n + 1);
                 }}
               />
@@ -483,7 +510,7 @@ export function EventEditor({
   zone: string;
   archived: boolean;
   onSave: (d: Draft, v: number) => Promise<unknown>;
-  onReload: () => Promise<void>;
+  onReload: (beforeReset?: () => void) => Promise<void>;
 }) {
   const a = useAutosave(
     {
@@ -510,6 +537,7 @@ export function EventEditor({
       ),
     archived,
     (d) => !!d.title.trim() && validTimes(d.start_at, d.end_at, zone),
+    `events:${event.project_id}:${event.id}`,
   );
   const [error, setError] = useState("");
   return (
@@ -568,7 +596,8 @@ export function EventEditor({
       {(a.error || error) && (
         <div role="alert">
           {a.error || error}
-          <p>本地草稿已保留。</p>
+          <p>请保留此页面；可复制草稿备份。</p>
+          {a.canRecover && <button onClick={a.recover}>恢复本机草稿</button>}
           <button onClick={() => void a.save()}>重试保存</button>
           <button
             onClick={() =>
@@ -583,7 +612,7 @@ export function EventEditor({
             onClick={async () => {
               if (confirm("重新载入会丢弃本地草稿，是否继续？"))
                 try {
-                  await onReload();
+                  await onReload(a.discardRecovery);
                 } catch (e) {
                   setError((e as Error).message);
                 }

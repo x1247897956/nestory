@@ -1,8 +1,19 @@
 import type { BodyDocument } from "../../app/document";
 import { renderObjectEditor as render } from "../../test/renderObjectEditor";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
-import { it, expect, vi } from "vitest";
+import { beforeEach, afterEach, it, expect, vi } from "vitest";
 import { EventEditor } from "./Events";
+beforeEach(() => {
+  const data = new Map<string, string>();
+  vi.stubGlobal("localStorage", {
+    get length() { return data.size; },
+    key: (index: number) => [...data.keys()][index] ?? null,
+    getItem: (key: string) => data.get(key) ?? null,
+    setItem: (key: string, value: string) => { data.set(key, value); },
+    removeItem: (key: string) => { data.delete(key); },
+  });
+});
+afterEach(() => vi.unstubAllGlobals());
 it("edits in deployment time and preserves Markdown on conflict", async () => {
   const save = vi.fn().mockRejectedValue(new Error("内容已更新"));
   render(
@@ -88,4 +99,23 @@ it("keeps invalid time drafts without saving", async () => {
   expect(screen.getByRole("alert")).toHaveTextContent("结束时间必须晚于开始时间");
   await new Promise(resolve => setTimeout(resolve, 900));
   expect(save).not.toHaveBeenCalled();
+});
+it("retains recovery after a failed reload and discards only in the successful reload callback", async () => {
+  vi.spyOn(window, "confirm").mockReturnValue(true);
+  let succeeded = false;
+  const reload = vi.fn(async (beforeReset?: () => void) => {
+    if (!succeeded) throw new Error("重新读取失败");
+    beforeReset?.();
+  });
+  render(<EventEditor event={{ id: "reload", project_id: "p", title: "原始标题", body_document: { version: 1, blocks: [] }, start_at: "2026-10-24T01:00:00Z", end_at: "2026-10-24T02:00:00Z", version: 1 }} zone="Asia/Shanghai" archived={false} onSave={async () => { throw new Error("版本冲突"); }} onReload={reload} />);
+  fireEvent.change(screen.getByLabelText("日程标题"), { target: { value: "本地标题" } });
+  await screen.findByRole("button", { name: "重新载入" });
+  expect(window.localStorage.length).toBeGreaterThan(0);
+  fireEvent.click(screen.getByRole("button", { name: "重新载入" }));
+  await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+  expect(window.localStorage.length).toBeGreaterThan(0);
+  succeeded = true;
+  fireEvent.click(screen.getByRole("button", { name: "重新载入" }));
+  await waitFor(() => expect(window.localStorage.length).toBe(0));
+  vi.restoreAllMocks();
 });

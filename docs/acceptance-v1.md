@@ -80,3 +80,7 @@ NOTEAPP_VERIFY_RESTORED=1 E2E_BASE_URL=http://127.0.0.1:18085 PLAYWRIGHT_CHROMIU
 ## 2026-10-25 块唯一正文
 
 正文接口与schema7只保留body_document，移除Markdown/旧原文字段，搜索直接从块读取。Go test/race/vet、前端单测26/26、完整浏览器29/29、准备工具4/4、Docker运维9/9通过。schema6→7隔离卷与正式卷各87份文档逐条对比、关系/元数据及12附件SHA一致；schema7备份干净卷恢复与三类编辑器打开通过。详见[块唯一正文验收](implementation/2026-10-25-block-only.md)。
+
+## 2026-10-25 V1稳定性收尾
+
+修复持久草稿、删除快照、上传移动互斥、创建幂等/日历结果确认及正文限额不一致。新增故障注入及复制标签页覆盖后完整浏览器35/35，前端单测55/55、Go test/race/vet、Docker运维9/9通过；schema7→8隔离升级/空卷恢复及正式升级逐表数据/12附件SHA一致。验收范围为既定单人本机或受信任局域网，具体证据及剩余边界见[稳定性验收](implementation/2026-10-25-v1-stability.md)。

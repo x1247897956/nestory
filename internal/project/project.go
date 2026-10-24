@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"noteapp/internal/apperr"
+	"noteapp/internal/idempotency"
 	"noteapp/internal/platform/clock"
 	"noteapp/internal/platform/id"
 	"strings"
@@ -21,6 +22,7 @@ type Project struct {
 	Version     int64  `json:"version"`
 }
 type Input struct {
+	RequestID   *string `json:"request_id,omitempty"`
 	Pinned      *bool   `json:"pinned"`
 	Title       *string `json:"title"`
 	Description *string `json:"description"`
@@ -61,6 +63,14 @@ func (s *Service) List(ctx context.Context, archived bool) ([]Project, error) {
 	return out, rows.Err()
 }
 func (s *Service) Create(ctx context.Context, in Input) (Project, error) {
+	key := ""
+	if in.RequestID != nil {
+		key = *in.RequestID
+	}
+	in.RequestID = nil
+	return idempotency.Create(ctx, s.db, key, "project", in, func(tx *sql.Tx) (Project, error) { return s.create(ctx, tx, in) })
+}
+func (s *Service) create(ctx context.Context, tx *sql.Tx, in Input) (Project, error) {
 	var p Project
 	if in.Title == nil || strings.TrimSpace(*in.Title) == "" {
 		return p, apperr.Invalid("项目名称不能为空")
@@ -73,11 +83,14 @@ func (s *Service) Create(ctx context.Context, in Input) (Project, error) {
 	if in.Description != nil {
 		p.Description = *in.Description
 	}
-	_, err = s.db.ExecContext(ctx, "INSERT INTO projects(id,title,description,created_at,updated_at) VALUES(?,?,?,?,?)", p.ID, p.Title, p.Description, p.CreatedAt, p.UpdatedAt)
+	_, err = tx.ExecContext(ctx, "INSERT INTO projects(id,title,description,created_at,updated_at) VALUES(?,?,?,?,?)", p.ID, p.Title, p.Description, p.CreatedAt, p.UpdatedAt)
 	return p, err
 }
 func (s *Service) Update(ctx context.Context, pid string, in Input) (Project, error) {
 	var p Project
+	if in.RequestID != nil {
+		return p, apperr.Invalid("request_id 仅支持创建请求")
+	}
 	if in.Version < 1 {
 		return p, apperr.Invalid("version 必填")
 	}

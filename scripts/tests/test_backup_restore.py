@@ -15,7 +15,7 @@ class BackupRestore(unittest.TestCase):
   for _ in range(100):
    try:self.api('/readyz');break
    except Exception:time.sleep(.1)
-  self.project=self.api('/projects',{'title':'Backup中文'});self.task=self.api('/projects/'+self.project['id']+'/tasks',{'title':'Task','body_document':{'version':1,'blocks':[{'id':'persisted','type':'paragraph','content':[{'type':'text','text':'persisted正文','styles':{}}]}]}})
+  self.project=self.api('/projects',{'title':'Backup中文','request_id':self.name+'-project'});self.task_input={'title':'Task','request_id':self.name+'-task','body_document':{'version':1,'blocks':[{'id':'persisted','type':'paragraph','content':[{'type':'text','text':'persisted正文','styles':{}}]}]}};self.task=self.api('/projects/'+self.project['id']+'/tasks',self.task_input)
  def api(self,path,body=None):
   req=urllib.request.Request(self.url+'/api/v1'+path,data=json.dumps(body).encode() if body else None,headers={'Content-Type':'application/json'})
   with urllib.request.urlopen(req,timeout=5) as res:return json.load(res)
@@ -27,7 +27,7 @@ class BackupRestore(unittest.TestCase):
  def restore(self,**kwargs):return run(str(ROOT/'scripts/restore.sh'),'--volume',self.target,'--image',IMAGE,'--backup',str(self.out),**kwargs)
  def running(self):return json.loads(run('docker','inspect',self.name).stdout)[0]['State']['Running']
  def test_round_trip_and_reject_nonempty_target(self):
-  self.backup();self.assertTrue(self.running());manifest=json.loads((self.out/'manifest.json').read_text());self.assertEqual(manifest['counts']['tasks'],1);self.restore()
+  self.backup();self.assertTrue(self.running());manifest=json.loads((self.out/'manifest.json').read_text());self.assertEqual(manifest['counts']['tasks'],1);self.assertEqual(manifest['counts']['creation_requests'],2);self.restore()
   self.assertNotEqual(self.restore(check=False).returncode,0)
   run('docker','run','-d','--name',self.target,'-p','127.0.0.1::8080','-v',self.target+':/data',IMAGE)
   port=json.loads(run('docker','inspect',self.target).stdout)[0]['NetworkSettings']['Ports']['8080/tcp'][0]['HostPort'];self.url='http://127.0.0.1:'+port
@@ -35,6 +35,7 @@ class BackupRestore(unittest.TestCase):
    try:got=self.api('/tasks/'+self.task['id']);break
    except Exception:time.sleep(.1)
   self.assertEqual(got['body_document'],self.task['body_document']);self.assertNotIn('body',got);self.assertNotIn('legacy_body',got)
+  replay=self.api('/projects/'+self.project['id']+'/tasks',self.task_input);self.assertEqual(replay,self.task)
  def test_failure_after_stop_restarts_original(self):
   # Corrupt the schema so manifest validation fails after tar, not before stopping.
   run('docker','exec',self.name,'sh','-c','mkdir /data/unexpected; ln -s /etc/passwd /data/unexpected/link')

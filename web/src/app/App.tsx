@@ -12,7 +12,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, stages, priorities, type Project, type Task } from "./api";
+import { api, abandonCreateIntent, stages, priorities, type Project, type Task } from "./api";
 import { ProjectForm } from "../features/project/ProjectForm";
 import { ProjectOverview } from "../features/project/ProjectOverview";
 import { TaskSummary } from "../features/task/TaskSummary";
@@ -39,12 +39,16 @@ export function App() {
   const [creating, setCreating] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const createDialog = useRef<HTMLDialogElement>(null);
+  const createAttempts = useRef<object[]>([]);
   useEffect(() => {
     if (createOpen) createDialog.current?.showModal();
   }, [createOpen]);
   const closeCreate = () => {
     if (creating) return;
     if ((newTitle.trim() || newParent) && !confirm("放弃未保存的新任务吗？")) return;
+    try { for (const input of createAttempts.current) abandonCreateIntent("/projects/" + projectId + "/tasks", input); }
+    catch(e) { setError((e as Error).message); return; }
+    createAttempts.current = [];
     setCreateOpen(false); setNewTitle(""); setNewParent("");
   };
   const openCreate = (parent = "") => {
@@ -306,6 +310,7 @@ export function App() {
                     onClick={async () => {
                       setError("");
                       try {
+                        if (!readOnly && document.querySelector('[data-dirty="true"]')) throw new Error("请先等待保存和文件处理完成，再归档项目。");
                         await api("/projects/" + projectId, "PATCH", {
                           version: p?.version,
                           archived: !readOnly,
@@ -476,8 +481,9 @@ export function App() {
                           }}
                           archived={readOnly}
                           onSave={saveTask}
-                          onReload={async () => {
+                          onReload={async (beforeReset) => {
                             await detail.refetch({ throwOnError: true });
+                            beforeReset?.();
                             setEditorEpoch((n) => n + 1);
                           }}
                         />
@@ -501,11 +507,15 @@ export function App() {
                         setCreating(true);
                         setError("");
                         try {
+                          const input = { title: newTitle, parent_id: newParent || null };
+                          createAttempts.current.push(input);
                           const t = await api<Task>(
                             "/projects/" + projectId + "/tasks",
                             "POST",
-                            { title: newTitle, parent_id: newParent || null },
+                            input,
                           );
+                          for (const attempted of createAttempts.current) abandonCreateIntent("/projects/" + projectId + "/tasks", attempted);
+                          createAttempts.current = [];
                           flushSync(() => {
                             setNewTitle("");
                             setNewParent("");

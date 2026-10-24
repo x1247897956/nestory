@@ -7,6 +7,7 @@ import (
 	"errors"
 	"noteapp/internal/apperr"
 	"noteapp/internal/document"
+	"noteapp/internal/idempotency"
 	"noteapp/internal/platform/clock"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
@@ -26,6 +27,7 @@ type Event struct {
 	Version      int64           `json:"version"`
 }
 type Input struct {
+	RequestID    *string         `json:"request_id,omitempty"`
 	Title        *string         `json:"title"`
 	BodyDocument json.RawMessage `json:"body_document"`
 	StartAt      *string         `json:"start_at"`
@@ -121,6 +123,14 @@ func apply(v *Event, in Input) (int64, int64, error) {
 	return interval(v.StartAt, v.EndAt)
 }
 func (s *Service) Create(ctx context.Context, pid string, in Input) (Event, error) {
+	key := ""
+	if in.RequestID != nil {
+		key = *in.RequestID
+	}
+	in.RequestID = nil
+	return idempotency.Create(ctx, s.db, key, "event"+":"+pid, in, func(tx *sql.Tx) (Event, error) { return s.create(ctx, tx, pid, in) })
+}
+func (s *Service) create(ctx context.Context, tx *sql.Tx, pid string, in Input) (Event, error) {
 	v := Event{ProjectID: pid, CreatedAt: clock.Now(), UpdatedAt: clock.Now(), Version: 1}
 	a, b, e := apply(&v, in)
 	if e != nil {
@@ -130,11 +140,6 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Event, erro
 	if e != nil {
 		return v, e
 	}
-	tx, e := s.db.BeginTx(ctx, nil)
-	if e != nil {
-		return v, e
-	}
-	defer tx.Rollback()
 	if e = project.Writable(ctx, tx, pid); e != nil {
 		return v, e
 	}
@@ -144,10 +149,13 @@ func (s *Service) Create(ctx context.Context, pid string, in Input) (Event, erro
 	}
 	v.StartAt = time.UnixMilli(a).UTC().Format(time.RFC3339Nano)
 	v.EndAt = time.UnixMilli(b).UTC().Format(time.RFC3339Nano)
-	return v, tx.Commit()
+	return v, nil
 }
 func (s *Service) Update(ctx context.Context, key string, in Input) (Event, error) {
 	var v Event
+	if in.RequestID != nil {
+		return v, apperr.Invalid("request_id 仅支持创建请求")
+	}
 	if in.Version < 1 {
 		return v, apperr.Invalid("version 必填")
 	}

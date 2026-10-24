@@ -120,3 +120,15 @@ python3 scripts/operations.py smoke --url http://127.0.0.1:18084
 ```
 
 一次性迁移对旧Markdown的格式解释遵循BlockNote导入语义，升级前备份保留原始字节。已有块JSON不经过Markdown转换，原样保留。全文搜索现在直接读取块JSON的text与附件name，没有持久化Markdown副本或新增全文索引，适用于当前个人数据规模。
+
+## schema8 稳定性升级
+
+schema7→8新增`creation_requests`表，用于和对象创建在同一事务保存重试结果；不改写已有对象或附件，不需要块迁移准备脚本。先备份，再使用`APP_IMAGE=noteapp:v1-stability-20261025`重建；恢复仍先使用备份清单中同一image ID。schema6及更早版本先执行前述块迁移，不能跳过旧正文检查。
+
+```sh
+scripts/backup.sh --container noteapp-v1-check-noteapp-1 --volume noteapp-v1-check --image noteapp:block-only-20261025 --app-version block-only-20261025 --output backups/before-schema8
+COMPOSE_PROJECT_NAME=noteapp-v1-check APP_VOLUME_NAME=noteapp-v1-check APP_PORT=18084 APP_IMAGE=noteapp:v1-stability-20261025 docker compose up -d --no-build --force-recreate
+python3 scripts/operations.py smoke --url http://127.0.0.1:18084
+```
+
+升级后刷新浏览器。当前浏览器草稿存放在localStorage，创建重试身份还依赖当前窗口的sessionStorage；站点数据不属于服务器数据卷备份范围。草稿存储失败时先复制JSON或尝试服务器保存，勿直接清理站点数据。不同浏览器/设备间不自动恢复未提交草稿。新增请求表须随数据库完整备份，不应单独清空，否则可能破坏响应丢失后的旧请求去重。

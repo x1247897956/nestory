@@ -7,6 +7,8 @@ import (
 	"noteapp/internal/apperr"
 )
 
+const MaxBytes = 2 << 20
+
 // Empty returns a fresh empty block document.
 func Empty() json.RawMessage { return json.RawMessage(`{"version":1,"blocks":[]}`) }
 
@@ -34,8 +36,8 @@ func Apply(blocks *json.RawMessage, input json.RawMessage) error {
 // Validate bounds document shape and depth without stripping library-owned props.
 func Validate(raw json.RawMessage) error {
 	invalid := apperr.Invalid("无效块正文：需要 version=1 和有效 blocks")
-	if len(raw) > 2<<20 {
-		return apperr.Invalid("块正文超过 2 MiB")
+	if len(raw) > MaxBytes {
+		return apperr.TooLarge("正文超过 2 MiB，请缩减内容或拆分为多篇笔记")
 	}
 	var doc struct {
 		Version int               `json:"version"`

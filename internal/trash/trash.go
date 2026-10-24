@@ -2,12 +2,16 @@ package trash
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"noteapp/internal/apperr"
 	"noteapp/internal/platform/clock"
 	"noteapp/internal/platform/id"
 	"noteapp/internal/project"
+	"sort"
 )
 
 type Service struct{ db *sql.DB }
@@ -15,9 +19,10 @@ type Service struct{ db *sql.DB }
 func New(db *sql.DB) *Service { return &Service{db} }
 
 type Preview struct {
-	Members []Member `json:"members,omitempty"`
-	Version int64    `json:"version"`
-	Count   int      `json:"count"`
+	Fingerprint string   `json:"fingerprint"`
+	Members     []Member `json:"members,omitempty"`
+	Version     int64    `json:"version"`
+	Count       int      `json:"count"`
 }
 type Member struct {
 	ID    string `json:"id"`
@@ -83,7 +88,8 @@ func preview(ctx context.Context, q query, typ, key string) (Preview, string, st
 			}
 		}
 		v.Count = len(v.Members)
-		return v, pid, title, nil
+		v.Fingerprint, e = fingerprint(ctx, q, typ, v.Members)
+		return v, pid, title, e
 	}
 	if typ == "events" {
 		v.Count = 1
@@ -109,7 +115,12 @@ func preview(ctx context.Context, q query, typ, key string) (Preview, string, st
 		}
 		v.Members = append(v.Members, m)
 	}
-	return v, pid, title, rows.Err()
+	if e = rows.Err(); e != nil {
+		return v, pid, title, e
+	}
+	rows.Close()
+	v.Fingerprint, e = fingerprint(ctx, q, typ, v.Members)
+	return v, pid, title, e
 }
 func (s *Service) Preview(ctx context.Context, typ, key string) (Preview, error) {
 	v, _, _, e := preview(ctx, s.db, typ, key)
@@ -128,7 +139,7 @@ func (s *Service) Delete(ctx context.Context, typ, key string, in Preview) (stri
 	if e = project.Writable(ctx, tx, pid); e != nil {
 		return "", e
 	}
-	if v.Version != in.Version || v.Count != in.Count {
+	if v.Version != in.Version || v.Count != in.Count || in.Fingerprint == "" || v.Fingerprint != in.Fingerprint {
 		return "", apperr.Conflict("内容或删除数量已变化，请重新预览并确认")
 	}
 	batch, e := id.New()
@@ -273,4 +284,31 @@ func (s *Service) Restore(ctx context.Context, batch string) error {
 		return e
 	}
 	return tx.Commit()
+}
+
+// fingerprint includes every member's native type, identity and version.
+func fingerprint(ctx context.Context, q query, typ string, members []Member) (string, error) {
+	entries := []string{}
+	tables := []string{typ}
+	if typ == "projects" {
+		tables = []string{"projects", "tasks", "pages", "events"}
+	}
+	for _, m := range members {
+		for _, table := range tables {
+			var version int64
+			err := q.QueryRowContext(ctx, "SELECT version FROM "+table+" WHERE id=? AND deleted_at IS NULL", m.ID).Scan(&version)
+			if errors.Is(err, sql.ErrNoRows) {
+				continue
+			}
+			if err != nil {
+				return "", err
+			}
+			raw, _ := json.Marshal([]any{table, m.ID, version})
+			entries = append(entries, string(raw))
+		}
+	}
+	sort.Strings(entries)
+	raw, _ := json.Marshal(entries)
+	sum := sha256.Sum256(raw)
+	return hex.EncodeToString(sum[:]), nil
 }

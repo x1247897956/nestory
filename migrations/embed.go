@@ -19,3 +19,6 @@ var ProjectActions string
 
 //go:embed 006_block_documents.sql
 var BlockDocuments string
+
+//go:embed 008_creation_requests.sql
+var CreationRequests string
