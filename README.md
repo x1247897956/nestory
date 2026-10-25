@@ -2,11 +2,11 @@
 
 单人、本地或受信任局域网使用的项目、任务与笔记软件。第一版提供五阶段任务与一层子任务、多层笔记、共享块编辑与安全附件、独立日历、三组双向关联、工作台、搜索、项目归档和按批次删除恢复。SQLite与附件在同一数据卷持久化，无登录或团队协作。
 
-实际验收与限制见 [第一版验收](docs/acceptance-v1.md)，安装、升级、备份恢复见 [运维手册](docs/operations.md)。
+本次审查修复见 [发布修复验收](docs/reviews/2026-10-25-release-fixes.md)。实际验收与限制见 [第一版验收](docs/acceptance-v1.md)，安装、升级、备份恢复见 [运维手册](docs/operations.md)。
 
 ## 开发
 
-固定工具链：Go **1.27.1**、Node **26.9.0**、npm **11.19.1**。依赖版本见 `go.mod` / `web/package-lock.json`，许可证见 [依赖记录](docs/implementation/dependencies.md)。
+固定工具链：Go **1.27.3**、Node **26.9.0**、npm **11.19.1**。依赖版本见 `go.mod` / `web/package-lock.json`，许可证见 [依赖记录](docs/implementation/dependencies.md)。
 
 ```sh
 cd web
@@ -22,7 +22,8 @@ go run ./cmd/noteapp
 
 | 环境变量 | 默认值 | 含义 |
 | --- | --- | --- |
-| APP_ADDR | :8080 | Go 服务监听地址 |
+| APP_ADDR | 127.0.0.1:8080 | 本地 Go 监听地址；容器显式设为 :8080 |
+| APP_ALLOWED_HOSTS | localhost,127.0.0.1,::1 | 所有路由允许的精确主机名/IP，不含端口、URL或通配符 |
 | APP_DATA_DIR | ./data | SQLite 与附件存储目录 |
 | APP_TIMEZONE | Asia/Shanghai | 部署时区，启动校验 |
 | APP_UPLOAD_LIMIT | 20971520 | 单附件最大字节数，20 MiB；正整数 |
@@ -43,7 +44,7 @@ APP_VERSION=$(git rev-parse HEAD) docker compose up -d --build
 scripts/smoke.sh --url http://127.0.0.1:8080
 ```
 
-单容器提供 API 和静态前端，非 root UID/GID 10001 运行；默认真实命名卷 `noteapp_noteapp-data`（APP_VOLUME_NAME） 持久化整个 `/data`。固定镜像标签与 digest 见 Dockerfile。默认仅本机可访问；受信任局域网部署可显式修改 APP_BIND。当前没有身份验证。
+单容器提供 API 和静态前端，非 root UID/GID 10001 运行；默认真实命名卷 `noteapp_noteapp-data`（APP_VOLUME_NAME） 持久化整个 `/data`。固定镜像标签与 digest 见 Dockerfile。默认仅本机可访问；受信任局域网部署须同时设置 `APP_BIND=0.0.0.0`，并在 `APP_ALLOWED_HOSTS` 中追加实际访问的主机名或 IP，例如 `localhost,127.0.0.1,::1,192.168.1.20,noteapp.home`。请求 Host 可带端口，配置项不带端口；未知 Host 对所有路由返回 403，不信任转发头。当前没有身份验证。
 
 更新/重建：`docker compose up -d --build --force-recreate`。停止：`docker compose down`。不要执行 `docker compose down -v`，那会删除数据卷。
 
@@ -113,3 +114,9 @@ scripts/restore.sh --volume noteapp-restored \
 上传/导入未结束时不能移动任务；归档、删除和重新载入仍受未保存状态保护。创建请求丢失响应后重试会复用同一请求ID，不重复插入对象；新的独立窗口和明确取消后的新操作使用独立身份。日历拖动遇到响应丢失会查询服务器确认；查询也失败时禁止继续拖动，提供同步操作。删除确认校验整个成员快照。正文JSON上限2MiB，超限保留当前草稿并提示拆分。
 
 schema7→8只添加创建请求结果表，不改写已有对象。升级前备份，使用新镜像重建原卷即可自动迁移；schema6及更早版本仍需先按上面的块迁移步骤准备。旧页面升级后请刷新。实际故障测试、备份恢复和限制见[稳定性验收](docs/implementation/2026-10-25-v1-stability.md)。
+
+## 使用边界
+
+当前面向个人规模数据。独立审计的容量样本为单项目每类 1000 个对象、每份约 8KB 正文；这是测量场景，并非无限规模或性能保证。列表目前读取完整正文，超大项目应拆分；摘要接口与分页列为后续优化。块数据按固定 BlockNote 0.56.0 schema 校验，非法写入返回400且不更改旧数据；升级不自动修复或丢弃已有正文。
+
+LAN 的普通 HTTP 使用安全随机数兼容 UUID 生成；免登录仍只适合受信任网络。Host 白名单用于限制访问主机，不能替代身份验证。反向代理若终止 HTTPS，需单独设计可信代理配置；当前不会直接相信 `X-Forwarded-*`。

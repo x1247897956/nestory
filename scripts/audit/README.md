@@ -1,6 +1,6 @@
 # 独立 V1 发布审计复现
 
-不修改产品。Python 脚本自动创建、清理自己 UUID 命名的容器和卷；镜像必须显式传入。
+脚本只操作独立临时数据。Python 脚本自动创建、清理自己 UUID 命名的容器和卷；镜像必须显式传入。
 
 ```sh
 python3 scripts/audit/release_probe.py --image noteapp:release-audit-20261025 --count 1000
@@ -11,7 +11,7 @@ python3 scripts/audit/migration_rehearsal.py --image noteapp:release-audit-20261
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH='/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' sh scripts/audit/run_browser.sh noteapp:release-audit-20261025
 ```
 
-浏览器脚本需要空闲 18187 端口；冲突时不会测试或停止既有实例。测试文件在常规 E2E 中默认跳过，runner 启用并校验容器卷/端口。部分测试明确断言**当前缺陷存在**；通过表示复现成功，不表示产品通过。修复后应把这些断言改成预期正确行为。
+runner现执行常规业务用例和发布回归的完整套件，全部写入其独立临时卷。浏览器脚本需要空闲 18187 端口；冲突时不会测试或停止既有实例。测试文件在常规 E2E 中默认跳过，runner 启用并校验容器卷/端口。2026-10-25 修复后，浏览器测试已改为断言安全行为，包含 LAN HTTP、草稿恢复、克隆窗口、文件处理中恢复保护和固定块 schema。原始缺陷复现结果仍保存在独立审查报告中。runner只在自己的容器允许 `lan.noteapp.test`，未知 `audit.invalid` 必须返回403。
 
 容量样本：每类 `count` 个对象，正文约 8KB；API 用 7 次串行请求统计端到端中位数和最大值，非 p95。浏览器样本只有单次冷导航，heap 是采样值，不是峰值。容量脚本另上传10个各1MiB随机附件并核对下载SHA，测8路搜索并发编辑；父子/关系使用另行完整旅程与恢复测试。5000 首轮连接中断时没有保存容器现场，不能据此归因产品；后续脚本对失败保留 state/logs，显式关闭 Python 系统代理。
 

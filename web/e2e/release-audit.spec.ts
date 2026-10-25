@@ -1,7 +1,7 @@
 // Independent release audit probes. Use only the disposable audit container.
 import { test, expect } from '@playwright/test';
 import {execFileSync} from 'node:child_process';
-test.skip(process.env.NOTEAPP_RELEASE_AUDIT !== '1','Opt-in defect reproductions; use scripts/audit/run_browser.sh');
+test.skip(process.env.NOTEAPP_RELEASE_AUDIT !== '1','Opt-in release regressions; use scripts/audit/run_browser.sh');
 test.beforeEach(async ({baseURL}) => {
  expect(new URL(baseURL!).port).toBe('18187');
  const name=process.env.NOTEAPP_AUDIT_CONTAINER;
@@ -11,16 +11,16 @@ test.beforeEach(async ({baseURL}) => {
  expect(info.Mounts.some((mount:any)=>mount.Name===name && mount.Destination==='/data')).toBe(true);
 });
 for (const [name,block] of Object.entries({
+  emptyRow:{id:'bad-emptyRow',type:'table',content:{type:'tableContent',rows:[{cells:[{type:'tableCell',props:{rowspan:2},content:[]}]},{cells:[]}]}},
   style:{id:'bad-style',type:'paragraph',content:[{type:'text',text:'safe text',styles:{unknown:true}}]},
   table:{id:'bad-table',type:'table',content:{type:'tableContent',headerRows:4294967296,rows:[{cells:[[]]}]}},
 })) {
- test(`reproduce accepted ${name} document that cannot reopen`,async({page,request})=>{
+ test(`reject ${name} document before persistence`,async({page,request})=>{
   const p=await(await request.post('/api/v1/projects',{data:{title:'Audit schema '+name}})).json();
   const response=await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title:name,body_document:{version:1,blocks:[block]}}});
-  expect(response.status()).toBe(201);const note=await response.json();
-  await page.goto(`/projects/${p.id}/pages/${note.id}`);
-  await expect(page.getByRole('alert').filter({hasText:'正文加载失败'})).toBeVisible();
-  await expect(page.getByRole('textbox',{name:'Markdown 正文'})).toHaveCount(0);
+  expect(response.status()).toBe(400);
+  const list=await(await request.get(`/api/v1/projects/${p.id}/pages`)).json();
+  expect(JSON.stringify(list)).not.toContain('bad-'+name);
  });
 }
 test('quota failure preserves input and manual server retry works',async({page,request})=>{
@@ -34,42 +34,30 @@ test('quota failure preserves input and manual server retry works',async({page,r
  await page.getByRole('button',{name:'重试保存'}).click();
  await expect.poll(async()=>JSON.stringify((await(await request.get(`/api/v1/pages/${note.id}`)).json()).body_document)).toContain('quota unsaved draft');
 });
-test('reproduce pending page upload discarded by reload recovery',async({page,request})=>{
- const p=await(await request.post('/api/v1/projects',{data:{title:'Audit pending reload'}})).json();
- const note=await(await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title:'Reload note'}})).json();
- await page.goto(`/projects/${p.id}/pages/${note.id}`);await page.getByRole('textbox',{name:'Markdown 正文'}).waitFor();
- // A failed save leaves the recovery controls visible.
- await page.route(`**/api/v1/pages/${note.id}`,async route=>{if(route.request().method()==='PATCH')await route.abort();else await route.continue();});
- await page.getByLabel('笔记标题',{exact:true}).fill('unsaved title');
- await expect(page.getByRole('button',{name:'重新载入',exact:true})).toBeVisible();
- let release!:()=>void;const gate=new Promise<void>(r=>release=r);let asset:any;
- await page.route('**/api/v1/projects/*/assets',async route=>{const response=await route.fetch();asset=await response.json();await gate;await route.fulfill({response});});
- await page.getByLabel('上传附件',{exact:true}).setInputFiles({name:'pending.txt',mimeType:'text/plain',buffer:Buffer.from('audit attachment')});
- await expect(page.getByText('正在处理文件…',{exact:true})).toBeVisible();
- // Actual behavior: unlike TaskEditor, the Page reload control remains enabled.
- await expect(page.getByRole('button',{name:'重新载入',exact:true})).toBeEnabled();
- page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'重新载入',exact:true}).click();
- await expect(page.getByLabel('笔记标题',{exact:true})).toHaveValue('Reload note');
- release();await expect.poll(()=>!!asset).toBe(true);
- await page.waitForTimeout(1200);
- expect(JSON.stringify((await(await request.get(`/api/v1/pages/${note.id}`)).json()).body_document)).not.toContain(asset.id);
- expect((await request.get('/api/v1/assets/'+asset.id)).status()).toBe(200);
+test('unknown Host is rejected across routes even with matching Origin',async({request})=>{
+ for(const path of ['/', '/api/v1/healthz', '/api/v1/readyz', '/assets/unknown.js']) {
+  expect((await request.get(path,{headers:{Host:'audit.invalid:18187','X-Forwarded-Host':'localhost'}})).status()).toBe(403);
+ }
+ expect((await request.post('/api/v1/projects',{headers:{Host:'audit.invalid:18187',Origin:'http://audit.invalid:18187'},data:{title:'blocked'}})).status()).toBe(403);
 });
-test('reproduce trusted LAN HTTP secure-context failure and foreign Host acceptance',async({playwright,request})=>{
- const browser=await playwright.chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,args:['--host-resolver-rules=MAP audit.invalid 127.0.0.1','--no-proxy-server']});
+test('configured LAN HTTP opens and autosaves all object types without secure context',async({playwright,request})=>{
+ const browser=await playwright.chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,args:['--host-resolver-rules=MAP lan.noteapp.test 127.0.0.1','--no-proxy-server']});
  try {
-  const p=await(await request.post('/api/v1/projects',{data:{title:'Audit LAN HTTP'}})).json();
-  const note=await(await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title:'LAN note'}})).json();
+  const p=await(await request.post('/api/v1/projects',{data:{title:'LAN HTTP'}})).json();
   const page=await browser.newPage();const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://audit.invalid:18187/');await expect(page.getByRole('link',{name:'工作台',exact:true})).toBeVisible();
+  await page.goto('http://lan.noteapp.test:18187/');
   expect(await page.evaluate(()=>isSecureContext)).toBe(false);
   expect(await page.evaluate(()=>typeof crypto.randomUUID)).toBe('undefined');
-  // A matching arbitrary Host/Origin can still perform writes at HTTP layer.
-  expect(await page.evaluate(async()=> (await fetch('/api/v1/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Audit foreign Host accepted'})})).status)).toBe(201);
-  await page.goto(`http://audit.invalid:18187/projects/${p.id}/pages/${note.id}`);
-  await expect(page.locator('body')).toContainText('randomUUID');
-  await expect(page.getByRole('textbox',{name:'Markdown 正文'})).toHaveCount(0);
-  console.log('LAN HTTP evidence',JSON.stringify({secure:false,errors,body:await page.locator('body').innerText()}));
+  expect(await page.evaluate(async()=> (await fetch('/api/v1/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'LAN create'})})).status)).toBe(201);
+  for(const kind of ['tasks','pages','events']) {
+   const data:any={title:'LAN '+kind};if(kind==='events')Object.assign(data,{start_at:'2026-10-25T09:00:00+08:00',end_at:'2026-10-25T10:00:00+08:00'});
+   const response=await request.post(`/api/v1/projects/${p.id}/${kind}`,{data});expect(response.status()).toBe(201);const obj=await response.json();
+   await page.goto(`http://lan.noteapp.test:18187/projects/${p.id}/${kind}/${obj.id}`);
+   const editor=page.getByRole('textbox',{name:'Markdown 正文'});await editor.waitFor();await editor.fill('LAN saved '+kind);
+   await expect.poll(async()=>JSON.stringify((await(await request.get(`/api/v1/${kind}/${obj.id}`)).json()).body_document)).toContain('LAN saved '+kind);
+   await page.reload();await expect(editor).toContainText('LAN saved '+kind);
+  }
+  expect(errors).toEqual([]);
  }finally{await browser.close();}
 });
 test('limited hostile link and raw HTML vectors do not execute',async({page,request})=>{

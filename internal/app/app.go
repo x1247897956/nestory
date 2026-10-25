@@ -6,7 +6,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
-	"net/url"
+
 	"noteapp/internal/asset"
 	"noteapp/internal/event"
 	"noteapp/internal/object"
@@ -294,11 +294,14 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		}()
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "same-origin")
+		if !allowedRequestHost(r.Host, c.AllowedHosts) {
+			httpx.Fail(w, &httpx.Error{Status: 403, Code: "forbidden", Message: "不允许的请求主机"})
+			return
+		}
 		if r.Method != "GET" && r.Method != "HEAD" && r.Method != "OPTIONS" {
 			origin := r.Header.Get("Origin")
 			if origin != "" {
-				u, err := url.Parse(origin)
-				if err != nil || ((u.Scheme != "http" && u.Scheme != "https") || u.Host != r.Host) && origin != c.DevOrigin {
+				if !allowedOrigin(origin, r, c.DevOrigin) {
 					httpx.Fail(w, &httpx.Error{Status: 403, Code: "forbidden", Message: "不允许的请求来源"})
 					return
 				}

@@ -1,0 +1,7 @@
+=== RUN   TestExistingReleaseCorpus
+    existing_corpus_local_test.go:5: validated tasks: 28 including deleted/archived
+    existing_corpus_local_test.go:5: validated pages: 40 including deleted/archived
+    existing_corpus_local_test.go:5: validated events: 19 including deleted/archived
+--- PASS: TestExistingReleaseCorpus (0.00s)
+PASS
+ok  	noteapp/internal/document	3.378s

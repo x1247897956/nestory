@@ -1,0 +1,12 @@
+
+> noteapp-web@0.1.0 test
+> vitest --run
+
+
+ RUN  v4.1.12 /Users/seyr1n/01-Project/noteapp/web
+
+
+ Test Files  12 passed (12)
+      Tests  66 passed (66)
+   Start at  09:26:59
+   Duration  8.49s (transform 871ms, setup 1.05s, import 1.97s, tests 19.89s, environment 4.94s)

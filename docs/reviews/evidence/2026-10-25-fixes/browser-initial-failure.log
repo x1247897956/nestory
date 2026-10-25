@@ -1,0 +1,82 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test release-audit.spec.ts release-pending.spec.ts release-schema.spec.ts release-lan.spec.ts
+
+(node:47760) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 23 tests using 1 worker
+
+(node:47763) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47763) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:47763) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/release-audit.spec.ts:59:3 › reject emptyRow document before persistence (547ms)
+  ✓   2 e2e/release-audit.spec.ts:59:3 › reject style document before persistence (143ms)
+  ✓   3 e2e/release-audit.spec.ts:59:3 › reject table document before persistence (171ms)
+  ✓   4 e2e/release-audit.spec.ts:82:1 › quota failure preserves input and manual server retry works (601ms)
+  ✓   5 e2e/release-audit.spec.ts:117:1 › unknown Host is rejected across routes even with matching Origin (36ms)
+  ✓   6 e2e/release-audit.spec.ts:138:1 › configured LAN HTTP opens and autosaves all object types without secure context (4.5s)
+  ✓   7 e2e/release-audit.spec.ts:195:1 › limited hostile link and raw HTML vectors do not execute (370ms)
+  ✓   8 e2e/release-lan.spec.ts:24:3 › LAN HTTP tasks: forced-close draft explicitly recovers and saves (3.1s)
+  ✓   9 e2e/release-lan.spec.ts:24:3 › LAN HTTP pages: forced-close draft explicitly recovers and saves (3.0s)
+  ✓  10 e2e/release-lan.spec.ts:24:3 › LAN HTTP events: forced-close draft explicitly recovers and saves (3.4s)
+  ✘  11 e2e/release-lan.spec.ts:97:1 › LAN HTTP cloned window name and sessionStorage acquire distinct owners and create independently (914ms)
+(node:48248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48248) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:48248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 e2e/release-pending.spec.ts:19:5 › tasks: recovery preserves upload in progress (1.8s)
+  ✓  13 e2e/release-pending.spec.ts:19:5 › tasks: recovery preserves import in progress (1.6s)
+  ✓  14 e2e/release-pending.spec.ts:19:5 › tasks: recovery preserves save in progress (1.7s)
+  ✓  15 e2e/release-pending.spec.ts:19:5 › pages: recovery preserves upload in progress (1.7s)
+  ✓  16 e2e/release-pending.spec.ts:19:5 › pages: recovery preserves import in progress (1.6s)
+  ✓  17 e2e/release-pending.spec.ts:19:5 › pages: recovery preserves save in progress (1.6s)
+  ✓  18 e2e/release-pending.spec.ts:19:5 › events: recovery preserves upload in progress (1.7s)
+  ✓  19 e2e/release-pending.spec.ts:19:5 › events: recovery preserves import in progress (1.6s)
+  ✓  20 e2e/release-pending.spec.ts:19:5 › events: recovery preserves save in progress (1.6s)
+  ✓  21 e2e/release-schema.spec.ts:20:3 › tasks: pinned schema corpus reopens unchanged, including archived read-only view (4.2s)
+  ✓  22 e2e/release-schema.spec.ts:20:3 › pages: pinned schema corpus reopens unchanged, including archived read-only view (4.3s)
+  ✓  23 e2e/release-schema.spec.ts:20:3 › events: pinned schema corpus reopens unchanged, including archived read-only view (4.2s)
+
+
+  1) e2e/release-lan.spec.ts:97:1 › LAN HTTP cloned window name and sessionStorage acquire distinct owners and create independently
+
+    Error: route.fetch: socket hang up
+    Call log:
+    [2m  - → POST http://lan.noteapp.test:18187/api/v1/projects[22m
+    [2m    - user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36[22m
+    [2m    - accept: */*[22m
+    [2m    - accept-encoding: gzip,deflate,br[22m
+    [2m    - accept-language: en-US[22m
+    [2m    - content-type: application/json[22m
+    [2m    - origin: http://lan.noteapp.test:18187[22m
+    [2m    - referer: http://lan.noteapp.test:18187/[22m
+    [2m    - sec-gpc: 1[22m
+    [2m    - content-length: 117[22m
+
+
+      78 |       if (route.request().method() !== 'POST') { await route.continue(); return; }
+      79 |       requestId = route.request().postDataJSON().request_id;
+    > 80 |       const response = await route.fetch();
+         |                                    ^
+      81 |       await gate;
+      82 |       await route.fulfill({ response });
+      83 |     });
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/release-lan.spec.ts:80:36
+
+    Error Context: test-results/release-lan-LAN-HTTP-clone-4db83-rs-and-create-independently/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/release-lan-LAN-HTTP-clone-4db83-rs-and-create-independently/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/release-lan-LAN-HTTP-clone-4db83-rs-and-create-independently/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/release-lan.spec.ts:97:1 › LAN HTTP cloned window name and sessionStorage acquire distinct owners and create independently
+  22 passed (46.8s)

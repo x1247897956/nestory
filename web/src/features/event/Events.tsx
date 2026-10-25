@@ -540,11 +540,12 @@ export function EventEditor({
     `events:${event.project_id}:${event.id}`,
   );
   const [error, setError] = useState("");
+  const [bodyPending, setBodyPending] = useState(false);
   return (
     <article
       className="editor"
       aria-label="日程详情"
-      data-dirty={a.dirty || a.busy}
+      data-dirty={a.dirty || a.busy || bodyPending}
     >
       <header className="task-inline-header">
         <h2 aria-label={a.draft.title}>
@@ -582,6 +583,7 @@ export function EventEditor({
       </header>
       <MarkdownEditor
         projectId={event.project_id}
+        onPendingChange={setBodyPending}
         body_document={a.draft.body_document}
         disabled={archived}
         onChange={(body_document) =>
@@ -597,7 +599,7 @@ export function EventEditor({
         <div role="alert">
           {a.error || error}
           <p>请保留此页面；可复制草稿备份。</p>
-          {a.canRecover && <button onClick={a.recover}>恢复本机草稿</button>}
+          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>恢复本机草稿</button>}
           <button onClick={() => void a.save()}>重试保存</button>
           <button
             onClick={() =>
@@ -609,7 +611,9 @@ export function EventEditor({
             复制草稿
           </button>
           <button
+            disabled={bodyPending || a.busy}
             onClick={async () => {
+              if (bodyPending || a.busy) return;
               if (confirm("重新载入会丢弃本地草稿，是否继续？"))
                 try {
                   await onReload(a.discardRecovery);

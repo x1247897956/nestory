@@ -1,0 +1,15 @@
+PASS all columns unchanged: schema_migrations (8 rows)
+PASS all columns unchanged: projects (35 rows)
+PASS all columns unchanged: tasks (28 rows)
+PASS all columns unchanged: pages (40 rows)
+PASS all columns unchanged: assets (12 rows)
+PASS all columns unchanged: events (19 rows)
+PASS all columns unchanged: task_pages (6 rows)
+PASS all columns unchanged: task_events (3 rows)
+PASS all columns unchanged: page_events (3 rows)
+PASS all columns unchanged: recent_visits (57 rows)
+PASS all columns unchanged: delete_batches (45 rows)
+PASS all columns unchanged: creation_requests (0 rows)
+PASS all asset SHA256 unchanged
+PASS schema remains 1–8
+Final deployed image: sha256:def8a88e3d3eea20d376b0cb849cd6ec29e046fd323e55ebf93a0564265954bf

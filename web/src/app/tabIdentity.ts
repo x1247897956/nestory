@@ -1,3 +1,4 @@
+import { randomUUID } from "./uuid";
 // sessionStorage is copied by window.open/Duplicate Tab. Pair it with the
 // browsing context name and probe live contexts before mounting editors.
 const storageKey = "noteapp:tab-owner:v1";
@@ -13,12 +14,12 @@ function assign(owner: string) {
 export function getTabOwner(): string {
   const saved = window.sessionStorage.getItem(storageKey);
   if (saved && window.name === namePrefix + saved) { current = saved; return saved; }
-  return assign(crypto.randomUUID());
+  return assign(randomUUID());
 }
 export async function initializeTabIdentity(): Promise<void> {
   let owner = getTabOwner();
   if (!window.BroadcastChannel) return;
-  const instance = crypto.randomUUID();
+  const instance = randomUUID();
   const replies = new Set<string>();
   channel = new window.BroadcastChannel("noteapp-tab-identity-v1");
   channel.onmessage = ({data}) => {
@@ -31,7 +32,7 @@ export async function initializeTabIdentity(): Promise<void> {
     channel.postMessage({kind:"claim",owner,instance});
     await new Promise(resolve=>setTimeout(resolve,60));
     if (!replies.has(owner)) break;
-    owner = assign(crypto.randomUUID());
+    owner = assign(randomUUID());
   }
   window.addEventListener("pagehide", (event) => {
     // Back/forward cache restores the same React tree; keep its responder alive.

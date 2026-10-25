@@ -1,5 +1,5 @@
 #!/bin/sh
-# Opt-in observed-defect reproductions, never the user's running instance.
+# Opt-in release regression checks, never the user's running instance.
 set -eu
 if [ "$#" -ne 1 ]; then echo 'Usage: sh scripts/audit/run_browser.sh IMAGE' >&2; exit 2; fi
 image=$1
@@ -13,7 +13,7 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 docker volume create "$name" >/dev/null
 made_volume=1
-docker create --name "$name" -p 127.0.0.1:18187:8080 -v "$name:/data" "$image" >/dev/null
+docker create -e APP_ALLOWED_HOSTS=localhost,127.0.0.1,::1,lan.noteapp.test --name "$name" -p 127.0.0.1:18187:8080 -v "$name:/data" "$image" >/dev/null
 made_container=1
 docker start "$name" >/dev/null
 attempt=0
@@ -21,4 +21,4 @@ until curl -fsS http://127.0.0.1:18187/api/v1/readyz >/dev/null; do
  attempt=$((attempt + 1)); [ "$attempt" -lt 50 ] || exit 1
  sleep .1
 done
-NOTEAPP_RELEASE_AUDIT=1 NOTEAPP_AUDIT_CONTAINER="$name" E2E_BASE_URL=http://127.0.0.1:18187 npm run e2e --prefix web -- release-audit.spec.ts
+NOTEAPP_RELEASE_AUDIT=1 NOTEAPP_AUDIT_CONTAINER="$name" E2E_BASE_URL=http://127.0.0.1:18187 npm run e2e --prefix web

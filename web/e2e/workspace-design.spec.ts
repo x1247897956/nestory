@@ -4,7 +4,7 @@ test('workspace emphasizes overdue work and removes status navigation and creati
  const day=(await(await request.get('/api/v1/workspace/today')).json()).date;
  const project=await(await request.post('/api/v1/projects',{data:{title:'工作台层次 '+Date.now()}})).json();
  const overdue=await(await request.post(`/api/v1/projects/${project.id}/tasks`,{data:{title:'优先处理阻塞',due_date:DateTime.fromISO(day).minus({days:1}).toISODate()}})).json();
- await request.post(`/api/v1/projects/${project.id}/events`,{data:{title:'今日评审',start_at:day+'T09:00:00+08:00',end_at:day+'T10:00:00+08:00'}});
+ const review=await(await request.post(`/api/v1/projects/${project.id}/events`,{data:{title:'今日评审',start_at:day+'T09:00:00+08:00',end_at:day+'T10:00:00+08:00'}})).json();
  await page.goto('/');
  await expect(page.getByRole('heading',{name:'工作台',exact:true})).toBeVisible();
  await expect(page.getByRole('complementary').getByRole('button',{name:'活跃项目',exact:true})).toHaveCount(0);
@@ -14,7 +14,11 @@ test('workspace emphasizes overdue work and removes status navigation and creati
  await expect(main).not.toContainText('Asia/Shanghai');
  const focus=page.getByRole('region',{name:'任务列表'});
  await expect(focus.locator(`a[href="/projects/${project.id}/tasks/${overdue.id}"]`)).toBeVisible();
- await expect(page.getByRole('region',{name:'日程日历'}).getByRole('link',{name:/今日评审/}).first()).toBeVisible();
+ const calendar=page.getByRole('region',{name:'日程日历'});
+ const reviewLink=calendar.locator(`a[href="/projects/${project.id}/events/${review.id}"]:visible`);
+ // FullCalendar collapses a crowded day after three events.
+ if(await reviewLink.count()===0) await calendar.locator(`.fc-daygrid-day[data-date="${day}"] .fc-daygrid-more-link`).click();
+ await expect(reviewLink.first()).toBeVisible();
  await expect(page.getByRole('link',{name:'工作台',exact:true})).toHaveAttribute('aria-current','page');
  await page.getByRole('link',{name:'搜索',exact:true}).click();
  await expect(page.getByRole('link',{name:'搜索',exact:true})).toHaveAttribute('aria-current','page');

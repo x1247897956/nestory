@@ -22,7 +22,7 @@ func setup(t *testing.T) (http.Handler, func()) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return app.New(db, config.Config{Timezone: "Asia/Shanghai"}), func() { db.Close() }
+	return app.New(db, config.Config{Timezone: "Asia/Shanghai", AllowedHosts: []string{"example.com", "localhost", "127.0.0.1", "::1"}}), func() { db.Close() }
 }
 func req(t *testing.T, h http.Handler, method, path string, data any, want int) object {
 	t.Helper()

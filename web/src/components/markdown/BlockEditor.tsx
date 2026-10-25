@@ -154,7 +154,12 @@ const EditorCanvas = memo(function EditorCanvas({
       slashMenu={false}
       sideMenu={false}
     >
-      {!disabled && <SideMenuController sideMenu={ObjectSideMenu} />}
+      {!disabled && <SideMenuController sideMenu={ObjectSideMenu} floatingUIOptions={{
+        // BlockNote renders closing menus as inert HTML snapshots. Remove them
+        // immediately so a fast pointer cannot click a handle without handlers.
+        useTransitionStylesProps: { duration: { open: 250, close: 0 } },
+        useTransitionStatusProps: { duration: { open: 250, close: 0 } },
+      }} />}
       {!disabled && (
         <SuggestionMenuController
           triggerCharacter="/"

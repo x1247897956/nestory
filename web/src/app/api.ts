@@ -1,3 +1,4 @@
+import { randomUUID } from "./uuid";
 import { getTabOwner } from "./tabIdentity";
 import { MAX_DOCUMENT_BYTES, type BodyDocument } from "./document";
 export type Project = {
@@ -72,7 +73,7 @@ function createIntent(path: string, method: string, body: unknown) {
     const key = createIntentKey(path, body);
     let id = window.localStorage.getItem(key);
     if (!id) {
-      id = crypto.randomUUID();
+      id = randomUUID();
       window.localStorage.setItem(key, id);
     }
     return { key, id, body: { ...body, request_id: id } };

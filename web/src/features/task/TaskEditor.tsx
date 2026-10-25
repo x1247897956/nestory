@@ -193,7 +193,7 @@ export function TaskEditor({
         <div className="error" role="alert">
           {error || saveError}
           <p>本地草稿已保留。可先复制正文，再重新载入。</p>
-          {canRecover && <button onClick={recover}>恢复本机草稿</button>}
+          {canRecover && <button disabled={bodyPending || busy || moving} onClick={() => { if (!bodyPending && !busy && !moving) recover(); }}>恢复本机草稿</button>}
           <button
             onClick={() =>
               navigator.clipboard
@@ -204,8 +204,9 @@ export function TaskEditor({
             复制草稿
           </button>{" "}
           <button
-            disabled={bodyPending || busy}
+            disabled={bodyPending || busy || moving}
             onClick={async () => {
+              if (bodyPending || busy || moving) return;
               if (window.confirm("重新载入会丢弃本地未保存更改，是否继续？"))
                 try {
                   await onReload(discardRecovery);

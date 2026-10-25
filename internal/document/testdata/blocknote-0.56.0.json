@@ -1,0 +1,743 @@
+{
+  "version": 1,
+  "blocks": [
+    {
+      "id": "schema-0",
+      "type": "paragraph",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify"
+      },
+      "children": [
+        {
+          "id": "nested-child",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "blue",
+            "textAlignment": "justify"
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "All styles",
+              "styles": {
+                "bold": true,
+                "italic": true,
+                "underline": true,
+                "strike": true,
+                "textColor": "#123456",
+                "backgroundColor": "yellow"
+              }
+            },
+            {
+              "type": "text",
+              "text": "code",
+              "styles": {
+                "code": true
+              }
+            },
+            {
+              "type": "link",
+              "href": "https://example.com",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "link",
+                  "styles": {
+                    "bold": true
+                  }
+                }
+              ]
+            }
+          ],
+          "children": []
+        }
+      ],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-1",
+      "type": "heading",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "level": 1,
+        "isToggleable": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-2",
+      "type": "heading",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "level": 2,
+        "isToggleable": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-3",
+      "type": "heading",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "level": 3,
+        "isToggleable": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-4",
+      "type": "heading",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "level": 4,
+        "isToggleable": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-5",
+      "type": "heading",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "level": 5,
+        "isToggleable": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-6",
+      "type": "heading",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "level": 6,
+        "isToggleable": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-7",
+      "type": "bulletListItem",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify"
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-8",
+      "type": "numberedListItem",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "start": 3
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-9",
+      "type": "checkListItem",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify",
+        "checked": true
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-10",
+      "type": "toggleListItem",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "blue",
+        "textAlignment": "justify"
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-11",
+      "type": "quote",
+      "props": {
+        "backgroundColor": "default",
+        "textColor": "red"
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "All styles",
+          "styles": {
+            "bold": true,
+            "italic": true,
+            "underline": true,
+            "strike": true,
+            "textColor": "#123456",
+            "backgroundColor": "yellow"
+          }
+        },
+        {
+          "type": "text",
+          "text": "code",
+          "styles": {
+            "code": true
+          }
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "link",
+              "styles": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schema-12",
+      "type": "codeBlock",
+      "props": {
+        "language": "text"
+      },
+      "children": [],
+      "content": [
+        {
+          "type": "text",
+          "text": "print(1)",
+          "styles": {}
+        }
+      ]
+    },
+    {
+      "id": "schema-13",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    {
+      "id": "schema-14",
+      "type": "file",
+      "props": {
+        "backgroundColor": "default",
+        "name": "attachment",
+        "url": "/api/attachments/schema-test",
+        "caption": "caption"
+      },
+      "children": []
+    },
+    {
+      "id": "schema-15",
+      "type": "image",
+      "props": {
+        "backgroundColor": "default",
+        "name": "attachment",
+        "url": "/api/attachments/schema-test",
+        "caption": "caption",
+        "showPreview": false,
+        "textAlignment": "center",
+        "previewWidth": 320
+      },
+      "children": []
+    },
+    {
+      "id": "schema-16",
+      "type": "video",
+      "props": {
+        "backgroundColor": "default",
+        "name": "attachment",
+        "url": "/api/attachments/schema-test",
+        "caption": "caption",
+        "showPreview": false,
+        "textAlignment": "center",
+        "previewWidth": 320
+      },
+      "children": []
+    },
+    {
+      "id": "schema-17",
+      "type": "audio",
+      "props": {
+        "backgroundColor": "default",
+        "name": "attachment",
+        "url": "/api/attachments/schema-test",
+        "caption": "caption",
+        "showPreview": false
+      },
+      "children": []
+    },
+    {
+      "id": "schema-18",
+      "type": "table",
+      "props": {
+        "textColor": "default"
+      },
+      "children": [],
+      "content": {
+        "type": "tableContent",
+        "headerRows": 1,
+        "headerCols": 1,
+        "columnWidths": [
+          120,
+          null
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "type": "tableCell",
+                "props": {
+                  "backgroundColor": "default",
+                  "textColor": "red",
+                  "textAlignment": "center",
+                  "colspan": 2,
+                  "rowspan": 1
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "merged",
+                    "styles": {
+                      "code": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "type": "tableCell",
+                "props": {
+                  "backgroundColor": "default",
+                  "textColor": "red",
+                  "textAlignment": "center"
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "a",
+                    "styles": {
+                      "code": true
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "props": {
+                  "backgroundColor": "default",
+                  "textColor": "red",
+                  "textAlignment": "center"
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "b",
+                    "styles": {
+                      "code": true
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

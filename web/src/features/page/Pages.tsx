@@ -236,7 +236,7 @@ export function Pages({
     </div>
   );
 }
-function PageEditor({
+export function PageEditor({
   page,
   archived,
   onSave,
@@ -264,6 +264,7 @@ function PageEditor({
     `pages:${page.project_id}:${page.id}`,
   );
   const [error, setError] = useState("");
+  const [bodyPending, setBodyPending] = useState(false);
   const titleInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (focusTitle && !archived) {
@@ -275,7 +276,7 @@ function PageEditor({
     <article
       className="editor"
       aria-label="笔记详情"
-      data-dirty={a.dirty || a.busy}
+      data-dirty={a.dirty || a.busy || bodyPending}
     >
       <header className="task-inline-header">
         <h2 aria-label={a.draft.title}>
@@ -300,6 +301,7 @@ function PageEditor({
       />
       <MarkdownEditor
         projectId={page.project_id}
+        onPendingChange={setBodyPending}
         body_document={a.draft.body_document}
         disabled={archived}
         onChange={(body_document) =>
@@ -311,7 +313,7 @@ function PageEditor({
         <div role="alert">
           {a.error || error}
           <p>本地草稿已保留。</p>
-          {a.canRecover && <button onClick={a.recover}>恢复本机草稿</button>}
+          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>恢复本机草稿</button>}
           <button onClick={() => a.save()}>重试保存</button>
           <button
             onClick={() =>
@@ -323,7 +325,9 @@ function PageEditor({
             复制草稿
           </button>
           <button
+            disabled={bodyPending || a.busy}
             onClick={async () => {
+              if (bodyPending || a.busy) return;
               if (confirm("重新载入会丢弃本地草稿，是否继续？"))
                 try {
                   await onReload(a.discardRecovery);

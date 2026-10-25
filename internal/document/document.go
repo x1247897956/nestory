@@ -4,6 +4,7 @@ package document
 import (
 	"bytes"
 	"encoding/json"
+	"math"
 	"noteapp/internal/apperr"
 )
 
@@ -73,6 +74,9 @@ func Validate(raw json.RawMessage) error {
 			default:
 				return false
 			}
+			if !validProps(b.Type, b.Props) {
+				return false
+			}
 			ids[b.ID] = true
 			if b.Type == "table" {
 				if !validTable(b.Content) {
@@ -121,9 +125,16 @@ func validInline(raw json.RawMessage, links bool) bool {
 			if item.Text == nil {
 				return false
 			}
-			for _, v := range item.Styles {
-				switch v.(type) {
-				case bool, string:
+			for key, v := range item.Styles {
+				switch key {
+				case "bold", "italic", "underline", "strike", "code":
+					if _, ok := v.(bool); !ok {
+						return false
+					}
+				case "textColor", "backgroundColor":
+					if _, ok := v.(string); !ok {
+						return false
+					}
 				default:
 					return false
 				}
@@ -138,32 +149,175 @@ func validInline(raw json.RawMessage, links bool) bool {
 	}
 	return true
 }
+
+// These schemas mirror @blocknote/core 0.56.0 src/blocks default specs.
+// Reject unsupported schema-owned properties; Apply retains the original JSON.
+func validProps(kind string, props map[string]any) bool {
+	allowed := map[string]string{}
+	add := func(keys ...string) {
+		for _, key := range keys {
+			allowed[key] = "string"
+		}
+	}
+	switch kind {
+	case "paragraph", "heading", "bulletListItem", "numberedListItem", "checkListItem", "toggleListItem", "tableCell":
+		add("backgroundColor", "textColor", "textAlignment")
+	case "quote":
+		add("backgroundColor", "textColor")
+	case "image", "video":
+		add("backgroundColor", "textAlignment", "name", "url", "caption")
+		allowed["showPreview"] = "bool"
+		allowed["previewWidth"] = "positive"
+	case "audio":
+		add("backgroundColor", "name", "url", "caption")
+		allowed["showPreview"] = "bool"
+	case "file":
+		add("backgroundColor", "name", "url", "caption")
+	case "codeBlock":
+		add("language")
+	case "table":
+		add("textColor")
+	}
+	switch kind {
+	case "heading":
+		allowed["level"] = "level"
+		allowed["isToggleable"] = "bool"
+	case "numberedListItem":
+		allowed["start"] = "integer"
+	case "checkListItem":
+		allowed["checked"] = "bool"
+	case "tableCell":
+		allowed["colspan"] = "span"
+		allowed["rowspan"] = "span"
+	}
+	for key, v := range props {
+		switch allowed[key] {
+		case "string":
+			if _, ok := v.(string); !ok {
+				return false
+			}
+		case "bool":
+			if _, ok := v.(bool); !ok {
+				return false
+			}
+		case "positive", "integer", "level", "span":
+			n, ok := v.(float64)
+			if !ok || math.IsInf(n, 0) || math.IsNaN(n) {
+				return false
+			}
+			if allowed[key] == "positive" {
+				if n <= 0 {
+					return false
+				}
+			} else if n != math.Trunc(n) || math.Abs(n) > 9007199254740991 {
+				return false
+			}
+			if allowed[key] == "level" && (n < 1 || n > 6) {
+				return false
+			}
+			if allowed[key] == "span" && (n < 1 || n > 10000) {
+				return false
+			}
+		default:
+			return false
+		}
+		if key == "textAlignment" && v != "left" && v != "center" && v != "right" && v != "justify" {
+			return false
+		}
+	}
+	return true
+}
 func validTable(raw json.RawMessage) bool {
 	var table struct {
-		Type string `json:"type"`
-		Rows []struct {
+		Type         string            `json:"type"`
+		HeaderRows   *int              `json:"headerRows"`
+		HeaderCols   *int              `json:"headerCols"`
+		ColumnWidths []json.RawMessage `json:"columnWidths"`
+		Rows         []struct {
 			Cells []json.RawMessage `json:"cells"`
 		} `json:"rows"`
 	}
 	if json.Unmarshal(raw, &table) != nil || table.Type != "tableContent" || len(table.Rows) == 0 {
 		return false
 	}
-	for _, row := range table.Rows {
+	// Bound expanded geometry before allocating. Row/column spans occupy a grid,
+	// so merged tables can legitimately contain different numbers of cells per row.
+	grid := make([]map[int]bool, len(table.Rows))
+	for i := range grid {
+		grid[i] = map[int]bool{}
+	}
+	width := 0
+	total := 0
+	for r, row := range table.Rows {
+		// ProseMirror tableRow requires at least one physical cell, even when
+		// earlier rowspans cover the entire logical row.
 		if len(row.Cells) == 0 {
 			return false
 		}
+		c := 0
 		for _, raw := range row.Cells {
-			if validInline(raw, true) {
-				continue
+			for grid[r][c] {
+				c++
 			}
-			var cell struct {
-				Type    string          `json:"type"`
-				Content json.RawMessage `json:"content"`
-				Props   map[string]any  `json:"props"`
+			cs, rs := 1, 1
+			if !validInline(raw, true) {
+				var cell struct {
+					Type    string          `json:"type"`
+					Content json.RawMessage `json:"content"`
+					Props   map[string]any  `json:"props"`
+				}
+				if json.Unmarshal(raw, &cell) != nil || cell.Type != "tableCell" || !validInline(cell.Content, true) || !validProps("tableCell", cell.Props) {
+					return false
+				}
+				if n, ok := cell.Props["colspan"].(float64); ok {
+					cs = int(n)
+				}
+				if n, ok := cell.Props["rowspan"].(float64); ok {
+					rs = int(n)
+				}
 			}
-			if json.Unmarshal(raw, &cell) != nil || cell.Type != "tableCell" || !validInline(cell.Content, true) {
+			if r+rs > len(grid) || c+cs > 10000 || cs*rs > 10000-total {
 				return false
 			}
+			total += cs * rs
+			for y := r; y < r+rs; y++ {
+				for x := c; x < c+cs; x++ {
+					if grid[y][x] {
+						return false
+					}
+					grid[y][x] = true
+				}
+			}
+			c += cs
+		}
+		if len(grid[r]) == 0 {
+			return false
+		}
+		if r == 0 {
+			width = len(grid[r])
+		}
+		if len(grid[r]) != width {
+			return false
+		}
+	}
+	for _, n := range []*int{table.HeaderRows, table.HeaderCols} {
+		if n != nil && *n < 0 {
+			return false
+		}
+	}
+	if table.HeaderRows != nil && *table.HeaderRows > len(grid) || table.HeaderCols != nil && *table.HeaderCols > width {
+		return false
+	}
+	if table.ColumnWidths != nil && len(table.ColumnWidths) != width {
+		return false
+	}
+	for _, raw := range table.ColumnWidths {
+		if string(raw) == "null" {
+			continue
+		}
+		var n float64
+		if json.Unmarshal(raw, &n) != nil || n <= 0 || math.IsInf(n, 0) || math.IsNaN(n) {
+			return false
 		}
 	}
 	return true

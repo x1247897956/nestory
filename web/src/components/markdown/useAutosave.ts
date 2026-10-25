@@ -1,3 +1,4 @@
+import { randomUUID } from "../../app/uuid";
 import { getTabOwner } from "../../app/tabIdentity";
 import { useEffect, useState } from "react";
 
@@ -20,7 +21,7 @@ export function useAutosave<T>(
     let owner = "";
     const ignoredKey = prefix + "ignored";
     let ignored: Record<string, string> = {};
-    const instance = crypto.randomUUID();
+    const instance = randomUUID();
     let ownKey = "";
     const recovered: { key: string; raw: string; value: RecordDraft<T> }[] = [];
     let error = "";
