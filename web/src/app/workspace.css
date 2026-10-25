@@ -260,10 +260,6 @@ label,.filters label { color:#6b7079; }
 .property-zone { color:#737986; font-size:10px; }
 /* Explicit intrinsic-property grid, shared by every object type. */
 .object-property-section { margin-top:20px; padding:16px 18px; border:1px solid #e4e7ed; border-radius:7px; background:#fafbfc; }
-.object-property-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
-.object-property-heading h3 { font-size:12px; font-weight:600; color:#4e5868; margin:0; }
-.object-property-heading .delete-control > button { padding:4px 6px; border:0; background:transparent; color:#737986; font-size:10px; }
-.object-property-heading .delete-control { position:relative; }
 .object-property-section .object-properties { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); align-items:start; gap:18px 22px; }
 .object-property-cell { min-width:0; }
 .object-property-label { display:block; color:#707784; font-size:11px; margin-bottom:7px; }
@@ -278,7 +274,6 @@ label,.filters label { color:#6b7079; }
 .sidebar-project-row .project-link { flex:1; min-width:0; }
 .project-menu-trigger { padding:4px 6px; border:0; background:transparent; color:#737986; flex-shrink:0; }
 .object-property-section { position:relative; margin-top:8px; padding:4px 0; border:0; background:transparent; border-radius:0; }
-.object-property-heading { position:absolute; right:0; top:-42px; margin:0; }
 .object-property-section .object-properties { display:flex; align-items:center; flex-wrap:wrap; gap:6px 18px; }
 .object-property-cell { display:flex; align-items:center; gap:7px; }
 .object-property-label { margin:0; font-size:11px; }
@@ -289,8 +284,7 @@ label,.filters label { color:#6b7079; }
 .page-workspace.object-detail-page,.calendar-workspace.object-detail-page { display:block; padding:24px 28px; }
 .object-detail-page .detail-pane { padding:0; border:0; background:transparent; width:100%; }
 .object-back { display:inline-block; margin-bottom:18px; color:#626874; font-size:12px; }
-.object-property-section .object-property-heading .delete-control { position:static; }
-@media(max-width:650px){.object-property-section .object-properties { gap:5px 12px; }.object-property-cell { display:flex; }.page-workspace.object-detail-page,.calendar-workspace.object-detail-page { padding:20px 18px; }.object-property-heading { top:-38px; }}
+@media(max-width:650px){.object-property-section .object-properties { gap:5px 12px; }.object-property-cell { display:flex; }.page-workspace.object-detail-page,.calendar-workspace.object-detail-page { padding:20px 18px; }}
 .object-detail-page .detail-pane { box-shadow:none; }
 /* Compact global navigation and a plain, scannable recycle list. */
 .project-options:not([open]) > div { display:none; }

@@ -1,3 +1,4 @@
+import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { SaveIndicator } from "../../components/markdown/SaveIndicator";
@@ -279,6 +280,7 @@ export function PageEditor({
       data-dirty={a.dirty || a.busy || bodyPending}
     >
       <header className="task-inline-header">
+        <div className="object-title-row">
         <h2 aria-label={a.draft.title}>
           <input
             ref={titleInput}
@@ -291,6 +293,8 @@ export function PageEditor({
             }
           />
         </h2>
+        <ObjectMenu type="pages" id={page.id} projectId={page.project_id} archived={archived}/>
+        </div>
       </header>
       <ObjectProperties
         projectId={page.project_id}

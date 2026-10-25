@@ -1,3 +1,4 @@
+import { openObjectDelete } from "./object-actions";
 import { archiveCurrentProject, unarchiveCurrentProject } from "./project-actions";
 import { assetIDs } from "./block-fixtures";
 import {importMarkdown} from "./editor-helpers";
@@ -136,7 +137,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
     await unarchiveCurrentProject(page);
     await expect(page.getByLabel("笔记标题", { exact: true })).toBeEnabled();
-    await page.getByRole("button", { name: "移入回收站", exact: true }).click();
+    await openObjectDelete(page);
     await page
       .getByRole("button", { name: "确认删除 1 个对象", exact: true })
       .click();

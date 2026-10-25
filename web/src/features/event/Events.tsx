@@ -1,3 +1,4 @@
+import { ObjectMenu } from "../../components/object/ObjectMenu";
 import "./events.css";
 import { SaveIndicator } from "../../components/markdown/SaveIndicator";
 import type { EventChangeArg } from "@fullcalendar/core";
@@ -548,6 +549,7 @@ export function EventEditor({
       data-dirty={a.dirty || a.busy || bodyPending}
     >
       <header className="task-inline-header">
+        <div className="object-title-row">
         <h2 aria-label={a.draft.title}>
           <input
             className="task-inline-title"
@@ -559,6 +561,8 @@ export function EventEditor({
             }
           />
         </h2>
+        <ObjectMenu type="events" id={event.id} projectId={event.project_id} archived={archived}/>
+        </div>
         <ObjectProperties
           projectId={event.project_id}
           type="events"

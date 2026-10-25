@@ -1,3 +1,4 @@
+import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { SaveIndicator } from "../../components/markdown/SaveIndicator";
@@ -77,6 +78,7 @@ export function TaskEditor({
       aria-label="任务详情"
     >
       <header className="task-inline-header">
+        <div className="object-title-row">
         <h2 aria-label={draft.title}>
           <input
             className="task-inline-title"
@@ -87,6 +89,8 @@ export function TaskEditor({
             placeholder="任务标题"
           />
         </h2>
+        <ObjectMenu type="tasks" id={task.id} projectId={task.project_id} archived={archived}/>
+        </div>
         <ObjectProperties
           projectId={task.project_id}
           type="tasks"

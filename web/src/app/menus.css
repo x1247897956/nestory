@@ -64,3 +64,12 @@
   .delete-dialog { padding:20px; }
   .delete-dialog footer { flex-wrap:wrap; }
 }
+
+.object-title-row { display:flex; align-items:center; gap:16px; }
+.object-title-row h2 { flex:1; min-width:0; }
+.object-menu { flex:none; }
+.object-menu-trigger { display:flex; align-items:center; justify-content:center; width:34px; height:34px; padding:6px; color:#626874; border:0; background:transparent; border-radius:5px; }
+.object-menu-trigger:hover { color:#243b63; background:#f1f3f7; }
+.object-menu-trigger:focus-visible { outline:2px solid #243b63; outline-offset:2px; }
+.object-action-menu .delete-control { margin:0; padding:0; border-top:0; }
+@media(max-width:650px) { .object-menu-trigger { width:40px; height:40px; } }
