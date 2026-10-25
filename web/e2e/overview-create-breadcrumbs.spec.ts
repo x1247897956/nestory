@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from '@playwright/test';
 test('overview creates all three types and breadcrumbs open each level', async ({page,request})=>{
  const p=await(await request.post('/api/v1/projects',{data:{title:'创建入口 '+Date.now()}})).json();
@@ -25,7 +26,7 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await page.getByRole('button',{name:'关闭日程详情'}).click();
  await expect(page).toHaveURL(base+'/events');
  await crumbs.getByRole('link',{name:'汇总',exact:true}).click();
- await page.getByRole('button',{name:'归档项目',exact:true}).click();
+ await archiveCurrentProject(page);
  await expect(page.getByRole('button',{name:'创建任务',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'创建笔记',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'创建日程',exact:true})).toHaveCount(0);

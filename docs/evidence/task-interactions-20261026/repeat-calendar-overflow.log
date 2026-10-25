@@ -1,0 +1,116 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/acceptance-v1.spec.ts --repeat-each=5
+
+(node:43323) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:43329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43329) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:43329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context (17.4s)
+(node:43523) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43523) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:43523) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context (12.5s)
+(node:43726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43726) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:43726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context (12.1s)
+(node:43808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43808) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:43808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context (19.8s)
+(node:43966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43966) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:43966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context (17.5s)
+
+
+  1) e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context ───────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('.fc-daygrid-day[data-date="2026-10-26"] a[href="/projects/c783b7f7e3ff854b5f670be626d6b782/events/954e40e263d1061206b0a4be50f7883e"]')
+    Expected: visible
+    Received: hidden
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.fc-daygrid-day[data-date="2026-10-26"] a[href="/projects/c783b7f7e3ff854b5f670be626d6b782/events/954e40e263d1061206b0a4be50f7883e"]')[22m
+    [2m    9 × locator resolved to <a href="/projects/c783b7f7e3ff854b5f670be626d6b782/events/954e40e263d1061206b0a4be50f7883e" class="fc-event fc-event-start fc-event-end fc-event-today fc-daygrid-event fc-daygrid-block-event fc-h-event">…</a>[22m
+    [2m      - unexpected value "hidden"[22m
+
+
+      126 |     await expect(
+      127 |       page.locator('.fc-daygrid-day[data-date="' + today + '"] a[href="/projects/' + pid + '/events/' + eid + '"]'),
+    > 128 |     ).toBeVisible();
+          |       ^
+      129 |     await page.goto("/projects/" + pid + "/pages/" + pgid);
+      130 |     await archiveCurrentProject(page);
+      131 |     await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/acceptance-v1.spec.ts:128:7
+
+    Error Context: test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context-repeat3/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context-repeat3/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context-repeat3/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context ───────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('.fc-daygrid-day[data-date="2026-10-26"] a[href="/projects/3018be759ffaf48e727661efb9a95bc9/events/18c552007e8b18e1cac9422b072153ae"]')
+    Expected: visible
+    Received: hidden
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.fc-daygrid-day[data-date="2026-10-26"] a[href="/projects/3018be759ffaf48e727661efb9a95bc9/events/18c552007e8b18e1cac9422b072153ae"]')[22m
+    [2m    9 × locator resolved to <a href="/projects/3018be759ffaf48e727661efb9a95bc9/events/18c552007e8b18e1cac9422b072153ae" class="fc-event fc-event-start fc-event-end fc-event-today fc-daygrid-event fc-daygrid-block-event fc-h-event">…</a>[22m
+    [2m      - unexpected value "hidden"[22m
+
+
+      126 |     await expect(
+      127 |       page.locator('.fc-daygrid-day[data-date="' + today + '"] a[href="/projects/' + pid + '/events/' + eid + '"]'),
+    > 128 |     ).toBeVisible();
+          |       ^
+      129 |     await page.goto("/projects/" + pid + "/pages/" + pgid);
+      130 |     await archiveCurrentProject(page);
+      131 |     await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/acceptance-v1.spec.ts:128:7
+
+    Error Context: test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context-repeat4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context-repeat4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context-repeat4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context ────────────────────
+    e2e/acceptance-v1.spec.ts:12:3 › v1 full journey in a fresh browser context ────────────────────
+  3 passed (1.5m)

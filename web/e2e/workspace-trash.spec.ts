@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from "@playwright/test";
 test("workspace search, preview reconfirmation, batch isolation, relations and archive", async ({
   page,
@@ -87,7 +88,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
       await request.delete("/api/v1/events/" + event.id, { data: preview })
     ).ok(),
   ).toBeTruthy();
-  await page.getByRole("button", { name: "归档项目", exact: true }).click();
+  await archiveCurrentProject(page);
   await expect(
     page.getByText("此项目已归档，内容只读。取消归档后可继续编辑。"),
   ).toBeVisible();

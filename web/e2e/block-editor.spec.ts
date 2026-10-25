@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 import { block, documentOf } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
 test("native blocks preserve checklist identity, slash commands and assets across object types", async ({
@@ -153,7 +154,7 @@ test("empty metadata preserves the native document; block copy, undo, slash keyb
   const stored = await (await request.get(path)).json();
   const ids = stored.body_document.blocks.map((b: any) => b.id);
   expect(new Set(ids).size).toBe(ids.length);
-  await page.getByRole("button", { name: "归档项目", exact: true }).click();
+  await archiveCurrentProject(page);
   await expect(editor).toHaveAttribute("contenteditable", "false");
   await expect(
     page.getByRole("button", { name: "打开菜单", exact: true }),

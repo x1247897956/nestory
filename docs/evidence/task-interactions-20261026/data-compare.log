@@ -1,0 +1,3 @@
+PASS: all columns and rows (including BLOB bytes) unchanged across 12 tables
+PASS: attachment SHA256 and metadata unchanged: 12
+PASS: SQLite integrity and foreign keys verified by both backup bundles

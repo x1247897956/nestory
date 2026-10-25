@@ -221,6 +221,10 @@ export function BlockEditor({
     onChange,
   });
   latest.current.onChange = onChange;
+  // Our parent echoes emitted documents back as props. An older echo may
+  // commit after a newer native transaction; it must never replace that edit.
+  // Weak identity tracking does not retain historical multi-megabyte bodies.
+  const acknowledgedDocuments = useRef(new WeakSet<BodyDocument>(body_document ? [body_document] : []));
   const importInput = useRef<HTMLInputElement>(null);
   const attachmentInput = useRef<HTMLInputElement>(null);
   const [loaded] = useState(() => {
@@ -276,6 +280,7 @@ export function BlockEditor({
   const editor = loaded.editor;
   useEffect(() => {
     if (!editor) return;
+    if (body_document && acknowledgedDocuments.current.has(body_document)) return;
     const next = JSON.stringify(body_document);
     if (next === latest.current.document) return;
     try {
@@ -286,6 +291,7 @@ export function BlockEditor({
           : [{ type: "paragraph" }],
       );
       latest.current.document = next;
+      if (body_document) acknowledgedDocuments.current.add(body_document);
     } catch (e) {
       setError(`正文同步失败，草稿已保留：${(e as Error).message}`);
     }
@@ -303,6 +309,7 @@ export function BlockEditor({
     if (!editor || locked.current) return;
     const blocks = structuredClone(editor.document);
     const doc: BodyDocument = { version: 1, blocks };
+    acknowledgedDocuments.current.add(doc);
     latest.current.document = JSON.stringify(doc);
     latest.current.onChange(doc);
   }, [editor]);

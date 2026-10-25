@@ -1,0 +1,7 @@
+
+> noteapp-web@0.1.0 build
+> tsc -b && vite build
+
+src/components/markdown/BlockEditor.test.tsx(11,63): error TS2322: Type '{ id: string; type: "paragraph"; content: { type: "text"; text: string; styles: {}; }[]; }' is not assignable to type 'Block'.
+  Type '{ id: string; type: "paragraph"; content: { type: "text"; text: string; styles: {}; }[]; }' is not assignable to type 'BlockFromConfigNoChildren<BlockConfig<"paragraph", { backgroundColor: { default: "default"; }; textColor: { default: "default"; }; textAlignment: { default: "left"; values: readonly ["left", "center", "right", "justify"]; }; }, "inline">, InlineContentSchemaFromSpecs<...>, StyleSchemaFromSpecs<...>> & { ...; }'.
+    Property 'props' is missing in type '{ id: string; type: "paragraph"; content: { type: "text"; text: string; styles: {}; }[]; }' but required in type 'BlockFromConfigNoChildren<BlockConfig<"paragraph", { backgroundColor: { default: "default"; }; textColor: { default: "default"; }; textAlignment: { default: "left"; values: readonly ["left", "center", "right", "justify"]; }; }, "inline">, InlineContentSchemaFromSpecs<...>, StyleSchemaFromSpecs<...>>'.

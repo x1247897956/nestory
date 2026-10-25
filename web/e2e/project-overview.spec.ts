@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from '@playwright/test';
 
 test('project opens overview and links to tasks pages and events', async ({page, request}) => {
@@ -23,10 +24,10 @@ test('project opens overview and links to tasks pages and events', async ({page,
   await expect(page.getByRole('button',{name:'添加任务',exact:true})).toHaveCount(0);
   await page.getByRole('link',{name:"任务",exact:true}).click();
   await expect(page).toHaveURL(new RegExp(`/projects/${p.id}/tasks$`));
-  const filtersBox = await page.getByLabel('筛选阶段').boundingBox();
+  const filtersBox = await page.getByLabel('筛选优先级').boundingBox();
   expect((await page.getByRole('button',{name:'添加任务',exact:true}).boundingBox())!.y).toBeLessThan(filtersBox!.y);
   await page.getByRole('link',{name:'汇总',exact:true}).click();
-  await page.getByRole('button',{name:'归档项目',exact:true}).click();
+  await archiveCurrentProject(page);
   await expect(page.getByRole('button',{name:'添加任务',exact:true})).toHaveCount(0);
   await expect(page.getByRole('link',{name:/推进实现/})).toBeVisible();
 });

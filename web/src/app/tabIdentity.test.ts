@@ -33,3 +33,11 @@ it('keeps the ownership responder across a persisted pagehide',async()=>{
  window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false}));
  expect(close).toHaveBeenCalled();
 });
+
+it('separates an opener clone immediately without depending on BroadcastChannel delivery',()=>{
+ const original=getTabOwner();
+ vi.stubGlobal('opener',{location:{origin:window.location.origin},sessionStorage:{getItem:()=>original}});
+ const clone=getTabOwner();
+ expect(clone).not.toBe(original);
+ expect(getTabOwner()).toBe(clone); // Reloads of the new tab retain its own identity.
+});

@@ -1,3 +1,4 @@
+import { archiveCurrentProject, unarchiveCurrentProject } from "./project-actions";
 import { assetIDs } from "./block-fixtures";
 import {importMarkdown} from "./editor-helpers";
 import { test, expect } from "@playwright/test";
@@ -88,8 +89,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await importMarkdown(page, "- [ ] 独立检查项");
     await expect(page.getByRole("status")).toHaveText("已保存");
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
-    await page.getByLabel("关联目标").selectOption({ label: "完整笔记" });
-    await page.getByRole("button", { name: "添加关联", exact: true }).click();
+    await page.getByRole("button", {name:"关联 完整笔记",exact:true}).click();
     await expect(
       page.getByRole("link", { name: "完整笔记", exact: true }),
     ).toBeVisible();
@@ -114,8 +114,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(page.getByRole("status")).toHaveText("已保存");
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     for (const label of ["完整笔记", "读摘要 · Todo"]) {
-      await page.getByLabel("关联目标").selectOption({ label });
-      await page.getByRole("button", { name: "添加关联", exact: true }).click();
+      await page.getByRole("button", {name:"关联 " + label,exact:true}).click();
       await expect(
         page.getByRole("link", { name: label, exact: true }),
       ).toBeVisible();
@@ -124,13 +123,18 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expect(
       page.locator('a[href="/projects/' + pid + '/tasks/' + tid + '"]'),
     ).toBeVisible();
-    await expect(
-      page.locator('.fc-daygrid-day[data-date="' + today + '"] a[href="/projects/' + pid + '/events/' + eid + '"]'),
-    ).toBeVisible();
+    const eventHref = `/projects/${pid}/events/${eid}`;
+    const day = page.locator(`.fc-daygrid-day[data-date="${today}"]`);
+    const calendarEvent = day.locator(`a[href="${eventHref}"]`);
+    await expect(calendarEvent).toBeAttached();
+    // Repeated journeys share the test workspace: later events can be behind
+    // FullCalendar's normal overflow disclosure rather than directly visible.
+    if (!await calendarEvent.isVisible()) await day.locator('.fc-daygrid-more-link').click();
+    await expect(page.locator(`a[href="${eventHref}"]:visible`)).toBeVisible();
     await page.goto("/projects/" + pid + "/pages/" + pgid);
-    await page.getByRole("button", { name: "归档项目", exact: true }).click();
+    await archiveCurrentProject(page);
     await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
-    await page.getByRole("button", { name: "取消归档", exact: true }).click();
+    await unarchiveCurrentProject(page);
     await expect(page.getByLabel("笔记标题", { exact: true })).toBeEnabled();
     await page.getByRole("button", { name: "移入回收站", exact: true }).click();
     await page

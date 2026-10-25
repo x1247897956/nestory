@@ -1,3 +1,4 @@
+import { archiveCurrentProject, unarchiveCurrentProject } from "./project-actions";
 import { paragraphs, documentText } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
 test("project, independent children, refresh, archive and two-tab conflict", async ({
@@ -61,12 +62,12 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
     "second tab draft",
   );
   await second.close();
-  await page.getByRole("button", { name: "归档项目", exact: true }).click();
+  await archiveCurrentProject(page);
   await expect(page.getByLabel("Markdown 正文")).toHaveAttribute(
     "contenteditable",
     "false",
   );
-  await page.getByRole("button", { name: "取消归档", exact: true }).click();
+  await unarchiveCurrentProject(page);
   await expect(page.getByLabel("Markdown 正文")).toHaveAttribute(
     "contenteditable",
     "true",

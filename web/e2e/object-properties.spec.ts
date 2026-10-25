@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 import {test,expect} from '@playwright/test';
 test('all object types share collapsed relation properties with keyboard and mobile support',async({page,request})=>{
  const create=async(path:string,data:object)=>(await(await request.post('/api/v1'+path,{data})).json());
@@ -35,7 +36,7 @@ test('all object types share collapsed relation properties with keyboard and mob
  await panel.getByRole('button',{name:'移除关联 关联行动',exact:true}).click();
  await expect(panel.getByRole('link',{name:/关联行动/})).toHaveCount(0);
  expect((await(await request.get(`/api/v1/tasks/${t.id}/relations`)).json()).length).toBe(0);
- await page.getByRole('button',{name:'归档项目',exact:true}).click();
+ await archiveCurrentProject(page);
  await page.locator('.relation-property > summary').click();
  await expect(panel.getByRole('link',{name:/关联讨论/})).toBeVisible();
  await expect(panel.getByRole('button',{name:'添加关联',exact:true})).toHaveCount(0);

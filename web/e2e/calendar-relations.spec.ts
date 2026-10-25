@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from "@playwright/test";
 import { DateTime } from "luxon";
 for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
@@ -72,18 +73,12 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       );
       await page.goto("/projects/"+p.id+"/events/"+eventId);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
-      await page
-        .getByLabel("关联目标")
-        .selectOption({ label: "方案集 / 实验方案" });
-      await page.getByRole("button", { name: "添加关联", exact: true }).click();
+      await page.getByRole("button", {name:"关联 方案集 / 实验方案",exact:true}).click();
       await expect(
         page.getByRole("link", { name: "方案集 / 实验方案", exact: true }),
       ).toBeVisible();
       await page.getByLabel("搜索关联标题").fill("执行");
-      await page
-        .getByLabel("关联目标")
-        .selectOption({ label: "执行实验 · InProcess" });
-      await page.getByRole("button", { name: "添加关联", exact: true }).click();
+      await page.getByRole("button", {name:"关联 执行实验 · InProcess",exact:true}).click();
       await expect(
         page.getByRole("link", { name: "执行实验 · InProcess" }),
       ).toBeVisible();
@@ -104,10 +99,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
           name: new RegExp("讨论方案 · " + today + " 22:00"),
         }),
       ).toBeVisible();
-      await page
-        .getByLabel("关联目标")
-        .selectOption({ label: "执行实验 · InProcess" });
-      await page.getByRole("button", { name: "添加关联", exact: true }).click();
+      await page.getByRole("button", {name:"关联 执行实验 · InProcess",exact:true}).click();
       await page
         .getByRole("link", { name: "执行实验 · InProcess", exact: true })
         .click();
@@ -155,8 +147,8 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
         ).status(),
       ).toBe(409);
       await page.getByLabel("搜索关联标题").fill("外部");
-      await expect(page.getByLabel("关联目标").locator("option")).toHaveCount(
-        1,
+      await expect(page.getByLabel("可关联对象").getByRole("button")).toHaveCount(
+        0,
       );
 
       const secondsEvent = await create("/projects/" + p.id + "/events", {
@@ -177,7 +169,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await expect(page.getByLabel("开始时间", { exact: true })).toHaveValue(
         today + "T22:00",
       );
-      await page.getByRole("button", { name: "归档项目", exact: true }).click();
+      await archiveCurrentProject(page);
       await expect(page.getByLabel("开始时间", { exact: true })).toBeDisabled();
       await expect(
         page.getByRole("button", { name: "添加关联", exact: true }),

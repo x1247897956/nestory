@@ -31,9 +31,12 @@ export function App() {
   const projectOptions = useRef<HTMLDetailsElement>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectForm, setProjectForm] = useState<"new" | "edit" | null>(null);
-  const [stage, setStage] = useState("all");
   const [priority, setPriority] = useState("all");
   const [group, setGroup] = useState(true);
+  const draggedTask = useRef<string | null>(null);
+  const [dropStage, setDropStage] = useState<string | null>(null);
+  const [stageBusy, setStageBusy] = useState(false);
+  const stageMutation = useRef(false);
   const [error, setError] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newParent, setNewParent] = useState("");
@@ -165,11 +168,33 @@ export function App() {
   const openTask = (t: Task) => {
     nav("/projects/" + projectId + "/tasks/" + t.id);
   };
-  const visible = (t: Task) =>
-    (stage === "all" || t.stage === stage) &&
-    (priority === "all" || t.priority === priority);
+  const changeStage = async (id: string, stage: string) => {
+    const task = all.find(t => t.id === id);
+    if (!task || task.stage === stage || readOnly || stageMutation.current) return;
+    stageMutation.current = true;
+    setStageBusy(true);
+    setError("");
+    try {
+      const next = await api<Task>(`/tasks/${id}`, "PATCH", { version: task.version, stage });
+      qc.setQueryData(["task", id], next);
+      await Promise.all([
+        qc.invalidateQueries({queryKey:["tasks", projectId]}),
+        qc.invalidateQueries({queryKey:["relations"]}),
+        qc.invalidateQueries({queryKey:["relation-options", projectId]}),
+        qc.invalidateQueries({queryKey:["workspace"]}),
+      ]);
+    } catch (e) {
+      setError("阶段更新失败，请重试：" + (e as Error).message);
+      void tasks.refetch();
+    } finally {
+      stageMutation.current = false;
+      setStageBusy(false);
+    }
+  };
+  const visible = (t: Task) => priority === "all" || t.priority === priority;
   const roots = all.filter((t) => !t.parent_id);
   const children = (id: string) => all.filter((t) => t.parent_id === id);
+  const groupedChildren = (t: Task) => children(t.id).filter(child => !group || child.stage === t.stage);
   const row = (t: Task, child = false) => (
     <div
       key={t.id}
@@ -179,7 +204,23 @@ export function App() {
         (taskId === t.id ? "selected" : "")
       }
     >
-      <span className={"stage-dot " + t.stage} />
+      {group && !readOnly && <button className="task-drag-handle" aria-label={"拖动任务 " + t.title}
+        title="拖到另一个阶段" disabled={stageBusy} draggable={!stageBusy}
+        onDragStart={event => {
+          draggedTask.current = t.id;
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("application/x-noteapp-task", t.id);
+        }}
+        onDragEnd={() => { draggedTask.current = null; setDropStage(null); }}>
+        <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" fill="currentColor">{[5,9,13].map(y=><g key={y}><circle cx="5" cy={y} r="1"/><circle cx="9" cy={y} r="1"/></g>)}</svg>
+      </button>}
+      <label className="task-stage-control" title="更改阶段">
+        <span className={"stage-dot " + t.stage} />
+        <select aria-label={"更改阶段 " + t.title} value={t.stage} disabled={readOnly || stageBusy}
+          onChange={event => void changeStage(t.id, event.target.value)}>
+          {stages.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+        </select>
+      </label>
       <button className="task-title" onClick={() => openTask(t)}>
         {t.title}
       </button>
@@ -189,7 +230,7 @@ export function App() {
           {priorities.find(([id]) => id === t.priority)?.[1]}
         </span>
       )}
-      {!child && children(t.id).length > 0 && (
+      {!child && groupedChildren(t).length > 0 && (
         <button
           className="expand"
           aria-label={"展开 " + t.title}
@@ -202,7 +243,7 @@ export function App() {
             })
           }
         >
-          {expanded.has(t.id) ? "−" : "+"} {children(t.id).length}
+          {expanded.has(t.id) ? "−" : "+"} {groupedChildren(t).length}
         </button>
       )}
     </div>
@@ -210,8 +251,8 @@ export function App() {
   const renderRoot = (t: Task) => (
     <div key={t.id}>
       {row(t)}
-      {(expanded.has(t.id) || stage !== "all" || priority !== "all") &&
-        children(t.id)
+      {(expanded.has(t.id) || priority !== "all") &&
+        groupedChildren(t)
           .filter(visible)
           .map((c) => row(c, true))}
     </div>
@@ -297,7 +338,7 @@ export function App() {
           </div>
         ) : (
           <>
-            <header className={"project-header" + (taskId || pageId || eventId ? " project-context-header" : "")}>
+            {!(taskId || pageId || eventId) && <header className="project-header">
 
               <div className="header-title">
                 <h1>{p?.title}</h1>
@@ -330,7 +371,7 @@ export function App() {
                 {p?.description}
               </p>
 
-            </header>
+            </header>}
             {(current.isError || detail.isError) && (
               <p className="error" role="alert">
                 刷新失败，当前草稿仍保留。请检查网络后重试。
@@ -374,20 +415,6 @@ export function App() {
                   </div>
                   <div className="filters">
                     <label>
-                      筛选阶段
-                      <select
-                        value={stage}
-                        onChange={(e) => setStage(e.target.value)}
-                      >
-                        <option value="all">全部阶段</option>
-                        {stages.map(([id, name]) => (
-                          <option value={id} key={id}>
-                            {name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
                       筛选优先级
                       <select
                         value={priority}
@@ -402,15 +429,14 @@ export function App() {
                       </select>
                     </label>
                   </div>
+                  {stageBusy && <p className="stage-update-status" role="status">正在更新阶段…</p>}
                   {tasks.isError ? (
                     <div role="alert">
                       任务加载失败
                       <button onClick={() => tasks.refetch()}>重试</button>
                     </div>
                   ) : group ? (
-                    stages
-                      .filter(([id]) => stage === "all" || stage === id)
-                      .map(([id, name]) => {
+                    stages.map(([id, name]) => {
                         const items = roots.filter(
                           (t) =>
                             t.stage === id &&
@@ -426,7 +452,20 @@ export function App() {
                               id,
                         );
                         return (
-                          <div className="task-group" key={id}>
+                          <div className={"task-group" + (dropStage === id ? " drop-target" : "")} key={id}
+                            role="region" aria-label={name + "阶段"} data-stage={id}
+                            onDragOver={event => {
+                              if (!readOnly && !stageMutation.current && draggedTask.current) {
+                                event.preventDefault(); event.dataTransfer.dropEffect = "move"; setDropStage(id);
+                              }
+                            }}
+                            onDragLeave={event => { if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setDropStage(null); }}
+                            onDrop={event => {
+                              event.preventDefault();
+                              const task = draggedTask.current;
+                              draggedTask.current = null; setDropStage(null);
+                              if (task && event.dataTransfer.getData("application/x-noteapp-task") === task) void changeStage(task, id);
+                            }}>
                             <h3>
                               <span className={"stage-dot " + id} />
                               {name}

@@ -13,7 +13,17 @@ function assign(owner: string) {
 }
 export function getTabOwner(): string {
   const saved = window.sessionStorage.getItem(storageKey);
-  if (saved && window.name === namePrefix + saved) { current = saved; return saved; }
+  if (saved && window.name === namePrefix + saved) {
+    // A same-origin popup can inherit both storage and name. Detect its live
+    // opener synchronously; BroadcastChannel delivery has no timing guarantee.
+    let copiedFromOpener = false;
+    try {
+      const opener = window.opener as Window | null;
+      copiedFromOpener = !!opener && opener.location.origin === window.location.origin &&
+        opener.sessionStorage.getItem(storageKey) === saved;
+    } catch { /* Cross-origin openers are not readable; use the live-context probe. */ }
+    if (!copiedFromOpener) { current = saved; return saved; }
+  }
   return assign(randomUUID());
 }
 export async function initializeTabIdentity(): Promise<void> {

@@ -1,3 +1,4 @@
+import { archiveCurrentProject } from "./project-actions";
 // Schema regressions may write only to the disposable release audit instance.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
@@ -47,7 +48,7 @@ for (const kind of ['tasks', 'pages', 'events'] as const) {
     await assertUnchanged();
     await page.reload();
     await assertUnchanged();
-    await page.getByRole('button', { name: '归档项目', exact: true }).click();
+    await archiveCurrentProject(page);
     await expect(page.getByText('此项目已归档，内容只读。取消归档后可继续编辑。', { exact: true })).toBeVisible();
     await assertUnchanged();
     await expect(editor).toHaveAttribute('contenteditable', 'false');

@@ -331,10 +331,6 @@ label,.filters label { color:#6b7079; }
 .sidebar-project .project-link { font-size:13px; padding:10px 12px; min-height:38px; }
 .sidebar-project .project-link.active { box-shadow:none; background:#e9edf3; color:#243b63; }
 .sidebar-project-row > .project-link { flex:1; min-width:0; }
-.project-context-header { padding:10px 28px 0; border-bottom:0; }
-.project-context-header .header-title { justify-content:flex-end; }
-.project-context-header h1,.project-context-header p { display:none; }
-.project-context-header button { color:#626874; font-size:11px; padding:5px 9px; }
 .project-header h1 { font-weight:600; letter-spacing:-.025em; }
 .object-back,.summary-navigation > a { font-size:12px; color:#626874; }
 .task-inline-header h2 { margin:18px 0 22px; }
@@ -353,4 +349,24 @@ label,.filters label { color:#6b7079; }
 .overview-section-actions { display:flex; gap:14px; align-items:center; }
 .overview-card ul { border-radius:5px; }
 .filters input,.filters select { font-size:12px; min-height:34px; }
-@media(max-width:650px){.project-context-header{padding:8px 18px 0}.task-inline-title{font-size:24px!important}.object-property-cell{max-width:100%}.task-property select{max-width:180px}}
+@media(max-width:650px){.task-inline-title{font-size:24px!important}.object-property-cell{max-width:100%}.task-property select{max-width:180px}}
+
+/* Compact object linking: search and select on one surface. */
+.relation-popover .relation-controls { margin-top:10px; gap:6px; }
+.relation-candidates { max-height:224px; overflow:auto; }
+.relation-popover .relation-candidates button { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:9px 8px; text-align:left; color:#252a33; background:transparent; border:0; border-radius:4px; }
+.relation-popover .relation-candidates button:hover { background:#f1f3f7; color:#243b63; }
+.relation-candidates button > span { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.relation-candidate-title { overflow-wrap:anywhere; font-size:12px; }
+.relation-candidates small { font-size:10px; color:#626874; }
+.relation-candidates svg { flex-shrink:0; }
+.relation-popover .relation-empty { margin:4px 0; padding:5px 0; }
+.task-drag-handle { display:flex; align-items:center; justify-content:center; padding:2px; width:22px; min-width:22px; height:28px; border:0; background:transparent; color:#737986; cursor:grab; }
+.task-drag-handle:active { cursor:grabbing; }
+.task-drag-handle:hover { background:#eceff4; color:#243b63; }
+.task-stage-control { position:relative; display:flex; align-items:center; justify-content:center; width:24px; height:28px; flex-shrink:0; border-radius:4px; }
+.task-stage-control select { position:absolute; inset:0; width:100%; height:100%; padding:0; margin:0; opacity:0; cursor:pointer; }
+.task-stage-control:focus-within { outline:2px solid #243b63; outline-offset:2px; }
+.task-group.drop-target { background:#f2f5fa; outline:1px dashed #243b63; outline-offset:3px; }
+.stage-update-status { font-size:12px; color:#243b63; }
+@media(max-width:650px) { .task-drag-handle { display:none; } .task-stage-control { width:30px; height:36px; } .relation-candidates button { min-height:44px; } }

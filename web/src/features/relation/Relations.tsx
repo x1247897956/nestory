@@ -35,7 +35,6 @@ export function Relations({
   }, []);
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
-  const [target, setTarget] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const config = useQuery({
@@ -81,7 +80,6 @@ export function Relations({
     setError("");
     try {
       await api("/relations/" + path, method);
-      setTarget("");
       await qc.invalidateQueries({ queryKey: ["relations"] });
     } catch (e) {
       setError((e as Error).message);
@@ -93,9 +91,9 @@ export function Relations({
     <details ref={popover} className="relation-property" onKeyDown={event => { if (event.key === "Escape" && popover.current) { popover.current.open = false; popover.current.querySelector("summary")?.focus(); } }}>
       <summary aria-label="关联对象">关联 <span>{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><span aria-hidden="true">⌄</span></summary>
       <section className="relation-popover" aria-label="关联对象列表">
-      <header><h3>关联对象</h3><span>同项目 · 双向关联</span></header>
+      <header><h3>关联对象</h3></header>
       {relations.isPending && <p role="status">正在加载关联…</p>}
-      {!relations.isPending && !relations.isError && !list.length && <p className="relation-empty">暂无关联，可连接相关任务、笔记或日程。</p>}
+      {!relations.isPending && !relations.isError && !list.length && <p className="relation-empty">暂无关联</p>}
       {list.map((item) => (
         <div className="relation-row" key={item.type + item.id}>
           {item.deleted ? (
@@ -145,52 +143,24 @@ export function Relations({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <select
-            aria-label="关联目标"
-            value={target}
-            onChange={(e) => setTarget(e.target.value)}
-          >
-            <option value="">选择关联对象</option>
-            {candidates.map((x) => (
-              <option key={x.id} value={x.id}>
-                {label(x)}
-              </option>
-            ))}
-          </select>
-          <button
-            disabled={busy || !target || !zone}
-            onClick={() => {
-              const item = candidates.find((x) => x.id === target);
-              if (!item) return;
-              const rank = { tasks: 0, pages: 1, events: 2 };
-              const left = rank[type] < rank[item.type as keyof typeof rank];
-              const names: Record<string, string> = {
-                tasks: "task",
-                pages: "page",
-                events: "event",
-              };
-              void change(
-                left
-                  ? names[type] +
-                      "-" +
-                      names[item.type] +
-                      "/" +
-                      id +
-                      "/" +
-                      item.id
-                  : names[item.type] +
-                      "-" +
-                      names[type] +
-                      "/" +
-                      item.id +
-                      "/" +
-                      id,
-                "PUT",
-              );
-            }}
-          >
-            添加关联
-          </button>
+          {options.isPending && <p role="status">正在加载…</p>}
+          {!options.isPending && !options.isError && !relations.isPending && !relations.isError && !candidates.length && <p className="relation-empty">{search ? "没有匹配的对象" : "没有可关联的对象"}</p>}
+          <div className="relation-candidates" aria-label="可关联对象">
+            {!relations.isPending && !relations.isError && candidates.map(item => <button
+              key={item.type + item.id} type="button" disabled={busy}
+              aria-label={"关联 " + label(item)}
+              onClick={() => {
+                const rank = { tasks: 0, pages: 1, events: 2 };
+                const left = rank[type] < rank[item.type as keyof typeof rank];
+                const names: Record<string,string> = { tasks: "task", pages: "page", events: "event" };
+                void change(left
+                  ? `${names[type]}-${names[item.type]}/${id}/${item.id}`
+                  : `${names[item.type]}-${names[type]}/${item.id}/${id}`, "PUT");
+              }}>
+              <span><span className="relation-candidate-title">{item.title}</span><small>{item.type === "pages" ? "笔记" : item.type === "events" ? "日程" : "任务"}</small></span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
+            </button>)}
+          </div>
         </div>
       )}
       {error && <p role="alert">{error}</p>}
