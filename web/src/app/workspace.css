@@ -239,7 +239,7 @@ label,.filters label { color:#6b7079; }
 .relation-property > summary::-webkit-details-marker,.note-parent-property > summary::-webkit-details-marker { display:none; }
 .relation-property > summary:hover,.note-parent-property > summary:hover,.relation-property[open] > summary { background:#f2f4f8; color:#243b63; }
 .relation-property > summary:focus-visible,.note-parent-property > summary:focus-visible { outline:2px solid #243b63; outline-offset:2px; }
-.relation-property > summary > span:first-child { font-size:10px; padding:1px 5px; background:#e9edf3; border-radius:4px; color:#243b63; }
+.relation-property > summary > span:nth-child(2) { font-size:10px; padding:1px 5px; background:#e9edf3; border-radius:4px; color:#243b63; }
 .relation-popover { position:absolute; z-index:30; left:0; top:calc(100% + 8px); width:min(420px,100%); max-height:440px; overflow:auto; padding:16px; border:1px solid #dfe3eb; border-radius:8px; background:#fff; box-shadow:0 12px 36px #19223418; }
 .relation-popover header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
 .relation-popover h3 { font-size:13px; margin:0; color:#252a33; }
@@ -364,3 +364,37 @@ label,.filters label { color:#6b7079; }
 .task-group.drop-target { background:#f2f5fa; outline:1px dashed #243b63; outline-offset:3px; }
 .stage-update-status { font-size:12px; color:#243b63; }
 @media(max-width:650px) { .task-drag-handle { display:none; } .task-stage-control { width:30px; height:36px; } .relation-candidates button { min-height:44px; } }
+
+/* Project overview: one identity, three equal entry sections. */
+.topbar-identity { min-width:0; }
+.project-overview-topbar { min-height:88px; height:auto; padding-top:22px; padding-bottom:22px; align-items:center; }
+.project-overview-topbar .breadcrumbs h1 { margin:0; font-size:23px; font-weight:600; line-height:1.35; letter-spacing:-.025em; min-width:0; }
+.project-overview-topbar .project-breadcrumb { color:#23272f; }
+.overview-description { margin:6px 0 0; color:#69717e; font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
+.project-overview { padding-top:24px; }
+.overview-card { margin-bottom:24px; padding-bottom:24px; }
+.overview-card header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 0 14px; min-height:38px; }
+.overview-section-title h3 { font-size:16px; }
+.overview-section-actions { gap:12px; flex-shrink:0; }
+.overview-section-actions .section-open { font-size:12px; font-weight:400; color:#69717e; white-space:nowrap; }
+.overview-section-actions button,.overview-section-actions .overview-create { display:inline-flex; align-items:center; justify-content:center; min-height:36px; padding:8px 14px; font-size:13px; font-weight:500; background:#243b63; color:white; border:1px solid #243b63; border-radius:5px; text-decoration:none; }
+.overview-section-actions button:hover,.overview-section-actions .overview-create:hover { background:#192e51; color:white; }
+.overview-empty { padding:22px 16px; border:1px solid #e8ebef; border-radius:5px; background:transparent; }
+@media(max-width:650px) { .project-overview { padding-top:20px; } .project-overview-topbar { min-height:76px; } .overview-section-actions { gap:8px; } .overview-section-actions .section-open { font-size:11px; } .overview-section-actions button,.overview-section-actions .overview-create { padding:8px 10px; min-height:36px; font-size:12px; } }
+
+/* Intrinsic and custom properties share the same name/value rhythm. */
+.object-property-section .object-properties { display:flex; flex-direction:column; align-items:stretch; gap:2px; }
+.object-property-section .object-property-cell { display:grid; grid-template-columns:minmax(100px,152px) minmax(0,1fr); align-items:center; gap:12px; min-height:32px; }
+.object-property-label { margin:0; padding:7px 8px; font-size:12px; color:#737986; }
+.object-property-cell[data-property="relations"] { display:block; }
+.object-property-cell .relation-property > summary { margin-left:0; padding:6px 8px; }
+.editor .object-property-cell .task-property { width:100%; min-width:0; }
+.editor .object-property-cell .task-property input,.editor .object-property-cell .task-property select { width:100%; max-width:300px; padding:5px 8px; margin:0; }
+.custom-properties { margin-top:2px; }
+@media(max-width:650px) { .object-property-section .object-property-cell { grid-template-columns:105px minmax(0,1fr); gap:5px; } }
+.object-property-cell .relation-property > summary { display:grid; grid-template-columns:152px auto auto; gap:8px; align-items:center; width:fit-content; }
+.relation-property-name { color:#737986; font-size:12px; }
+@media(max-width:650px) { .object-property-cell .relation-property > summary { grid-template-columns:105px auto auto; gap:5px; } }
+.task-inline-header:has(.object-property-section) { border-bottom:0; }
+.editor .object-property-cell .task-property select { width:auto; min-width:110px; max-width:100%; }
+.editor .object-property-cell .task-property input { width:auto; min-width:0; max-width:100%; }

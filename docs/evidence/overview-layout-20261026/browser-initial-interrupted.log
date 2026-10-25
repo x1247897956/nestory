@@ -1,0 +1,109 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test
+
+(node:31424) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 76 tests using 1 worker
+
+(node:31427) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31427) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:31427) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 e2e/acceptance-v1.spec.ts:13:3 › v1 full journey in a fresh browser context (5.6s)
+(node:31518) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31518) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:31518) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 e2e/block-editor.spec.ts:4:1 › native blocks preserve checklist identity, slash commands and assets across object types (13.7s)
+  ✓   3 e2e/block-editor.spec.ts:94:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (4.0s)
+  ✓   4 e2e/block-interoperability.spec.ts:5:1 › Markdown import/export preserves tables, nested blocks, code and uploaded images (4.1s)
+  ✓   5 e2e/block-interoperability.spec.ts:61:1 › dragging a block preserves its identity and saves the new order (1.4s)
+  ✓   6 e2e/block-menu.spec.ts:3:1 › closing side menu removes inert handles before quick mouse reopen and block copy (1.5s)
+  ✓   7 e2e/calendar-relations.spec.ts:5:3 › calendar and all relations in browser America/Los_Angeles (8.6s)
+  ✓   8 e2e/calendar-relations.spec.ts:5:3 › calendar and all relations in browser Europe/London (9.3s)
+  ✓   9 e2e/compact-live-design.spec.ts:3:1 › project row settings persist and deletion restores the project (1.3s)
+  ✓  10 e2e/compact-live-design.spec.ts:71:1 › compact full-page objects use live Markdown and simple breadcrumbs (1.9s)
+  ✓  11 e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults (2.0s)
+  ✓  12 e2e/create-drafts.spec.ts:73:1 › new Project draft guards closing and cancel while empty form stays clean (454ms)
+  ✘  13 e2e/custom-properties.spec.ts:71:1 › type-first shared definitions, all four values, independent notes and stable option IDs (3.4s)
+
+
+  1) e2e/acceptance-v1.spec.ts:13:3 › v1 full journey in a fresh browser context ───────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'V1完整验收 1792960545885' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'V1完整验收 1792960545885' })[22m
+
+
+      28 |     await page.getByLabel("项目说明").fill("全功能恢复验收");
+      29 |     await page.getByRole("button", { name: "保存项目" }).click();
+    > 30 |     await expect(page.getByRole("heading", { name: title })).toBeVisible();
+         |                                                              ^
+      31 |     const pid = new URL(page.url()).pathname.split("/")[2];
+      32 |     await page.getByRole("link", { name: "笔记", exact: true }).click();
+      33 |     await page.getByRole("button", { name: "新建笔记", exact: true }).click();
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/acceptance-v1.spec.ts:30:62
+
+    Error Context: test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/acceptance-v1-v1-full-journey-in-a-fresh-browser-context/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/custom-properties.spec.ts:71:1 › type-first shared definitions, all four values, independent notes and stable option IDs 
+
+    Test was interrupted.
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByRole('group', { name: '属性设置', exact: true }).getByText('未保存', { exact: true })
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('group', { name: '属性设置', exact: true }).getByText('未保存', { exact: true })[22m
+    [2m    2 × locator resolved to 1 element[22m
+    [2m      - unexpected value "1"[22m
+
+
+      24 |  }
+      25 |  await expect(settings.getByLabel(`选项名称 ${values.length}`,{exact:true})).toHaveValue(values.at(-1)!);
+    > 26 |  await expect(settings.getByText('未保存',{exact:true})).toHaveCount(0);
+         |                                                       ^
+      27 |  await settings.getByLabel('新选项名称',{exact:true}).press('Escape');
+      28 | }
+      29 |
+        at options (/Users/seyr1n/01-Project/noteapp/web/e2e/custom-properties.spec.ts:26:55)
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/custom-properties.spec.ts:40:41
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/custom-properties-type-fir-75acf-notes-and-stable-option-IDs/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/custom-properties-type-fir-75acf-notes-and-stable-option-IDs/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/acceptance-v1.spec.ts:13:3 › v1 full journey in a fresh browser context ────────────────────
+  1 interrupted
+    e2e/custom-properties.spec.ts:71:1 › type-first shared definitions, all four values, independent notes and stable option IDs 
+  63 did not run
+  11 passed (59.0s)
+Error response from daemon: get noteapp-release-audit-1792960543-31400: no such volume

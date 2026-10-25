@@ -1,6 +1,6 @@
 import {importMarkdown} from "./editor-helpers";
 import { test, expect } from "@playwright/test";
-test("page tree, source-position tasks, autosave failures and persistent safe assets", async ({
+test("flat notes, source-position tasks, autosave failures and persistent safe assets", async ({
   page,
   request,
 }) => {
@@ -10,13 +10,9 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
     })
   ).json();
   await page.goto("/projects/" + p.id + "/pages");
-  for (const [title, parent] of [
-    ["A", ""],
-    ["B", "A"],
-    ["C", "B"],
-  ]) {
+  for (const title of ["A", "B", "C"]) {
     await page.goto("/projects/" + p.id + "/pages");
-    await page.getByRole("button", { name: parent ? `新建子笔记 ${parent}` : "新建笔记", exact: true }).click();
+    await page.getByRole("button", { name: "新建笔记", exact: true }).click();
     const titleField = page.getByLabel("笔记标题", { exact: true });
     await expect(titleField).toHaveValue("无标题笔记");
     await expect(titleField).toBeFocused();
@@ -26,15 +22,8 @@ test("page tree, source-position tasks, autosave failures and persistent safe as
   const nodes = await (
     await request.get("/api/v1/projects/" + p.id + "/pages")
   ).json();
-  const a = nodes.find((n: { title: string }) => n.title === "A");
   const c = nodes.find((n: { title: string }) => n.title === "C");
-  expect(
-    (
-      await request.post("/api/v1/pages/" + a.id + "/move", {
-        data: { parent_id: c.id, position: 0, version: a.version },
-      })
-    ).status(),
-  ).toBe(409);
+  expect(nodes.every((n: {parent_id: string | null})=>n.parent_id===null)).toBe(true);
   const source = "中文笔记\n\n- [ ] 同名\n- [ ] 同名\n\n```js\n- [ ] 代码\n```";
   await importMarkdown(page,source);
   await expect(page.getByRole("checkbox")).toHaveCount(2);

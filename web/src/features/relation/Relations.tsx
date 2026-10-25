@@ -89,7 +89,7 @@ export function Relations({
   };
   return (
     <details ref={popover} className="relation-property" onKeyDown={event => { if (event.key === "Escape" && popover.current) { popover.current.open = false; popover.current.querySelector("summary")?.focus(); } }}>
-      <summary aria-label="关联对象">关联 <span>{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><span aria-hidden="true">⌄</span></summary>
+      <summary aria-label="关联对象"><span className="relation-property-name">关联</span> <span>{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><span aria-hidden="true">⌄</span></summary>
       <section className="relation-popover" aria-label="关联对象列表">
       <header><h3>关联对象</h3></header>
       {relations.isPending && <p role="status">正在加载关联…</p>}

@@ -42,7 +42,6 @@ export function Pages({
   }, []);
   const attempted = useRef("");
   const createdId = useRef("");
-  const retryParent = useRef<string | null>(null);
   const context = useRef({ projectId, pageId });
   context.current = { projectId, pageId };
   const [epoch, setEpoch] = useState(0);
@@ -62,26 +61,11 @@ export function Pages({
       qc.invalidateQueries({ queryKey: ["relations"] }),
     ]);
   const nodes = list.data ?? [];
-  const flat: { page: Page; depth: number }[] = [];
-  const stack = nodes
-    .filter((n) => !n.parent_id)
-    .sort((a, b) => b.position - a.position || b.id.localeCompare(a.id))
-    .map((page) => ({ page, depth: 0 }));
-  const seen = new Set<string>();
-  while (stack.length) {
-    const item = stack.pop()!;
-    if (seen.has(item.page.id)) continue;
-    seen.add(item.page.id);
-    flat.push(item);
-    const children = nodes
-      .filter((n) => n.parent_id === item.page.id)
-      .sort((a, b) => b.position - a.position || b.id.localeCompare(a.id));
-    for (const page of children) stack.push({ page, depth: item.depth + 1 });
-  }
-  const createPage = async (parentId: string | null = null) => {
+  // Legacy nested notes remain accessible, but the interface is a flat list.
+  const flat = [...nodes].sort((a,b)=>a.position-b.position||a.id.localeCompare(b.id));
+  const createPage = async () => {
     if (pending.current || archived) return;
     pending.current = true;
-    retryParent.current = parentId;
     setCreating(true);
     setError("");
     const originProject = projectId;
@@ -91,7 +75,7 @@ export function Pages({
         "POST",
         {
           title: "无标题笔记",
-          parent_id: parentId,
+          parent_id: null,
         },
       );
       qc.setQueryData(["page", next.id], next);
@@ -129,7 +113,7 @@ export function Pages({
       }
     >
       {!pageId && (
-        <section className="page-tree" aria-label="笔记树">
+        <section className="page-tree" aria-label="笔记列表">
           <header className="page-list-header">
             <h2>笔记</h2>
             {!archived && (
@@ -143,38 +127,30 @@ export function Pages({
               {error}{" "}
               <button
                 disabled={creating}
-                onClick={() => void createPage(retryParent.current)}
+                onClick={() => void createPage()}
               >
                 重试新建
               </button>
               <button disabled={creating} onClick={() => {
                 if (!confirm("上次新建可能已经完成。放弃此次重试并允许另建笔记？")) return;
                 try {
-                  abandonCreateIntent("/projects/" + projectId + "/pages", {title:"无标题笔记",parent_id:retryParent.current});
+                  abandonCreateIntent("/projects/" + projectId + "/pages", {title:"无标题笔记",parent_id:null});
                   setError("");
                 } catch(e) { setError((e as Error).message); }
               }}>放弃此次新建</button>
             </p>
           )}
           <div className="page-list">
-            {flat.map(({ page, depth }) => (
+            {flat.map((page) => (
               <div
                 className="page-list-row"
                 key={page.id}
-                style={{ paddingLeft: 16 + Math.min(depth, 12) * 20 }}
+                style={{ paddingLeft: 16 }}
               >
                 <Link to={"/projects/" + projectId + "/pages/" + page.id}>
                   {page.title}
                 </Link>
-                {!archived && (
-                  <button
-                    disabled={creating || !!error}
-                    aria-label={"新建子笔记 " + page.title}
-                    onClick={() => void createPage(page.id)}
-                  >
-                    新建子笔记
-                  </button>
-                )}
+
               </div>
             ))}
             {list.isLoading && <p className="page-list-empty">加载笔记…</p>}

@@ -309,14 +309,17 @@ export function App() {
         </div>
       </aside>
       <main>
-        <div className="topbar">
+        <div className={"topbar" + (projectId && overview ? " project-overview-topbar" : "")}>
+          <div className="topbar-identity">
           <nav className="breadcrumbs" aria-label="面包屑">
             {projectId ? <>
-              <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current={overview ? "page" : undefined}>{p?.title ?? "项目"}</Link>
+              {overview ? <h1 aria-label={p?.title ?? "项目"}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current="page">{p?.title ?? "项目"}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总">{p?.title ?? "项目"}</Link>}
               {(taskId || pageId || eventId) ? <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{taskId ? detail.data?.title ?? "加载中…" : objectTitle.data?.title ?? "加载中…"}</span></> : !overview && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
 
             </> : <span aria-current="page">{path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
           </nav>
+          {projectId && overview && p?.description && <p className="overview-description">{p.description}</p>}
+          </div>
           <span className="private-tag">本地 · 私有</span>
         </div>
         {!projectId ? (
@@ -338,40 +341,6 @@ export function App() {
           </div>
         ) : (
           <>
-            {!(taskId || pageId || eventId) && <header className="project-header">
-
-              <div className="header-title">
-                <h1>{p?.title}</h1>
-                <div>
-                  {!readOnly && (
-                    <button onClick={() => { setEditingProject(null); setProjectForm("edit"); }}>
-                      修改项目
-                    </button>
-                  )}{" "}
-                  <button
-                    onClick={async () => {
-                      setError("");
-                      try {
-                        if (!readOnly && document.querySelector('[data-dirty="true"]')) throw new Error("请先等待保存和文件处理完成，再归档项目。");
-                        await api("/projects/" + projectId, "PATCH", {
-                          version: p?.version,
-                          archived: !readOnly,
-                        });
-                        await invalidate();
-                      } catch (e) {
-                        setError((e as Error).message);
-                      }
-                    }}
-                  >
-                    {readOnly ? "取消归档" : "归档项目"}
-                  </button>
-                </div>
-              </div>
-              <p>
-                {p?.description}
-              </p>
-
-            </header>}
             {(current.isError || detail.isError) && (
               <p className="error" role="alert">
                 刷新失败，当前草稿仍保留。请检查网络后重试。
