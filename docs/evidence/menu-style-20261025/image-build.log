@@ -1,0 +1,111 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.35kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#4 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 124B done
+#5 DONE 0.0s
+
+#6 [stage-2 1/3] FROM docker.io/library/alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+#6 resolve docker.io/library/alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f done
+#6 DONE 0.0s
+
+#7 [frontend 1/6] FROM docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#7 resolve docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070 done
+#7 DONE 0.0s
+
+#8 [backend 1/7] FROM docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c
+#8 resolve docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 32.12kB 0.0s done
+#9 DONE 0.0s
+
+#10 [frontend 2/6] WORKDIR /src/web
+#10 CACHED
+
+#11 [frontend 3/6] COPY web/package*.json ./
+#11 CACHED
+
+#12 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --fetch-timeout=30000 --fetch-retries=1 --foreground-scripts --loglevel=verbose
+#12 CACHED
+
+#13 [backend 3/7] COPY go.mod go.sum ./
+#13 CACHED
+
+#14 [backend 2/7] WORKDIR /src
+#14 CACHED
+
+#15 [backend 4/7] RUN go mod download
+#15 CACHED
+
+#16 [frontend 5/6] COPY web/ ./
+#16 DONE 0.0s
+
+#17 [backend 5/7] COPY . .
+#17 DONE 0.1s
+
+#18 [frontend 6/6] RUN npm run build
+#18 0.324
+#18 0.324 > noteapp-web@0.1.0 build
+#18 0.324 > tsc -b && vite build
+#18 0.324
+#18 2.293 vite v7.3.7 building client environment for production...
+#18 2.319 transforming...
+#18 4.073 ✓ 500 modules transformed.
+#18 4.209 rendering chunks...
+#18 4.489 computing gzip size...
+#18 4.514 dist/index.html                     0.41 kB │ gzip:   0.32 kB
+#18 4.514 dist/assets/index-Lt4IgJl4.css    117.74 kB │ gzip:  21.54 kB
+#18 4.514 dist/assets/module-RjUF93sV.js     77.27 kB │ gzip:  27.77 kB
+#18 4.514 dist/assets/native-48B9X9Wg.js    432.75 kB │ gzip:  82.80 kB
+#18 4.514 dist/assets/index-BP7k_7ji.js   1,676.68 kB │ gzip: 521.62 kB
+#18 4.514
+#18 4.514 (!) Some chunks are larger than 500 kB after minification. Consider:
+#18 4.514 - Using dynamic import() to code-split the application
+#18 4.514 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#18 4.514 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#18 4.515 ✓ built in 2.21s
+#18 4.565 npm notice
+#18 4.565 npm notice New major version of npm available! 11.19.1 -> 12.2.1
+#18 4.565 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+#18 4.565 npm notice To update run: npm install -g npm@12.2.1
+#18 4.565 npm notice
+#18 DONE 4.6s
+
+#19 [backend 6/7] COPY --from=frontend /src/web/dist ./web/dist
+#19 DONE 0.0s
+
+#20 [backend 7/7] RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /noteapp ./cmd/noteapp
+#20 DONE 5.9s
+
+#21 [stage-2 2/3] RUN apk add --no-cache ca-certificates tzdata && addgroup -g 10001 noteapp && adduser -D -u 10001 -G noteapp noteapp && mkdir -p /data/assets && chown -R noteapp:noteapp /data
+#21 CACHED
+
+#22 [stage-2 3/3] COPY --from=backend /noteapp /usr/local/bin/noteapp
+#22 DONE 0.0s
+
+#23 exporting to image
+#23 exporting layers
+#23 exporting layers 0.2s done
+#23 exporting manifest sha256:f9ac5fc6f4839757a823b40223e074271a06aa8790062a38c23c72acf3910898 done
+#23 exporting config sha256:8c24482ec86b9338fe5983d9b3b28c85b0f06a30d80a8c58d451c21ac8dee122 done
+#23 exporting attestation manifest sha256:ea672f412b64300e3bf826b29fb504680e7bf0e08116505d6a373ca09434b2c2 done
+#23 exporting manifest list sha256:7087afc8922cce38dfe153156fab67e165c0dee194fc1812a95fd0950e70d4e2 done
+#23 naming to docker.io/library/noteapp:menu-style-20261025 done
+#23 unpacking to docker.io/library/noteapp:menu-style-20261025 0.0s done
+#23 DONE 0.3s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/pwntk38zi6ew700sj9k5ja7ds

@@ -1,0 +1,25 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test menu-style.spec.ts compact-live-design.spec.ts workspace-trash.spec.ts tasks.spec.ts
+
+(node:65499) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:65502) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65502) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:65502) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/compact-live-design.spec.ts:3:1 › project row settings persist and deletion restores the project (1.4s)
+  ✓  2 e2e/compact-live-design.spec.ts:71:1 › compact full-page objects use live Markdown and simple breadcrumbs (1.8s)
+  ✓  3 e2e/menu-style.spec.ts:3:3 › project menu and deletion use separate consistent surfaces at 1280px (742ms)
+  ✓  4 e2e/menu-style.spec.ts:3:3 › project menu and deletion use separate consistent surfaces at 390px (570ms)
+  ✓  5 e2e/menu-style.spec.ts:73:1 › deletion confirmation stays open during a pending delete (465ms)
+  ✓  6 e2e/menu-style.spec.ts:127:1 › a failed conflict refresh keeps the error in the dialog and blocks stale confirmation (631ms)
+  ✓  7 e2e/tasks.spec.ts:3:1 › project, independent children, refresh, archive and two-tab conflict (4.1s)
+  ✓  8 e2e/tasks.spec.ts:108:1 › navigation guards an in-flight save after reverting to baseline (2.1s)
+  ✓  9 e2e/workspace-trash.spec.ts:2:1 › workspace search, preview reconfirmation, batch isolation, relations and archive (2.9s)
+
+  9 passed (15.6s)

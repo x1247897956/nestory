@@ -4,7 +4,7 @@ test('project row settings persist and deletion restores the project',async({pag
  const p=await(await request.post('/api/v1/projects',{data:{title:'菜单测试 '+Date.now()}})).json();
  await page.goto(`/projects/${p.id}`);
  const menu=page.locator(`#project-menu-${p.id}`);
- const open=()=>page.getByRole('button',{name:new RegExp('项目设置 菜单')}).click();
+ const open=()=>page.locator(`button[popovertarget="project-menu-${p.id}"]`).click();
  await open();await menu.getByRole('button',{name:'重命名',exact:true}).click();
  await page.getByLabel('项目名称').fill('菜单已改名 '+p.id);
  await page.getByRole('button',{name:'保存项目',exact:true}).click();
@@ -17,7 +17,7 @@ test('project row settings persist and deletion restores the project',async({pag
  await settings.click();await menu.getByRole('button',{name:'取消归档',exact:true}).click();
  await expect(page.getByText('此项目已归档，内容只读。取消归档后可继续编辑。')).toHaveCount(0);
  await settings.click();await menu.getByRole('button',{name:'删除',exact:true}).click();
- await menu.getByRole('button',{name:'确认删除 1 个对象',exact:true}).click();
+ await page.getByRole('dialog',{name:'确认删除'}).getByRole('button',{name:'确认删除 1 个对象',exact:true}).click();
  await expect(page).toHaveURL('/');
  await page.goto('/trash');await page.getByRole('button',{name:`恢复 菜单已改名 ${p.id}`,exact:true}).click();
  await expect.poll(async()=> (await request.get('/api/v1/projects/'+p.id)).status()).toBe(200);

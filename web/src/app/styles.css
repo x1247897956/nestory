@@ -775,11 +775,7 @@ h3 > span:last-child {
 .delete-control {
   margin: 16px 0;
 }
-.delete-control [role="dialog"] {
-  padding: 16px;
-  border: 1px solid #c46e57;
-  background: #fff8f4;
-}
+
 
 /* Task summaries share the project's quiet green editorial palette. */
 .task-toolbar-actions { display:flex; gap:10px; align-items:center; }

@@ -255,7 +255,6 @@ label,.filters label { color:#6b7079; }
 .object-actions { margin-left:auto; }
 .object-actions .delete-control > button { padding:5px 7px; background:transparent; border:0; color:#737986; font-size:11px; }
 .object-actions .delete-control > button:hover { color:#994d42; background:#faf3f1; }
-.object-actions .delete-control > [role="dialog"] { position:absolute; z-index:40; top:100%; right:0; width:min(420px,100%); background:#fff; border:1px solid var(--border); padding:16px; border-radius:8px; box-shadow:0 12px 36px #19223418; }
 .object-actions .delete-control > p { position:absolute; top:100%; right:0; background:white; z-index:40; padding:10px; max-width:100%; }
 .note-parent-property .page-controls { position:absolute; z-index:30; left:0; top:calc(100% + 8px); width:min(420px,100%); padding:16px; border:1px solid var(--border); background:#fff; border-radius:8px; box-shadow:0 12px 36px #19223418; }
 .property-zone { color:#737986; font-size:10px; }
@@ -265,7 +264,6 @@ label,.filters label { color:#6b7079; }
 .object-property-heading h3 { font-size:12px; font-weight:600; color:#4e5868; margin:0; }
 .object-property-heading .delete-control > button { padding:4px 6px; border:0; background:transparent; color:#737986; font-size:10px; }
 .object-property-heading .delete-control { position:relative; }
-.object-property-heading .delete-control > [role="dialog"] { position:absolute; top:100%; right:0; z-index:40; width:min(340px,75vw); border:1px solid var(--border); border-radius:7px; padding:16px; background:#fff; box-shadow:0 12px 36px #19223418; font-size:12px; }
 .object-property-section .object-properties { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); align-items:start; gap:18px 22px; }
 .object-property-cell { min-width:0; }
 .object-property-label { display:block; color:#707784; font-size:11px; margin-bottom:7px; }
@@ -279,11 +277,6 @@ label,.filters label { color:#6b7079; }
 .sidebar-project-row { display:flex; align-items:center; position:relative; }
 .sidebar-project-row .project-link { flex:1; min-width:0; }
 .project-menu-trigger { padding:4px 6px; border:0; background:transparent; color:#737986; flex-shrink:0; }
-.project-row-menu { position:fixed; margin:0; width:180px; padding:5px; border:1px solid var(--border); border-radius:7px; background:#fff; box-shadow:0 8px 26px #18223520; }
-.project-row-menu > button,.project-row-menu .delete-control > button { display:block; width:100%; text-align:left; padding:8px 10px; border:0; font-size:12px; background:transparent; }
-.project-row-menu button:hover { background:#f2f4f7; }
-.project-row-menu .delete-control > button { color:#994d42; }
-.project-row-menu [role="dialog"] { padding:10px; font-size:12px; }
 .object-property-section { position:relative; margin-top:8px; padding:4px 0; border:0; background:transparent; border-radius:0; }
 .object-property-heading { position:absolute; right:0; top:-42px; margin:0; }
 .object-property-section .object-properties { display:flex; align-items:center; flex-wrap:wrap; gap:6px 18px; }
@@ -298,8 +291,6 @@ label,.filters label { color:#6b7079; }
 .object-back { display:inline-block; margin-bottom:18px; color:#626874; font-size:12px; }
 .object-property-section .object-property-heading .delete-control { position:static; }
 @media(max-width:650px){.object-property-section .object-properties { gap:5px 12px; }.object-property-cell { display:flex; }.page-workspace.object-detail-page,.calendar-workspace.object-detail-page { padding:20px 18px; }.object-property-heading { top:-38px; }}
-.project-row-menu:has([role="dialog"]) { top:50%!important; left:50%!important; transform:translate(-50%,-50%); width:min(380px,calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto; }
-.project-row-menu [role="dialog"] ul { max-height:35vh; overflow:auto; }
 .object-detail-page .detail-pane { box-shadow:none; }
 /* Compact global navigation and a plain, scannable recycle list. */
 .project-options:not([open]) > div { display:none; }
