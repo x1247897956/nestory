@@ -40,6 +40,7 @@ test('type-first shared definitions, all four values, independent notes and stab
  const single=await add(page,'单选','分类');await options(page,'分类',['研究','生活']);
  const multi=await add(page,'多选','标签');await options(page,'标签',['论文','待阅读']);
  const url=await add(page,'网址','参考网址');
+ await url.getByRole('button',{name:'未填写',exact:true}).click();
  await url.getByLabel('属性值 参考网址').fill('javascript:alert(1)');
  await expect(url.getByText(/请输入完整HTTP/)).toBeVisible();
  await expect(url.getByRole('link')).toHaveCount(0);
@@ -47,10 +48,12 @@ test('type-first shared definitions, all four values, independent notes and stab
  const defs=await fields(request,'pages',a.id);
  const classification=defs.find((f:any)=>f.definition.name==='分类').definition;
  const tags=defs.find((f:any)=>f.definition.name==='标签').definition;
- await single.getByLabel('属性值 分类').selectOption(classification.options[0].id);
+ await single.getByLabel('属性值 分类').click();
+ await page.getByRole('option',{name:'研究',exact:true}).click();
  await multi.getByLabel('属性值 标签').click();
- await multi.getByRole('checkbox',{name:'论文',exact:true}).check();
- await multi.getByRole('checkbox',{name:'待阅读',exact:true}).check();
+ await page.getByRole('option',{name:'论文',exact:true}).click();
+ await page.getByRole('option',{name:'待阅读',exact:true}).click();
+ await page.keyboard.press('Escape');
  await expect.poll(async()=>{
   const values=await fields(request,'pages',a.id);return values.filter((f:any)=>f.value!==null).length;
  }).toBe(4);
@@ -69,7 +72,7 @@ test('type-first shared definitions, all four values, independent notes and stab
  expect((await fields(request,'pages',a.id)).find((f:any)=>f.definition.id===classification.id).value).toBe(classification.options[0].id);
  await page.reload();
  await expect(page.getByLabel('属性值 备注')).toHaveValue('仅属于笔记甲\n保留换行');
- await expect(page.getByLabel('属性值 分类')).toHaveValue(classification.options[0].id);
+ await expect(page.getByLabel('属性值 分类')).toHaveText('研究资料');
  await page.setViewportSize({width:390,height:844});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
  await page.screenshot({animations:'disabled',fullPage:true,path:'/tmp/noteapp-custom-properties-mobile.png'});
@@ -170,4 +173,59 @@ test('an unopened shared settings draft in another tab never blocks this note va
  let prompted=false;other.on('dialog',async dialog=>{prompted=true;await dialog.dismiss();});
  await other.getByRole('link',{name:'工作台',exact:true}).click();
  await expect(other).toHaveURL('/');expect(prompted).toBe(false);
+});
+
+
+test('choice popovers create tags inline and URL values are direct editable links',async({page,request})=>{
+ const p=await post(request,'/projects',{title:'属性交互'});
+ const n=await post(request,`/projects/${p.id}/pages`,{title:'紧凑属性'});
+ await page.goto(`/projects/${p.id}/pages/${n.id}`);
+ await add(page,'多选','标签');
+ await page.getByLabel('属性值 标签',{exact:true}).click();
+ await page.getByLabel('搜索或创建选项',{exact:true}).fill('直接创建');
+ await page.getByRole('button',{name:'创建“直接创建”',exact:true}).click();
+ await expect.poll(async()=>(await fields(request,'pages',n.id))[0].value?.length).toBe(1);
+ await expect(page.getByRole('option',{name:'直接创建',exact:true})).toHaveAttribute('aria-selected','true');
+ await page.getByLabel('搜索或创建选项',{exact:true}).fill('第二项');
+ await page.getByLabel('搜索或创建选项',{exact:true}).press('Enter');
+ await expect.poll(async()=>(await fields(request,'pages',n.id))[0].value?.length).toBe(2);
+ await page.keyboard.press('Escape');
+ const url=await add(page,'网址','参考');
+ await url.getByRole('button',{name:'未填写',exact:true}).click();
+ await url.getByLabel('属性值 参考',{exact:true}).fill('http://127.0.0.1:18187/search');
+ await url.getByLabel('属性值 参考',{exact:true}).press('Enter');
+ const link=url.getByRole('link',{name:'打开网址 参考',exact:true});
+ await expect(link).toHaveAttribute('href','http://127.0.0.1:18187/search');
+ const opened=page.waitForEvent('popup');await link.click();const tab=await opened;await expect(tab).toHaveURL(/\/search$/);await tab.close();
+ await url.getByRole('button',{name:'编辑网址 参考',exact:true}).click();
+ await expect(url.getByLabel('属性值 参考',{exact:true})).toHaveValue('http://127.0.0.1:18187/search');
+ await url.getByLabel('属性值 参考',{exact:true}).press('Enter');
+ await expect.poll(async()=>(await fields(request,'pages',n.id)).find((f:any)=>f.definition.name==='参考').value).toBe('http://127.0.0.1:18187/search');
+ await page.setViewportSize({width:773,height:827});
+ await page.screenshot({fullPage:true,path:'/tmp/noteapp-property-redesign-773.png'});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(773);
+ await page.getByLabel('属性值 标签',{exact:true}).click();
+ await page.screenshot({path:'/tmp/noteapp-property-choice-773.png'});
+ await page.keyboard.press('Escape');
+ await page.getByRole('button',{name:'设置属性 标签',exact:true}).click();
+ await expect(page.getByRole('group',{name:'属性设置',exact:true}).getByLabel('选项名称 1',{exact:true})).toHaveValue('直接创建');
+ await expect(page.getByRole('group',{name:'属性设置',exact:true}).getByLabel('选项名称 2',{exact:true})).toHaveValue('第二项');
+ await page.screenshot({path:'/tmp/noteapp-property-settings-773.png'});
+});
+
+test('inline option creation preserves concurrent definition edits',async({page,request})=>{
+ const p=await post(request,'/projects',{title:'并发选项'});
+ const n=await post(request,`/projects/${p.id}/pages`,{title:'选项合并'});
+ const d=await post(request,`/projects/${p.id}/property-definitions/pages`,{kind:'multi_select',name:'标签'});
+ await page.goto(`/projects/${p.id}/pages/${n.id}`);
+ await expect(page.getByLabel('属性值 标签',{exact:true})).toBeVisible();
+ const changed=await request.patch(`/api/v1/property-definitions/${d.id}`,{data:{version:1,name:'共享标签',options:[{id:'other-option',name:'另一页新增'}]}});
+ expect(changed.status()).toBe(200);
+ await page.getByLabel('属性值 标签',{exact:true}).click();
+ await page.getByLabel('搜索或创建选项',{exact:true}).fill('本页新增');
+ await page.getByRole('button',{name:'创建“本页新增”',exact:true}).click();
+ await expect.poll(async()=>(await fields(request,'pages',n.id))[0].value?.length).toBe(1);
+ const result=(await fields(request,'pages',n.id))[0];
+ expect(result.definition.name).toBe('共享标签');
+ expect(result.definition.options.map((o:any)=>o.name)).toEqual(['另一页新增','本页新增']);
 });

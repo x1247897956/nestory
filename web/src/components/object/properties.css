@@ -34,3 +34,41 @@
 .custom-multiselect-options label { display:flex; align-items:center; gap:7px; padding:3px; font-size:12px; }
 .editor .custom-multiselect-options input { width:14px; min-height:14px; height:14px; margin:0; accent-color:#243b63; }
 @media(max-width:650px) { .custom-properties-fields { display:block; } .custom-property { margin-bottom:5px; } .custom-property-name { min-width:70px; text-align:left; } .custom-property-value { flex:1; min-width:0; max-width:100%; } .custom-property-entry { width:100%; } }
+
+/* Object properties are a quiet two-column list, with editing at the value. */
+.custom-properties { font-size:13px; margin-top:8px; }
+.custom-properties-fields { display:flex; flex-direction:column; gap:2px; }
+.custom-property { width:100%; min-width:0; }
+.custom-property-entry { display:grid; grid-template-columns:minmax(100px,152px) minmax(0,1fr); gap:12px; align-items:start; }
+.custom-property-name { display:flex; align-items:center; gap:8px; width:100%; max-width:none; padding:7px 8px; text-align:left; font-size:12px; border-radius:4px; }
+.custom-property-name svg { flex:none; }
+.custom-property-name span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.custom-property-value { width:100%; max-width:none; min-width:0; }
+.editor .custom-property-value textarea { resize:none; padding:5px 8px; }
+.property-value-trigger { display:flex; flex-wrap:wrap; align-items:center; gap:5px; width:100%; min-height:32px; padding:5px 8px; border:0; background:transparent; text-align:left; color:inherit; font:inherit; border-radius:4px; }
+.property-value-trigger:hover:not(:disabled) { background:#f4f5f7; }
+.property-empty { color:#737986; }
+.property-tag { display:inline-block; max-width:100%; padding:2px 7px; border-radius:4px; background:#eef0f3; color:#394352; line-height:1.5; overflow-wrap:anywhere; }
+.property-url-value { display:flex; align-items:center; gap:4px; min-height:32px; }
+.property-url-value > a { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:5px 8px; color:#243b63; text-decoration:underline; text-underline-offset:3px; }
+.property-url-edit { flex:none; border:0; background:transparent; padding:5px; color:#737986; opacity:0; }
+.property-url-value:hover .property-url-edit,.property-url-value:focus-within .property-url-edit { opacity:1; }
+.property-choice { padding:6px; }
+.editor .property-choice > input { margin:0 0 5px; padding:9px; border:0; border-bottom:1px solid #e8eaee; border-radius:0; background:transparent; }
+.property-choice [role="listbox"] { max-height:220px; overflow:auto; }
+.property-choice [role="option"],.property-create-option,.property-clear { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; padding:7px 8px; border:0; border-radius:4px; background:transparent; font:inherit; text-align:left; }
+.property-choice button:hover,.property-choice button:focus-visible { background:#f1f3f6; }
+.property-clear { color:#737986; border-top:1px solid #e8eaee; border-radius:0; margin-top:5px; }
+.property-choice-hint { margin:8px; color:#737986; font-size:12px; }
+.custom-property-popover { box-shadow:0 8px 30px #1822351c; border:0; outline:1px solid #e4e7ec; padding:12px; }
+.property-choice { padding:6px; }
+.custom-option-settings { border-top:1px solid #e8eaee; padding-top:8px; margin-top:12px; }
+.property-shared-hint { margin:8px 0 0; line-height:1.5; }
+.property-recovery-actions { gap:4px; }
+.property-recovery-actions button { border:0; background:#f1f3f6; }
+@media(max-width:650px) { .custom-property-entry { grid-template-columns:105px minmax(0,1fr); gap:5px; } .custom-property-name { min-width:0; } .property-url-edit { opacity:1; } }
+.property-settings-caption { font-size:12px; font-weight:600; color:#303845; padding:0 0 12px; }
+.custom-property-popover label { font-size:11px; }
+.custom-property-popover .property-recovery-actions button { min-height:28px; }
+.editor .custom-option-settings > input { border-color:transparent; background:#f5f6f8; padding:6px 8px; margin:4px 0; }
+.custom-property button:focus-visible,.custom-property-popover button:focus-visible { outline:2px solid #243b63; outline-offset:1px; }
