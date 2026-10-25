@@ -1,0 +1,172 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/hover-diagnosis.spec.ts --grep empty metadata --repeat-each=5
+
+(node:30063) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:30064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30064) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:30064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+HOVER_DIAG {
+  moves: [
+    {
+      time: [33m1715.2999999523163[39m,
+      x: [33m310[39m,
+      y: [33m390[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    }
+  ],
+  handles: [
+    [32m'<button type="button" class="block-handle" aria-label="打开菜单" aria-haspopup="menu" aria-controls="_r_3d_" draggable="true">⠿</button>'[39m
+  ],
+  active: [32m'<div aria-autocomplete="list" aria-haspopup="listbox" contenteditable="true" role="textbox" tabindex="0" aria-label="Markdown 正文" aria-multiline="true" translate="no" class="tiptap ProseMirror bn-edit'[39m
+}
+AFTER_DIAG {
+  moves: [
+    {
+      time: [33m1715.2999999523163[39m,
+      x: [33m310[39m,
+      y: [33m390[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    }
+  ],
+  handles: [33m1[39m
+}
+MOVE_RECOVERS
+  ✓  1 e2e/hover-diagnosis.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (4.5s)
+(node:30120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30120) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:30120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+HOVER_DIAG {
+  moves: [
+    {
+      time: [33m1950.2000000476837[39m,
+      x: [33m333[39m,
+      y: [33m332[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    },
+    { scroll: [33m69[39m, time: [33m1950.7000000476837[39m }
+  ],
+  handles: [],
+  active: [32m'<div aria-autocomplete="list" aria-haspopup="listbox" contenteditable="true" role="textbox" tabindex="0" aria-label="Markdown 正文" aria-multiline="true" translate="no" class="tiptap ProseMirror bn-edit'[39m
+}
+AFTER_DIAG {
+  moves: [
+    {
+      time: [33m1950.2000000476837[39m,
+      x: [33m333[39m,
+      y: [33m332[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    },
+    { scroll: [33m69[39m, time: [33m1950.7000000476837[39m }
+  ],
+  handles: [33m0[39m
+}
+MOVE_RECOVERS
+  ✓  2 e2e/hover-diagnosis.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (4.7s)
+(node:30157) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30157) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:30157) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+HOVER_DIAG {
+  moves: [
+    {
+      time: [33m1739.2000000476837[39m,
+      x: [33m310[39m,
+      y: [33m390[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    }
+  ],
+  handles: [
+    [32m'<button type="button" class="block-handle" aria-label="打开菜单" aria-haspopup="menu" aria-controls="_r_3d_" draggable="true">⠿</button>'[39m
+  ],
+  active: [32m'<div aria-autocomplete="list" aria-haspopup="listbox" contenteditable="true" role="textbox" tabindex="0" aria-label="Markdown 正文" aria-multiline="true" translate="no" class="tiptap ProseMirror bn-edit'[39m
+}
+AFTER_DIAG {
+  moves: [
+    {
+      time: [33m1739.2000000476837[39m,
+      x: [33m310[39m,
+      y: [33m390[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    }
+  ],
+  handles: [33m1[39m
+}
+MOVE_RECOVERS
+  ✓  3 e2e/hover-diagnosis.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (4.5s)
+(node:30197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30197) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:30197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+HOVER_DIAG {
+  moves: [
+    {
+      time: [33m1977.9000000953674[39m,
+      x: [33m333[39m,
+      y: [33m332[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    },
+    { scroll: [33m69[39m, time: [33m1978.2000000476837[39m }
+  ],
+  handles: [],
+  active: [32m'<div aria-autocomplete="list" aria-haspopup="listbox" contenteditable="true" role="textbox" tabindex="0" aria-label="Markdown 正文" aria-multiline="true" translate="no" class="tiptap ProseMirror bn-edit'[39m
+}
+AFTER_DIAG {
+  moves: [
+    {
+      time: [33m1977.9000000953674[39m,
+      x: [33m333[39m,
+      y: [33m332[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    },
+    { scroll: [33m69[39m, time: [33m1978.2000000476837[39m }
+  ],
+  handles: [33m0[39m
+}
+MOVE_RECOVERS
+  ✓  4 e2e/hover-diagnosis.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (4.8s)
+(node:30235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30235) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:30235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+HOVER_DIAG {
+  moves: [
+    {
+      time: [33m1705.2999999523163[39m,
+      x: [33m310[39m,
+      y: [33m390[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    }
+  ],
+  handles: [
+    [32m'<button type="button" class="block-handle" aria-label="打开菜单" aria-haspopup="menu" aria-controls="_r_3d_" draggable="true">⠿</button>'[39m
+  ],
+  active: [32m'<div aria-autocomplete="list" aria-haspopup="listbox" contenteditable="true" role="textbox" tabindex="0" aria-label="Markdown 正文" aria-multiline="true" translate="no" class="tiptap ProseMirror bn-edit'[39m
+}
+AFTER_DIAG {
+  moves: [
+    {
+      time: [33m1705.2999999523163[39m,
+      x: [33m310[39m,
+      y: [33m390[39m,
+      target: [32m'<h2 class="bn-inline-content">块标题</h2>'[39m
+    }
+  ],
+  handles: [33m1[39m
+}
+MOVE_RECOVERS
+  ✓  5 e2e/hover-diagnosis.spec.ts:93:1 › empty metadata preserves the native document; block copy, undo, slash keyboard and read-only mode (4.4s)
+
+  5 passed (25.4s)

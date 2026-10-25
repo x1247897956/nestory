@@ -136,7 +136,16 @@ test("empty metadata preserves the native document; block copy, undo, slash keyb
   await expect(editor).not.toContainText("撤销内容");
   await editor.press("ControlOrMeta+Shift+z");
   await expect(editor).toContainText("撤销内容");
-  await editor.getByRole("heading", { name: "块标题" }).hover();
+  const heading = editor.getByRole("heading", { name: "块标题" });
+  // Playwright hover can trigger a late scroll, which intentionally hides
+  // BlockNote's side menu. Move within the block after that scroll commits,
+  // like a pointer approaching its handle, rather than waiting motionless.
+  await heading.hover();
+  await page.evaluate(() => new Promise<void>(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  const headingBox = await heading.boundingBox();
+  expect(headingBox).not.toBeNull();
+  await page.mouse.move(headingBox!.x + 8, headingBox!.y + headingBox!.height / 2, { steps: 3 });
   await page.getByRole("button", { name: "打开菜单", exact: true }).click();
   await page.getByRole("menuitem", { name: "复制块", exact: true }).click();
   await expect(editor.getByRole("heading", { name: "块标题" })).toHaveCount(2);

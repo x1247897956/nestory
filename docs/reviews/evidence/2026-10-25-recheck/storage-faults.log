@@ -1,0 +1,83 @@
+{
+  "unwritable_upload": [
+    500,
+    {
+      "error": {
+        "code": "internal",
+        "message": "服务器内部错误"
+      }
+    }
+  ],
+  "fill_exit": 1,
+  "fill_error": "dd: error writing '/data/audit-filler': No space left on device\n1853+0 records in\n1852+0 records out\n1896448 bytes (1.8MB) copied, 0.001181 seconds, 1.5GB/s\n",
+  "full_create": [
+    500,
+    {
+      "error": {
+        "code": "internal",
+        "message": "服务器内部错误"
+      }
+    }
+  ],
+  "full_upload": [
+    500,
+    {
+      "error": {
+        "code": "internal",
+        "message": "服务器内部错误"
+      }
+    }
+  ],
+  "baseline_read": [
+    200,
+    {
+      "pinned": false,
+      "id": "b2ba4e4571f7efd2ccf9bafc35449751",
+      "title": "before full",
+      "description": "",
+      "archived_at": null,
+      "created_at": 1792943241941,
+      "updated_at": 1792943241941,
+      "version": 1
+    }
+  ],
+  "after_free": [
+    201,
+    {
+      "pinned": false,
+      "id": "df262d3b1425c7f6601d4435084eb323",
+      "title": "after free",
+      "description": "",
+      "archived_at": null,
+      "created_at": 1792943242119,
+      "updated_at": 1792943242119,
+      "version": 1
+    }
+  ],
+  "projects": [
+    200,
+    [
+      {
+        "pinned": false,
+        "id": "b2ba4e4571f7efd2ccf9bafc35449751",
+        "title": "before full",
+        "description": "",
+        "archived_at": null,
+        "created_at": 1792943241941,
+        "updated_at": 1792943241941,
+        "version": 1
+      },
+      {
+        "pinned": false,
+        "id": "df262d3b1425c7f6601d4435084eb323",
+        "title": "after free",
+        "description": "",
+        "archived_at": null,
+        "created_at": 1792943242119,
+        "updated_at": 1792943242119,
+        "version": 1
+      }
+    ]
+  ],
+  "logs": "2026/10/25 15:47:21 INFO listening addr=:8080\n2026/10/25 15:47:22 ERROR request failed error=\"open /data/assets/upload-1740695269: permission denied\"\n2026/10/25 15:47:22 ERROR request failed error=\"database or disk is full (13)\"\n2026/10/25 15:47:22 ERROR request failed error=\"write /data/assets/upload-3591294590: no space left on device\"\n"
+}
