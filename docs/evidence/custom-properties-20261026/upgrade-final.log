@@ -1,0 +1,3 @@
+PASS actual schema8 backup upgraded to9: all 12 original tables unchanged except added migration9; attachments unchanged
+PASS clean-volume restore: all four definitions/options/values/versions and native body preserved
+Verified rehearsal backup directories: 2026-10-26-custom-upgrade-9e689f5a3a 2026-10-26-custom-values-9e689f5a3a

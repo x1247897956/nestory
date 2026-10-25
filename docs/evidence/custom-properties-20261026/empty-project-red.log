@@ -1,0 +1,5 @@
+--- FAIL: TestDefinitionChangeInvalidatesEmptyProjectPreview (0.02s)
+    custom_properties_test.go:139: DELETE /projects/e1314c44bc3a3745035f596adfb7ef8d: want 409 got 200: {"batch_id":"366717be0c437ec1cab17cdeea2d904c"}
+FAIL
+FAIL	noteapp/internal/app	4.994s
+FAIL

@@ -1,0 +1,1 @@
+PASS schema9, all 12 pre-existing tables unchanged (migration9 added), 12 attachment SHA unchanged; no synthetic fields in production

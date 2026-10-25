@@ -1,3 +1,5 @@
+当前新增功能验收：[schema9 自定义属性](implementation/2026-10-26-custom-properties.md)。
+
 # Noteapp 第一版实际验收
 
 当前追加版本见 [2026-10-25 发布审查修复](reviews/2026-10-25-release-fixes.md) 和 [2026-10-26 交互精简与回归](implementation/2026-10-26-task-interactions.md)，下文保留最初阶段验收证据。

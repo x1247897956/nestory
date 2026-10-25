@@ -1,0 +1,48 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/custom-properties.spec.ts --grep another note
+
+(node:8429) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:8430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8430) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:8430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/custom-properties.spec.ts:298:1 › another note can save its own value after a shared definition is edited in a different tab (6.6s)
+
+
+  1) e2e/custom-properties.spec.ts:298:1 › another note can save its own value after a shared definition is edited in a different tab 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"此笔记自己的内容"[39m
+    Received: [31mnull[39m
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      148 |  const field=other.locator(`[data-custom-property="${d.id}"]`);
+      149 |  await field.getByRole('textbox').fill('此笔记自己的内容');
+    > 150 |  await expect.poll(async()=>(await fields(request,'pages',b.id))[0].value).toBe('此笔记自己的内容');
+          |  ^
+      151 |  await expect(field.getByRole('textbox')).toHaveValue('此笔记自己的内容');
+      152 |  expect((await fields(request,'pages',a.id))[0].value).toBeNull();
+      153 | });
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/custom-properties.spec.ts:150:2
+
+    Error Context: test-results/custom-properties-another--c6a93-s-edited-in-a-different-tab/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/custom-properties-another--c6a93-s-edited-in-a-different-tab/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/custom-properties-another--c6a93-s-edited-in-a-different-tab/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/custom-properties.spec.ts:298:1 › another note can save its own value after a shared definition is edited in a different tab 

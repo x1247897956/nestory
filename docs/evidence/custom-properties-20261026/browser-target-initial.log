@@ -1,0 +1,20 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/custom-properties.spec.ts
+
+(node:6962) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:6969) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6969) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:6969) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/custom-properties.spec.ts:71:1 › type-first shared definitions, all four values, independent notes and stable option IDs (11.0s)
+  ✓  2 e2e/custom-properties.spec.ts:174:1 › value conflicts preserve input, forced-close recovery saves, archive stays read-only (3.7s)
+  ✓  3 e2e/custom-properties.spec.ts:241:1 › lost definition response retries the same creation, task and event fields use the same UI (4.2s)
+
+  3 passed (20.8s)

@@ -18,3 +18,11 @@ runner现执行常规业务用例和发布回归的完整套件，全部写入�
 磁盘测试使用 **2MiB 独立 named tmpfs volume** 触发 ENOSPC，不填满 Docker 主磁盘。迁移脚本创建自己的 schema6 数据，测试拒绝未准备的旧正文、准备复用、升级到8、三端关系和附件。
 
 Alpine脚本使用官方分支main secdb和镜像内原生apk版本比较，输出版本候选，不能代替运行路径/可利用性判定；不要求Docker Scout登录。
+
+自定义属性schema9演练（只恢复备份副本到本脚本新建的临时卷，不操作正式容器）：
+
+```sh
+python3 scripts/audit/custom_properties_rehearsal.py --image noteapp:custom-properties-20261026 --source-image noteapp:object-menu-20261026 --backup backups/2026-10-26-after-object-menu
+```
+
+要求源清单是schema8且源镜像与清单一致。脚本升级副本到9、比较全部原有行和附件，写入独立演练项目的四种属性，再备份恢复到另一个干净卷核对；会在backups/留下验证备份，临时容器/卷自动清理。随机宿主端口在停启后重新发现，避免复用旧地址。已有schema6准备迁移脚本当前目标也为schema9。
