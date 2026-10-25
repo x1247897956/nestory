@@ -16,8 +16,8 @@ class BackupRestore(unittest.TestCase):
    try:self.api('/readyz');break
    except Exception:time.sleep(.1)
   self.project=self.api('/projects',{'title':'Backup中文','request_id':self.name+'-project'});self.task_input={'title':'Task','request_id':self.name+'-task','body_document':{'version':1,'blocks':[{'id':'persisted','type':'paragraph','content':[{'type':'text','text':'persisted正文','styles':{}}]}]}};self.task=self.api('/projects/'+self.project['id']+'/tasks',self.task_input)
- def api(self,path,body=None):
-  req=urllib.request.Request(self.url+'/api/v1'+path,data=json.dumps(body).encode() if body else None,headers={'Content-Type':'application/json'})
+ def api(self,path,body=None,method=None):
+  req=urllib.request.Request(self.url+'/api/v1'+path,data=json.dumps(body).encode() if body else None,headers={'Content-Type':'application/json'},method=method)
   with urllib.request.urlopen(req,timeout=5) as res:return json.load(res)
  def tearDown(self):
   for c in [self.name,self.target]:run('docker','rm','-f',c,check=False)
@@ -36,6 +36,20 @@ class BackupRestore(unittest.TestCase):
    except Exception:time.sleep(.1)
   self.assertEqual(got['body_document'],self.task['body_document']);self.assertNotIn('body',got);self.assertNotIn('legacy_body',got)
   replay=self.api('/projects/'+self.project['id']+'/tasks',self.task_input);self.assertEqual(replay,self.task)
+ def test_custom_properties_survive_clean_volume_restore(self):
+  for kind,value in [('text','保留自定义正文'),('url','https://example.com'),('single_select','o1'),('multi_select',['o1','o2'])]:
+   definition=self.api('/projects/'+self.project['id']+'/property-definitions/tasks',{'kind':kind})
+   if 'select' in kind:definition=self.api('/property-definitions/'+definition['id'],{'version':1,'options':[{'id':'o1','name':'一'},{'id':'o2','name':'二'}]},'PATCH')
+   self.api('/objects/tasks/'+self.task['id']+'/custom-properties/'+definition['id'],{'version':0,'definition_version':definition['version'],'value':value},'PUT')
+  expected=self.api('/objects/tasks/'+self.task['id']+'/custom-properties')
+  self.backup();self.restore()
+  run('docker','run','-d','--name',self.target,'-p','127.0.0.1::8080','-v',self.target+':/data',IMAGE)
+  port=json.loads(run('docker','inspect',self.target).stdout)[0]['NetworkSettings']['Ports']['8080/tcp'][0]['HostPort'];self.url='http://127.0.0.1:'+port
+  for _ in range(100):
+   try:actual=self.api('/objects/tasks/'+self.task['id']+'/custom-properties');break
+   except Exception:time.sleep(.1)
+  self.assertEqual(actual,expected)
+  self.assertEqual(self.api('/tasks/'+self.task['id'])['body_document'],self.task['body_document'])
  def test_failure_after_stop_restarts_original(self):
   # Corrupt the schema so manifest validation fails after tar, not before stopping.
   run('docker','exec',self.name,'sh','-c','mkdir /data/unexpected; ln -s /etc/passwd /data/unexpected/link')

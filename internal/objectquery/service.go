@@ -13,14 +13,18 @@ import (
 type Reader func(context.Context, string) (object.Object, error)
 type ProjectState func(context.Context, string) (bool, error)
 type RelationReader func(context.Context, string, string) ([]relation.Item, error)
+type CustomPropertyReader func(context.Context, object.Type, string) ([]object.CustomProperty, error)
 type Service struct {
+	custom    CustomPropertyReader
 	readers   map[object.Type]Reader
 	archived  ProjectState
 	relations RelationReader
 }
 
-func New(readers map[object.Type]Reader, archived ProjectState, relations RelationReader) *Service {
-	return &Service{readers: maps.Clone(readers), archived: archived, relations: relations}
+func New(readers map[object.Type]Reader, archived ProjectState, relations RelationReader, custom CustomPropertyReader) *Service {
+	s := &Service{readers: maps.Clone(readers), archived: archived, relations: relations}
+	s.custom = custom
+	return s
 }
 func (s *Service) Get(ctx context.Context, typ object.Type, id string) (object.Object, error) {
 	if _, err := object.Describe(typ); err != nil {
@@ -46,5 +50,12 @@ func (s *Service) Get(ctx context.Context, typ object.Type, id string) (object.O
 		v.Properties = map[string]any{}
 	}
 	v.Properties["relations"] = links
+	v.CustomProperties = []object.CustomProperty{}
+	if s.custom != nil {
+		v.CustomProperties, err = s.custom(ctx, typ, id)
+		if err != nil {
+			return object.Object{}, err
+		}
+	}
 	return v, nil
 }

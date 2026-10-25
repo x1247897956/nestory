@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"noteapp/internal/asset"
+	"noteapp/internal/customproperty"
 	"noteapp/internal/event"
 	"noteapp/internal/object"
 	"noteapp/internal/objectquery"
@@ -148,6 +149,8 @@ func New(db *sql.DB, c config.Config) http.Handler {
 
 	events := event.New(db)
 	relations := relation.New(db)
+	properties := customproperty.New(db)
+	registerCustomProperties(mux, properties)
 	registerObjects(mux, objectquery.New(map[object.Type]objectquery.Reader{
 		object.Task: func(ctx context.Context, id string) (object.Object, error) {
 			v, err := t.Get(ctx, id)
@@ -164,7 +167,10 @@ func New(db *sql.DB, c config.Config) http.Handler {
 	}, func(ctx context.Context, pid string) (bool, error) {
 		v, err := p.Get(ctx, pid)
 		return v.ArchivedAt != nil, err
-	}, relations.List))
+	}, relations.List, func(ctx context.Context, typ object.Type, id string) ([]object.CustomProperty, error) {
+		v, e := properties.Fields(ctx, typ, id)
+		return v.Fields, e
+	}))
 	mux.HandleFunc("GET /api/v1/projects/{id}/relation-options", func(w http.ResponseWriter, r *http.Request) {
 		v, e := relations.Candidates(r.Context(), r.PathValue("id"))
 		respond(w, 200, v, e)

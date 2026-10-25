@@ -22,3 +22,6 @@ var BlockDocuments string
 
 //go:embed 008_creation_requests.sql
 var CreationRequests string
+
+//go:embed 009_custom_properties.sql
+var CustomProperties string

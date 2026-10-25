@@ -305,6 +305,24 @@ func fingerprint(ctx context.Context, q query, typ string, members []Member) (st
 			}
 			raw, _ := json.Marshal([]any{table, m.ID, version})
 			entries = append(entries, string(raw))
+			if table == "projects" {
+				var definitions string
+				if err = q.QueryRowContext(ctx, `SELECT coalesce(json_group_array(json_array(id,version)),'[]') FROM (SELECT id,version FROM custom_property_definitions WHERE project_id=? ORDER BY id)`, m.ID).Scan(&definitions); err != nil {
+					return "", err
+				}
+				entries = append(entries, "definitions:"+m.ID+":"+definitions)
+			}
+			if table != "projects" {
+				var properties string
+				err = q.QueryRowContext(ctx, `SELECT coalesce(json_group_array(json_array(id,version,value_version)),'[]') FROM
+              (SELECT d.id,d.version,coalesce(v.version,0) value_version FROM custom_property_definitions d
+               LEFT JOIN custom_property_values v ON v.definition_id=d.id AND v.object_id=?
+               WHERE d.object_type=? AND d.project_id=(SELECT project_id FROM `+table+` WHERE id=?) ORDER BY d.id)`, m.ID, table, m.ID).Scan(&properties)
+				if err != nil {
+					return "", err
+				}
+				entries = append(entries, table+":"+m.ID+":"+properties)
+			}
 		}
 	}
 	sort.Strings(entries)

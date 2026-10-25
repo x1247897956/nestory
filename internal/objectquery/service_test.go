@@ -29,7 +29,7 @@ func TestQueryPreservesRulesAndPropagatesFailures(t *testing.T) {
 			t.Fatal(typ, id)
 		}
 		return []relation.Item{{ID: "n", Type: "pages"}}, nil
-	})
+	}, nil)
 	v, err := s.Get(ctx, object.Task, "t")
 	if err != nil || !v.ReadOnly || v.Properties["stage"] != "todo" || len(v.Properties["relations"].([]relation.Item)) != 1 {
 		t.Fatal(v, err)

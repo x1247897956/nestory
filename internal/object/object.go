@@ -1,6 +1,6 @@
 // Package object defines the shared identity and fixed intrinsic properties of
 // tasks, notes and events. Type-specific services retain their own validation
-// and storage; properties are not user-defined fields or an EAV persistence model.
+// and storage; custom definitions and values are separate from intrinsic fields.
 package object
 
 import (
@@ -37,16 +37,17 @@ type Entity interface{ AsObject() Object }
 // Object is a shared read view. Version tracks the native object row; relation
 // changes use their own idempotent operations and do not increment that version.
 type Object struct {
-	BodyDocument json.RawMessage `json:"body_document"`
-	ID           string          `json:"id"`
-	Type         Type            `json:"type"`
-	ProjectID    string          `json:"project_id"`
-	Title        string          `json:"title"`
-	Version      int64           `json:"version"`
-	CreatedAt    int64           `json:"created_at"`
-	UpdatedAt    int64           `json:"updated_at"`
-	ReadOnly     bool            `json:"read_only"`
-	Properties   map[string]any  `json:"properties"`
+	CustomProperties []CustomProperty `json:"custom_properties"`
+	BodyDocument     json.RawMessage  `json:"body_document"`
+	ID               string           `json:"id"`
+	Type             Type             `json:"type"`
+	ProjectID        string           `json:"project_id"`
+	Title            string           `json:"title"`
+	Version          int64            `json:"version"`
+	CreatedAt        int64            `json:"created_at"`
+	UpdatedAt        int64            `json:"updated_at"`
+	ReadOnly         bool             `json:"read_only"`
+	Properties       map[string]any   `json:"properties"`
 }
 
 func Describe(typ Type) (Definition, error) {
@@ -71,4 +72,26 @@ func Describe(typ Type) (Definition, error) {
 	}
 	d.Properties = append(d.Properties, PropertyDefinition{Key: "relations", Label: "关联对象", Kind: "relations", Default: []any{}, Mutation: "relation"})
 	return d, nil
+}
+
+// CustomDefinition is shared by all objects of one type in one project.
+type CustomOption struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+type CustomDefinition struct {
+	ID         string         `json:"id"`
+	ProjectID  string         `json:"project_id"`
+	ObjectType Type           `json:"object_type"`
+	Name       string         `json:"name"`
+	Kind       string         `json:"kind"`
+	Options    []CustomOption `json:"options"`
+	Version    int64          `json:"version"`
+	CreatedAt  int64          `json:"created_at"`
+	UpdatedAt  int64          `json:"updated_at"`
+}
+type CustomProperty struct {
+	Definition CustomDefinition `json:"definition"`
+	Value      json.RawMessage  `json:"value"`
+	Version    int64            `json:"version"`
 }
