@@ -1,3 +1,4 @@
+import { CustomProperties } from "./CustomProperties";
 import { Children, isValidElement, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../app/api";
@@ -18,5 +19,6 @@ export function ObjectProperties({ projectId, type, id, version, archived, child
     <div className="object-properties task-properties" role="group" aria-label="对象属性">
       {schema.data ? schema.data.properties.filter(property => type !== "pages" || property.key === "relations").map(property => property.kind === "relations" ? <div className="object-property-cell" key={property.key} data-property={property.key}><Relations key={type + id} projectId={projectId} type={type} id={id} archived={readonly}/></div> : <div className="object-property-cell" key={property.key} data-property={property.key}><span className="object-property-label">{property.label}</span>{fields.get(property.key) ?? <span className="object-property-value">{object.isPending ? "加载中…" : object.data?.properties[property.key] == null ? "未设置" : String(object.data.properties[property.key])}</span>}</div>) : <>{schema.isPending && <span role="status">正在加载属性定义…</span>}{children}</>}
     </div>
+    <CustomProperties key={type+id} projectId={projectId} type={type} id={id} archived={readonly}/>
   </section>;
 }

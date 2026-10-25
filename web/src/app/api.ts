@@ -67,7 +67,7 @@ export function abandonCreateIntent(path: string, body: unknown): void {
   }
 }
 function createIntent(path: string, method: string, body: unknown) {
-  if (method !== "POST" || !/^\/projects(?:\/[^/?]+\/(?:tasks|pages|events))?$/.test(path)) return;
+  if (method !== "POST" || !(/^\/projects(?:\/[^/?]+\/(?:tasks|pages|events))?$/.test(path) || /^\/projects\/[^/?]+\/property-definitions\/(?:tasks|pages|events)$/.test(path))) return;
   if (!body || typeof body !== "object" || Array.isArray(body)) return;
   try {
     const key = createIntentKey(path, body);

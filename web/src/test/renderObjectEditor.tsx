@@ -12,5 +12,6 @@ export function renderObjectEditor(element: ReactElement) {
   client.setQueryData(["object-type", "events"], {type:"events", properties:[{key:"start_at",label:"开始时间"},{key:"end_at",label:"结束时间"},{key:"relations",label:"关联对象",kind:"relations"}]});
   for (const type of ["tasks", "events"]) for (const id of ["t", "e", "fold"]) for (const archived of [false,true]) client.setQueryData(["object", type, id, 1, archived], {read_only:archived,properties:{}});
   for (const type of ["tasks", "events"]) for (const id of ["t", "e", "fold"]) client.setQueryData(["relations", type, id], []);
+  for (const type of ["tasks", "events"]) for (const id of ["t", "e", "fold"]) client.setQueryData(["custom-properties", "p", type, id], {fields:[],read_only:false});
   return render(<QueryClientProvider client={client}><MemoryRouter>{element}</MemoryRouter></QueryClientProvider>);
 }

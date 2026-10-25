@@ -31,8 +31,8 @@ Interfaces: Spec中的5个HTTP接口；Service Definitions/Create/Update/Fields/
 
 Files: web/src/components/object/CustomProperties.tsx, PropertyField.tsx, PropertySettings.tsx, properties.css；ObjectProperties接入，api持久创建intent。
 Interfaces: type-first创建默认名→自动命名；属性值/定义自动保存，fields查询缓存聚合，独立草稿key。
-- [ ] 写浏览器用例覆盖同类型已有/新建对象继承、异类型/项目隔离、全部值、选项编辑、版本冲突、正文不丢、归档。
-- [ ] 实现紧凑字段、菜单与各状态、自动保存及恢复，单测/构建/浏览器测试。
+- [x] 写浏览器用例覆盖同类型已有/新建对象继承、异类型/项目隔离、全部值、选项编辑、版本冲突、正文不丢、归档。
+- [x] 实现紧凑字段、菜单与各状态、自动保存及恢复，单测/构建/浏览器测试。
 
 ### Task 3: 验收与部署
 
