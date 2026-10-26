@@ -1,3 +1,4 @@
+import {closeObject} from "./object-actions";
 import {test,expect} from '@playwright/test';
 import {DateTime} from 'luxon';
 test('workspace emphasizes overdue work and removes status navigation and creation CTA',async({page,request})=>{
@@ -20,6 +21,7 @@ test('workspace emphasizes overdue work and removes status navigation and creati
  if(await reviewLink.count()===0) await calendar.locator(`.fc-daygrid-day[data-date="${day}"] .fc-daygrid-more-link`).click();
  await expect(reviewLink.first()).toBeVisible();
  await expect(page.getByRole('link',{name:'工作台',exact:true})).toHaveAttribute('aria-current','page');
+ await closeObject(page);
  await page.getByRole('link',{name:'搜索',exact:true}).click();
  await expect(page.getByRole('link',{name:'搜索',exact:true})).toHaveAttribute('aria-current','page');
  await expect(page.getByRole('link',{name:'工作台',exact:true})).not.toHaveAttribute('aria-current','page');

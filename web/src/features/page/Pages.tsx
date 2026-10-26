@@ -1,3 +1,4 @@
+import { ObjectDialog } from "../../components/object/ObjectDialog";
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
@@ -20,10 +21,12 @@ export type Page = {
 };
 export function Pages({
   projectId,
+  projectTitle = "项目",
   pageId,
   archived,
 }: {
   projectId: string;
+  projectTitle?: string;
   pageId?: string;
   archived: boolean;
 }) {
@@ -108,12 +111,11 @@ export function Pages({
   return (
     <div
       className={
-        "page-workspace " +
-        (pageId ? "object-detail-page" : "page-list-workspace")
+        "page-workspace page-list-workspace"
       }
     >
-      {!pageId && (
-        <section className="page-tree" aria-label="笔记列表">
+      {(
+        <section className="page-tree" aria-label="笔记列表" aria-hidden={pageId?true:undefined} inert={!!pageId}>
           <header className="page-list-header">
             <h2>笔记</h2>
             {!archived && (
@@ -168,12 +170,8 @@ export function Pages({
         </section>
       )}
       {pageId && (
+        <ObjectDialog projectId={projectId} projectTitle={projectTitle} type="pages" title={detail.data?.title ?? "加载中…"}>
         <section>
-          {pageId && (
-            <Link className="object-back" to={`/projects/${projectId}/pages`}>
-              ← 返回笔记列表
-            </Link>
-          )}
           {pageId ? (
             detail.data && detail.data.project_id === projectId ? (
               <>
@@ -209,6 +207,7 @@ export function Pages({
             <p>选择或新建笔记，开始记录。</p>
           )}
         </section>
+        </ObjectDialog>
       )}
     </div>
   );
@@ -245,8 +244,8 @@ export function PageEditor({
   const titleInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (focusTitle && !archived) {
-      titleInput.current?.focus();
-      titleInput.current?.select();
+      const frame=requestAnimationFrame(()=>{titleInput.current?.focus();titleInput.current?.select();});
+      return()=>cancelAnimationFrame(frame);
     }
   }, [focusTitle, archived]);
   return (

@@ -1,3 +1,4 @@
+import {closeObject} from "./object-actions";
 import { test, expect } from "@playwright/test";
 test("breadcrumbs name the current surface and project options dismiss naturally", async ({
   page,
@@ -29,6 +30,7 @@ test("breadcrumbs name the current surface and project options dismiss naturally
     .click();
   await expect(options).not.toHaveAttribute("open", "");
   await summary.click();
+  await closeObject(page);
   await page.getByRole("link", { name: "搜索", exact: true }).click();
   await expect(options).not.toHaveAttribute("open", "");
   const p = await (
@@ -52,7 +54,7 @@ test("breadcrumbs name the current surface and project options dismiss naturally
     ).json();
     await page.goto(`/projects/${p.id}/${kind}/${o.id}`);
     const crumbs = page.getByRole("navigation", { name: "面包屑" });
-    await expect(crumbs).toHaveText(`${p.title}/对象 ${kind}`);
+    await expect(crumbs).toHaveText(`${p.title}/${kind==="tasks"?"任务":kind==="pages"?"笔记":"日程"}/对象 ${kind}`);
     await crumbs.getByRole("link", { name: "汇总", exact: true }).click();
     await expect(page).toHaveURL(`/projects/${p.id}`);
     await expect(crumbs).toHaveText(p.title);

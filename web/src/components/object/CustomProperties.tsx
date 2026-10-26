@@ -23,6 +23,10 @@ export function CustomProperties({projectId,type,id,archived}:{projectId:string;
   qc.setQueriesData<PropertyView>({queryKey:["custom-properties",projectId,type]},old=>old?{...old,fields:old.fields.map(f=>f.definition.id===d.id?{...f,definition:d}:f)}:old);
   void qc.invalidateQueries({queryKey:["object"]});
  };
+ const definitionDeleted=(id:string)=>{
+  qc.setQueriesData<PropertyView>({queryKey:["custom-properties",projectId,type]},old=>old?{...old,fields:old.fields.filter(f=>f.definition.id!==id)}:old);
+  void qc.invalidateQueries({queryKey:["property-catalog",projectId]});void qc.invalidateQueries({queryKey:["object"]});
+ };
  const valueSaved=(field:CustomField)=>{
   qc.setQueryData<PropertyView>(key,old=>old?{...old,fields:old.fields.map(f=>f.definition.id===field.definition.id?field:f)}:old);
   void qc.invalidateQueries({queryKey:["object"]});
@@ -44,7 +48,7 @@ export function CustomProperties({projectId,type,id,archived}:{projectId:string;
   {query.isError&&<p role="alert">自定义属性加载失败，当前输入仍保留。<button onClick={()=>void query.refetch()}>重试加载属性</button></p>}
   <div className="custom-properties-fields">
    {query.data?.fields.map(field=><PropertyField key={field.definition.id} field={field} objectId={id} archived={readonly}
-    autoEdit={created===field.definition.id} onDefinition={definitionSaved} onValue={valueSaved} refresh={()=>query.refetch({throwOnError:true})}/>) }
+    autoEdit={created===field.definition.id} onDefinition={definitionSaved} onValue={valueSaved} onDeleted={definitionDeleted} refresh={()=>query.refetch({throwOnError:true})}/>) }
   </div>
   {!readonly&&!query.isPending&&!query.isError&&<>
    <button ref={trigger} className="add-property" aria-label="添加属性" disabled={creating||query.data!.fields.length>=64} popoverTarget={popup}

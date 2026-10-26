@@ -1,3 +1,4 @@
+import { ObjectDialog } from "../../components/object/ObjectDialog";
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import "./events.css";
 import { SaveIndicator } from "../../components/markdown/SaveIndicator";
@@ -41,10 +42,12 @@ type Draft = {
 };
 export function Events({
   projectId,
+  projectTitle = "项目",
   eventId,
   archived,
 }: {
   projectId: string;
+  projectTitle?: string;
   eventId?: string;
   archived: boolean;
 }) {
@@ -260,11 +263,11 @@ export function Events({
   };
   return (
     <div
-      className={"calendar-workspace " + (eventId ? "object-detail-page" : "")}
+      className="calendar-workspace"
       data-dirty={busy}
     >
-      {!eventId && (
-        <section aria-label="项目日历">
+      {(
+        <section aria-label="项目日历" aria-hidden={eventId?true:undefined} inert={!!eventId}>
           <div className="calendar-heading">
             <div>
               <h1>日程</h1>
@@ -457,13 +460,8 @@ export function Events({
         </section>
       )}
       {eventId && (
+        <ObjectDialog projectId={projectId} projectTitle={projectTitle} type="events" title={detail.data?.title ?? "加载中…"}>
         <aside className="detail-pane">
-          <button
-            aria-label="关闭日程详情"
-            onClick={() => nav("/projects/" + projectId + "/events")}
-          >
-            ← 返回日历
-          </button>
           {detail.data?.project_id === projectId ? (
             <>
               <EventEditor
@@ -496,6 +494,7 @@ export function Events({
             <p>加载日程…</p>
           )}
         </aside>
+        </ObjectDialog>
       )}
     </div>
   );

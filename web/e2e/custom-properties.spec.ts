@@ -1,3 +1,5 @@
+import {closeObject} from "./object-actions";
+import {openOption,closeOptions} from "./option-actions";
 import {expandProperties} from "./property-actions";
 import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
 import { archiveCurrentProject } from './project-actions';
@@ -17,15 +19,16 @@ async function add(page:Page,type:string,name:string) {
  return field;
 }
 async function options(page:Page,name:string,values:string[]) {
- await page.getByRole('button',{name:`设置属性 ${name}`,exact:true}).click();
- const settings=page.getByRole('group',{name:'属性设置',exact:true});
- for(const value of values) {
-  await settings.getByLabel('新选项名称',{exact:true}).fill(value);
-  await settings.getByRole('button',{name:'添加选项',exact:true}).click();
+ const field=page.getByRole('group',{name:`自定义属性 ${name}`,exact:true});
+ for(const value of values){
+  if(!await field.getByLabel('搜索或创建选项',{exact:true}).isVisible())await page.getByLabel(`属性值 ${name}`,{exact:true}).click();
+  await field.getByLabel('搜索或创建选项',{exact:true}).fill(value);
+  await page.getByRole('button',{name:`创建“${value}”`,exact:true}).click();
+  await expect(page.getByLabel(`属性值 ${name}`,{exact:true})).toContainText(value);
  }
- await expect(settings.getByLabel(`选项名称 ${values.length}`,{exact:true})).toHaveValue(values.at(-1)!);
- await expect(settings.getByText('未保存',{exact:true})).toHaveCount(0);
- await settings.getByLabel('新选项名称',{exact:true}).press('Escape');
+ if(!await field.getByLabel('搜索或创建选项',{exact:true}).isVisible())await page.getByLabel(`属性值 ${name}`,{exact:true}).click();
+ await page.getByRole('button',{name:'清空选择',exact:true}).click();
+ await expect(page.getByRole('group',{name:`自定义属性 ${name}`,exact:true}).locator('[data-dirty="true"]')).toHaveCount(0);
 }
 
 test('type-first shared definitions, all four values, independent notes and stable option IDs',async({page,request})=>{
@@ -68,13 +71,12 @@ test('type-first shared definitions, all four values, independent notes and stab
  expect(await fields(request,'tasks',task.id)).toEqual([]);
  const c=await post(request,`/projects/${project.id}/pages`,{title:'新建也继承'});
  expect((await fields(request,'pages',c.id)).length).toBe(4);
- await page.getByRole('button',{name:'设置属性 分类',exact:true}).click();
- const settings=page.getByRole('group',{name:'属性设置',exact:true});
- await settings.getByLabel('选项名称 1',{exact:true}).fill('研究资料');
+ const settings=await openOption(page,'分类','研究');
+ await settings.getByLabel('选项名称',{exact:true}).fill('研究资料');
  await expect.poll(async()=>{
   const value=(await fields(request,'pages',a.id)).find((f:any)=>f.definition.id===classification.id);return value.definition.options[0].name;
  }).toBe('研究资料');
- await settings.getByLabel('选项名称 1',{exact:true}).press('Escape');
+ await closeOptions(page);
  expect((await fields(request,'pages',a.id)).find((f:any)=>f.definition.id===classification.id).value).toBe(classification.options[0].id);
  await page.reload();await expandProperties(page);
  await expect(page.getByLabel('属性值 备注')).toHaveValue('仅属于笔记甲\n保留换行');
@@ -186,6 +188,7 @@ test('an unopened shared settings draft in another tab never blocks this note va
  await other.getByLabel('属性值 备注').fill('不受设置草稿影响');
  await expect.poll(async()=>(await fields(request,'pages',b.id))[0].value).toBe('不受设置草稿影响');
  let prompted=false;other.on('dialog',async dialog=>{prompted=true;await dialog.dismiss();});
+ await closeObject(other);
  await other.getByRole('link',{name:'工作台',exact:true}).click();
  await expect(other).toHaveURL('/');expect(prompted).toBe(false);
 });
@@ -229,8 +232,9 @@ test('choice popovers create tags inline and URL values are direct editable link
  await page.screenshot({path:'/tmp/noteapp-property-choice-773.png'});
  await page.keyboard.press('Escape');
  await page.getByRole('button',{name:'设置属性 标签',exact:true}).click();
- await expect(page.getByRole('group',{name:'属性设置',exact:true}).getByLabel('选项名称 1',{exact:true})).toHaveValue('直接创建');
- await expect(page.getByRole('group',{name:'属性设置',exact:true}).getByLabel('选项名称 2',{exact:true})).toHaveValue('第二项');
+ const propertySettings=page.getByRole('group',{name:'属性设置',exact:true});
+ await expect(propertySettings.getByLabel('选项名称')).toHaveCount(0);
+ await expect(propertySettings.getByRole('button',{name:'删除属性',exact:true})).toBeVisible();
  await page.screenshot({path:'/tmp/noteapp-property-settings-773.png'});
 });
 

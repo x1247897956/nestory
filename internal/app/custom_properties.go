@@ -30,6 +30,24 @@ func registerCustomProperties(mux *http.ServeMux, s *customproperty.Service) {
 		v, e := s.Update(r.Context(), r.PathValue("id"), in)
 		respond(w, 200, v, e)
 	})
+	mux.HandleFunc("DELETE /api/v1/property-definitions/{id}", func(w http.ResponseWriter, r *http.Request) {
+		var in customproperty.DeleteInput
+		if e := httpx.Decode(w, r, &in); e != nil {
+			httpx.Fail(w, e)
+			return
+		}
+		e := s.Delete(r.Context(), r.PathValue("id"), in)
+		respond(w, 200, map[string]bool{"deleted": true}, e)
+	})
+	mux.HandleFunc("DELETE /api/v1/property-definitions/{id}/options/{optionId}", func(w http.ResponseWriter, r *http.Request) {
+		var in customproperty.DeleteInput
+		if e := httpx.Decode(w, r, &in); e != nil {
+			httpx.Fail(w, e)
+			return
+		}
+		v, e := s.DeleteOption(r.Context(), r.PathValue("id"), r.PathValue("optionId"), in)
+		respond(w, 200, v, e)
+	})
 	mux.HandleFunc("GET /api/v1/objects/{type}/{id}/custom-properties", func(w http.ResponseWriter, r *http.Request) {
 		v, e := s.Fields(r.Context(), object.Type(r.PathValue("type")), r.PathValue("id"))
 		respond(w, 200, v, e)

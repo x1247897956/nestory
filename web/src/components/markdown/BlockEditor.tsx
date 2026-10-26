@@ -1,3 +1,4 @@
+import { useObjectPortal } from "../object/ObjectDialog";
 import { useCallback, useEffect, useRef, useState, useId, memo } from "react";
 import {
   BlockNoteEditor,
@@ -145,16 +146,18 @@ const EditorCanvas = memo(function EditorCanvas({
   attachmentInput: React.RefObject<HTMLInputElement | null>;
   importInput: React.RefObject<HTMLInputElement | null>;
 }) {
+  const portal = useObjectPortal();
   return (
     <BlockNoteView
       editor={editor}
+      portalElements={portal ? { default: portal } : undefined}
       editable={!disabled}
       theme="light"
       onChange={emit}
       slashMenu={false}
       sideMenu={false}
     >
-      {!disabled && <SideMenuController sideMenu={ObjectSideMenu} floatingUIOptions={{
+      {!disabled && <SideMenuController portalElement={portal} sideMenu={ObjectSideMenu} floatingUIOptions={{
         // BlockNote renders closing menus as inert HTML snapshots. Remove them
         // immediately so a fast pointer cannot click a handle without handlers.
         useTransitionStylesProps: { duration: { open: 250, close: 0 } },
@@ -162,6 +165,7 @@ const EditorCanvas = memo(function EditorCanvas({
       }} />}
       {!disabled && (
         <SuggestionMenuController
+          portalElement={portal}
           triggerCharacter="/"
           getItems={async (query) =>
             filterSuggestionItems(

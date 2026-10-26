@@ -35,7 +35,7 @@ test('top-right create action and dedicated summaries for every task', async ({ 
   await expect(page.getByLabel('父任务',{exact:true})).toHaveValue(parent.id);
   await expect(page.getByRole('heading',{name:'任务层级'})).toHaveCount(0);
   await expect(page.getByText('子任务',{exact:true})).toHaveCount(0);
-  await page.getByRole('link',{name:'返回任务列表'}).click();
+  await page.getByRole('link',{name:'任务',exact:true}).click();
   await add.click();
   const dialog = page.getByRole('dialog',{name:'添加任务'});
   await dialog.getByLabel('新任务标题').fill('新增独立汇总');

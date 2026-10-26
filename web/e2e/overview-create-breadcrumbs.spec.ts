@@ -1,3 +1,4 @@
+import {closeObject} from "./object-actions";
 import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from '@playwright/test';
 test('overview creates all three types and breadcrumbs open each level', async ({page,request})=>{
@@ -9,7 +10,7 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await page.getByRole('dialog').getByRole('button',{name:'创建任务',exact:true}).click();
  await expect(page.getByLabel('任务标题',{exact:true})).toHaveValue('栏内创建任务');
  const crumbs=page.getByRole('navigation',{name:'面包屑'});
- await page.getByRole('link',{name:'返回任务列表'}).click();
+ await page.getByRole('link',{name:'任务',exact:true}).click();
  await expect(page).toHaveURL(base+'/tasks');
  await crumbs.getByRole('link',{name:'汇总',exact:true}).click();
  await page.getByRole('link',{name:'创建笔记',exact:true}).click();
@@ -17,7 +18,7 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await page.getByLabel('笔记标题',{exact:true}).fill('栏内创建笔记');
  await expect(page.getByRole('status')).toHaveText('已保存');
  await expect(page.getByLabel('笔记标题',{exact:true})).toHaveValue('栏内创建笔记');
- await page.getByRole('link',{name:'返回笔记列表'}).click();
+ await page.getByRole('link',{name:'笔记',exact:true}).click();
  await expect(page).toHaveURL(base+'/pages');
  await crumbs.getByRole('link',{name:'汇总',exact:true}).click();
  await page.getByRole('link',{name:'创建日程',exact:true}).click();
@@ -30,6 +31,7 @@ test('overview creates all three types and breadcrumbs open each level', async (
  await expect(page.getByRole('button',{name:'创建任务',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'创建笔记',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'创建日程',exact:true})).toHaveCount(0);
+ await closeObject(page);
  await page.getByRole('link',{name:'工作台',exact:true}).click();
  await expect(page).toHaveURL('/');
 });

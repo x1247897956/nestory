@@ -140,3 +140,45 @@ func TestDefinitionChangeInvalidatesEmptyProjectPreview(t *testing.T) {
 	req(t, h, "POST", "/projects/"+pid+"/property-definitions/pages", object{"kind": "text"}, 201)
 	req(t, h, "DELETE", "/projects/"+pid, before, 409)
 }
+
+func TestCustomPropertyDeleteHTTPContracts(t *testing.T) {
+	h, closeDB := setup(t)
+	defer closeDB()
+	p := req(t, h, "POST", "/projects", object{"title": "Delete properties"}, 201)
+	pid := p["id"].(string)
+	n := req(t, h, "POST", "/projects/"+pid+"/pages", object{"title": "N"}, 201)
+	d := req(t, h, "POST", "/projects/"+pid+"/property-definitions/pages", object{"kind": "single_select"}, 201)
+	path := "/property-definitions/" + d["id"].(string)
+	req(t, h, "DELETE", path, object{"version": 1, "unexpected": true}, 400)
+	req(t, h, "DELETE", "/property-definitions/title", object{"version": 1}, 404)
+	d = req(t, h, "PATCH", path, object{"version": 1, "options": []object{{"id": "a", "name": "A"}, {"id": "b", "name": "B"}}}, 200)
+	req(t, h, "PUT", "/objects/pages/"+n["id"].(string)+"/custom-properties/"+d["id"].(string), object{"version": 0, "definition_version": 2, "value": "a"}, 200)
+	req(t, h, "DELETE", path+"/options/a", object{"version": 1}, 409)
+	req(t, h, "DELETE", path+"/options/missing", object{"version": 2}, 404)
+	d = req(t, h, "DELETE", path+"/options/a", object{"version": 2}, 200)
+	if d["version"] != float64(3) || len(d["options"].([]any)) != 1 {
+		t.Fatal(d)
+	}
+	fields := req(t, h, "GET", "/objects/pages/"+n["id"].(string)+"/custom-properties", nil, 200)["fields"].([]any)
+	f := fields[0].(map[string]any)
+	if f["value"] != nil || f["version"] != float64(2) {
+		t.Fatal(f)
+	}
+	got := req(t, h, "GET", "/pages/"+n["id"].(string), nil, 200)
+	if got["version"] != n["version"] {
+		t.Fatal("body version changed")
+	}
+	req(t, h, "PATCH", "/projects/"+pid, object{"version": p["version"], "archived": true}, 200)
+	req(t, h, "DELETE", path, object{"version": 3}, 409)
+	req(t, h, "DELETE", path+"/options/b", object{"version": 3}, 409)
+	// A second project exercises successful definition deletion and its response.
+	p2 := req(t, h, "POST", "/projects", object{"title": "Writable"}, 201)
+	d2 := req(t, h, "POST", "/projects/"+p2["id"].(string)+"/property-definitions/tasks", object{"kind": "text"}, 201)
+	path2 := "/property-definitions/" + d2["id"].(string)
+	req(t, h, "DELETE", path2, object{"version": 0}, 409)
+	result := req(t, h, "DELETE", path2, object{"version": 1}, 200)
+	if result["deleted"] != true {
+		t.Fatal(result)
+	}
+	req(t, h, "DELETE", path2, object{"version": 1}, 404)
+}

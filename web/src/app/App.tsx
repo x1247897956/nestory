@@ -1,3 +1,4 @@
+import { ObjectDialog } from "../components/object/ObjectDialog";
 import { ProjectMenu } from "../features/project/ProjectMenu";
 import { flushSync } from "react-dom";
 import { Workspace } from "../features/workspace/Workspace";
@@ -88,7 +89,6 @@ export function App() {
     queryFn: () => api<Task>("/tasks/" + taskId),
     enabled: !!taskId,
   });
-  const objectTitle = useQuery({queryKey:[pageId ? "page" : "event",pageId ?? eventId],queryFn:()=>api<{title:string}>(`/${pageId ? "pages" : "events"}/${pageId ?? eventId}`),enabled:!!(pageId||eventId)});
   const path = useLocation().pathname;
   useEffect(() => {
     const dismiss = (event: PointerEvent) => {
@@ -259,11 +259,11 @@ export function App() {
   );
   return (
     <div className="shell">
-      <aside className="sidebar">
+      <aside className="sidebar" aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)}>
         <Link to="/" className="brand">
           <span className="brand-mark">n.</span>
           <span>
-            Noteapp<small>个人工作空间</small>
+            Noteapp
           </span>
         </Link>
         <Link className="nav-item" to="/" aria-current={path === "/" ? "page" : undefined}>
@@ -304,23 +304,21 @@ export function App() {
         <button className="new-project" onClick={() => setProjectForm("new")}>
           ＋ 新建项目
         </button>
-        <div className="sidebar-bottom">
-          <span className="local-dot" /> 本地空间<br />
-        </div>
+
       </aside>
       <main>
-        <div className={"topbar" + (projectId && overview ? " project-overview-topbar" : "")}>
+        <div aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)} className={"topbar" + (projectId && overview ? " project-overview-topbar" : "")}>
           <div className="topbar-identity">
           <nav className="breadcrumbs" aria-label="面包屑">
             {projectId ? <>
               {overview ? <h1 aria-label={p?.title ?? "项目"}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current="page">{p?.title ?? "项目"}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总">{p?.title ?? "项目"}</Link>}
-              {(taskId || pageId || eventId) ? <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{taskId ? detail.data?.title ?? "加载中…" : objectTitle.data?.title ?? "加载中…"}</span></> : !overview && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
+              {!overview && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
 
             </> : <span aria-current="page">{path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
           </nav>
           {projectId && overview && p?.description && <p className="overview-description">{p.description}</p>}
           </div>
-          <span className="private-tag">本地 · 私有</span>
+
         </div>
         {!projectId ? (
           <>
@@ -361,18 +359,20 @@ export function App() {
             ) : calendar ? (
               <Events
                 projectId={projectId}
+                projectTitle={p?.title ?? "项目"}
                 eventId={eventId}
                 archived={readOnly}
               />
             ) : notes ? (
               <Pages
                 projectId={projectId}
+                projectTitle={p?.title ?? "项目"}
                 pageId={pageId}
                 archived={readOnly}
               />
             ) : (
-              <div className={"workspace " + (taskId ? "task-summary-workspace" : "")}>
-                {!taskId && <section className="task-list">
+              <div className="workspace">
+                <section className="task-list" aria-hidden={taskId?true:undefined} inert={!!taskId}>
                   <div className="list-toolbar">
                     <div>
                       <h2>所有任务</h2>
@@ -464,8 +464,9 @@ export function App() {
                       .map(renderRoot)
                   )}
 
-                </section>}
+                </section>
                 {taskId && (
+                  <ObjectDialog projectId={projectId} projectTitle={p?.title ?? "项目"} type="tasks" title={detail.data?.title ?? "加载中…"}>
                   <div className="task-summary-page">
                     {detail.isPending ? (
                       <p>加载任务…</p>
@@ -501,6 +502,7 @@ export function App() {
                       <p>任务不属于此项目</p>
                     )}
                   </div>
+                  </ObjectDialog>
                 )}
               </div>
             )}

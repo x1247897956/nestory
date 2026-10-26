@@ -6,7 +6,7 @@ import { PropertyChoice } from "./PropertyChoice";
 import { PropertySettings } from "./PropertySettings";
 import { propertyKinds, positionPropertyPopover, validPropertyURL, normalizePropertyValue, type CustomField, type PropertyDefinition, type PropertyValue, type PropertyView } from "./propertyTypes";
 
-export function PropertyField({field,objectId,archived,autoEdit,onDefinition,onValue,refresh}:{field:CustomField;objectId:string;archived:boolean;autoEdit:boolean;onDefinition:(d:PropertyDefinition)=>void;onValue:(field:CustomField)=>void;refresh:()=>Promise<unknown>}) {
+export function PropertyField({field,objectId,archived,autoEdit,onDefinition,onValue,onDeleted,refresh}:{field:CustomField;objectId:string;archived:boolean;autoEdit:boolean;onDefinition:(d:PropertyDefinition)=>void;onValue:(field:CustomField)=>void;onDeleted:(id:string)=>void;refresh:()=>Promise<unknown>}) {
  const [settingsEpoch,setSettingsEpoch]=useState(0);
  const [settingsOpened,setSettingsOpened]=useState(autoEdit);
  const [valueEpoch,setValueEpoch]=useState(0);
@@ -23,7 +23,7 @@ export function PropertyField({field,objectId,archived,autoEdit,onDefinition,onV
     onReload={async discard=>{await refresh();discard();setValueEpoch(n=>n+1);}}/>
   </div>
   <div id={popup} ref={panel} popover="auto" role="group" aria-label="属性设置" className="custom-property-popover">
-   {settingsOpened&&<PropertySettings key={settingsEpoch} definition={d} archived={archived} focusName={autoEdit} onSaved={onDefinition}
+   {settingsOpened&&<PropertySettings key={settingsEpoch} definition={d} archived={archived} focusName={autoEdit} onSaved={onDefinition} onDeleted={onDeleted}
     onReload={async discard=>{await refresh();discard();setSettingsEpoch(n=>n+1);}}/>}
   </div>
  </div>;
@@ -58,7 +58,7 @@ function ValueEditor({field,objectId,archived,onValue,onDefinition,onReload}:{fi
     : <>{typeof value==="string"&&value?<a href={value} target="_blank" rel="noopener noreferrer" title={value} aria-label={`打开网址 ${d.name}`}>{value}</a>:<button className="property-value-trigger property-empty" disabled={archived} onClick={()=>setEditingURL(true)}>未填写</button>}
      {!archived&&<button className="property-url-edit" aria-label={`编辑网址 ${d.name}`} onClick={()=>setEditingURL(true)}><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="m13 3 4 4-9 9-5 1 1-5Z M11 5l4 4"/></svg></button>}</>}
     </div>
-   : <PropertyChoice definition={d} value={value} disabled={archived} onChange={update} onDefinition={onDefinition}/>}
+   : <PropertyChoice definition={d} value={value} disabled={archived} pending={a.dirty||a.busy||!!a.error} onChange={update} onDefinition={onDefinition} onOptionDeleted={async next=>{if(a.dirty||a.busy||a.error)throw new Error("当前属性值尚未保存，请先处理保存提示");if(next)onDefinition(next);await onReload(a.discardRecovery);}}/>}
 
   {invalid&&<small className="custom-property-invalid">请输入完整HTTP或HTTPS网址，当前输入未保存</small>}
   <PropertyDraftStatus state={a} onReload={onReload}/>

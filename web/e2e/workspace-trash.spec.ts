@@ -1,3 +1,4 @@
+import {closeObject} from "./object-actions";
 import {expandProperties} from "./property-actions";
 import { openObjectDelete } from "./object-actions";
 import { archiveCurrentProject } from "./project-actions";
@@ -27,7 +28,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   ).toBeTruthy();
   await page.goto("/projects/" + p.id + "/pages/" + c.id);await expandProperties(page);
   await openObjectDelete(page);
-  await expect(page.getByRole("dialog")).toContainText("共 1 个对象");
+  await expect(page.getByRole("dialog", {name: "确认删除", exact: true})).toContainText("共 1 个对象");
   await page.getByRole("button", { name: "确认删除 1 个对象" }).click();
   await expect(page).toHaveURL(new RegExp("/projects/" + p.id + "/pages$"));
   await page.goto("/projects/" + p.id + "/tasks/" + t.id);await expandProperties(page);
@@ -49,9 +50,10 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   });
   await page.getByRole("button", { name: "确认删除 1 个对象" }).click();
   await expect(page.getByRole("alert")).toContainText("再次确认");
-  await expect(page.getByRole("dialog")).toContainText("共 2 个对象");
+  await expect(page.getByRole("dialog", {name: "确认删除", exact: true})).toContainText("共 2 个对象");
   await page.getByRole("button", { name: "确认删除 2 个对象" }).click();
   await expect(page).toHaveURL(new RegExp("/projects/" + p.id + "/pages$"));
+  await closeObject(page);
   await page.getByRole("link", { name: "回收站", exact: true }).click();
   await page
     .getByRole("button", { name: "恢复 先删后代", exact: true })
@@ -65,6 +67,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
     .getByRole("button", { name: "恢复 先删后代", exact: true })
     .click();
   expect((await request.get("/api/v1/pages/" + c.id)).status()).toBe(200);
+  await closeObject(page);
   await page.getByRole("link", { name: "搜索", exact: true }).click();
   await page.getByLabel("搜索标题与正文").fill("中文%_");
   await expect(
@@ -103,6 +106,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
       })
     ).status(),
   ).toBe(409);
+  await closeObject(page);
   await page.getByRole("link", { name: "搜索", exact: true }).click();
   await page.getByLabel("搜索标题与正文").fill("中文%_");
   await expect(page.getByText("0 条结果")).toBeVisible();
@@ -111,6 +115,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
     page.locator('a[href="/projects/' + p.id + "/pages/" + a.id + '"]'),
   ).toBeVisible();
 
+  await closeObject(page);
   await page.getByRole("link", { name: "回收站", exact: true }).click();
   await expect(
     page.getByRole("button", {
@@ -121,6 +126,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   await expect(
     page.getByText("项目已归档，请先取消归档再恢复。").first(),
   ).toBeVisible();
+  await closeObject(page);
   await page.getByRole("link", { name: "工作台", exact: true }).click();
   await expect(page.getByRole("heading", { name: "工作台", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "最近访问" })).toBeVisible();

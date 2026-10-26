@@ -27,7 +27,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   const parentURL = page.url();
   const parentID = parentURL.split("/").at(-1)!;
   const projectID = parentURL.split("/")[4];
-  await page.getByRole("link", {name:"返回任务列表",exact:false}).click();
+  await page.getByRole('link',{name:'任务',exact:true}).click();
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
   await page.getByLabel("新任务标题").fill("读摘要");
   await page.getByRole("dialog", { name: "添加任务" }).getByLabel("父任务", { exact: true }).selectOption(parentID);

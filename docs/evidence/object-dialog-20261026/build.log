@@ -1,0 +1,20 @@
+
+> noteapp-web@0.1.0 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 512 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.41 kB │ gzip:   0.32 kB
+dist/assets/index-BJaz94k_.css    137.88 kB │ gzip:  25.23 kB
+dist/assets/module-RjUF93sV.js     77.27 kB │ gzip:  27.58 kB
+dist/assets/native-48B9X9Wg.js    432.75 kB │ gzip:  83.17 kB
+dist/assets/index-Dzc1mGQg.js   1,703.72 kB │ gzip: 527.91 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.80s

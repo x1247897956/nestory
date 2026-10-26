@@ -1,3 +1,4 @@
+import {closeObject} from "./object-actions";
 import {expandProperties} from "./property-actions";
 import { openObjectDelete } from "./object-actions";
 import { archiveCurrentProject, unarchiveCurrentProject } from "./project-actions";
@@ -79,7 +80,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expandProperties(page);
     await page.getByLabel("阶段", { exact: true }).selectOption("done");
     await expect(page.getByRole("status")).toHaveText("已保存");
-    await page.getByRole("link", {name:"返回任务列表",exact:false}).click();
+    await page.getByRole('link',{name:'任务',exact:true}).click();
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
     await page.getByLabel("新任务标题").fill("读摘要");
     await page.getByRole("dialog", { name: "添加任务" }).getByLabel("父任务", { exact: true }).selectOption(parent);
@@ -126,6 +127,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
         page.getByRole("link", { name: label, exact: true }),
       ).toBeVisible();
     }
+    await closeObject(page);
     await page.getByRole("link", { name: "工作台", exact: true }).click();
     await expect(
       page.locator('a[href="/projects/' + pid + '/tasks/' + tid + '"]'),
@@ -147,6 +149,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await page
       .getByRole("button", { name: "确认删除 1 个对象", exact: true })
       .click();
+    await closeObject(page);
     await page.getByRole("link", { name: "回收站", exact: true }).click();
     await page
       .getByRole("button", { name: "恢复 完整笔记", exact: true })

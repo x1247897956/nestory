@@ -36,7 +36,7 @@ test('lost creation response retries same intent across reload without duplicate
  await expect(page.getByLabel('笔记标题',{exact:true})).toHaveValue('无标题笔记');
  expect(ids[0]).toBeTruthy();expect(ids[1]).toBe(ids[0]);
  expect(await(await request.get(`/api/v1/projects/${p.id}/pages`)).json()).toHaveLength(1);
- await page.getByRole('link',{name:'返回笔记列表'}).click();
+ await page.getByRole('link',{name:'笔记',exact:true}).click();
  await page.getByRole('button',{name:'新建笔记',exact:true}).click();
  await expect(page.getByLabel('笔记标题',{exact:true})).toHaveValue('无标题笔记');
  expect(ids[2]).not.toBe(ids[0]);

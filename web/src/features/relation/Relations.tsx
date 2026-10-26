@@ -1,3 +1,4 @@
+import {PropertyIcon} from "../../components/object/PropertyIcon";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -88,8 +89,8 @@ export function Relations({
     }
   };
   return (
-    <details ref={popover} className="relation-property" onKeyDown={event => { if (event.key === "Escape" && popover.current) { popover.current.open = false; popover.current.querySelector("summary")?.focus(); } }}>
-      <summary aria-label="关联对象"><span className="relation-property-name">关联</span> <span>{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><span aria-hidden="true">⌄</span></summary>
+    <details ref={popover} className="relation-property" onKeyDown={event => { if (event.key === "Escape" && popover.current?.open) { event.preventDefault(); event.stopPropagation(); popover.current.open = false; popover.current.querySelector("summary")?.focus(); } }}>
+      <summary aria-label="关联对象"><span className="relation-property-name"><PropertyIcon name="relations"/>关联</span><span className="relation-property-value"><span className="relation-count">{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="m6 8 4 4 4-4"/></svg></span></summary>
       <section className="relation-popover" aria-label="关联对象列表">
       <header><h3>关联对象</h3></header>
       {relations.isPending && <p role="status">正在加载关联…</p>}

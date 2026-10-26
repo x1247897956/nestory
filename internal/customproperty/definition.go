@@ -169,7 +169,7 @@ func validateOptions(old, options []object.CustomOption) error {
 	}
 	for _, o := range old {
 		if !ids[o.ID] {
-			return apperr.Invalid("选项暂不支持删除，可重命名")
+			return apperr.Invalid("请通过选项删除接口移除选项，不能直接从更新请求中省略")
 		}
 	}
 	return nil

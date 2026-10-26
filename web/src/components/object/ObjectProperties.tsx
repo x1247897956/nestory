@@ -1,4 +1,5 @@
 import { positionPropertyPopover } from "./propertyTypes";
+import { PropertyIcon } from "./PropertyIcon";
 import { CustomProperties } from "./CustomProperties";
 import { Children, isValidElement, useId, useState, useEffect, useRef, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -28,10 +29,12 @@ export function ObjectProperties({ projectId, type, id, version, archived, child
     // Reveal its actual recovery controls, including those inside a closed popover.
     requestAnimationFrame(()=>{
      if(!root.isConnected||!error.isConnected)return;
-     const panel=error.closest<HTMLElement>('[popover]');
-     if(panel&&!panel.matches(':popover-open')){
-      const trigger=Array.from(root.querySelectorAll<HTMLButtonElement>('button[popovertarget]')).find(b=>b.getAttribute('popovertarget')===panel.id);
-      positionPropertyPopover(panel,trigger??null);panel.showPopover();
+     const panels:HTMLElement[]=[];
+     let panel=error.closest<HTMLElement>('[popover]');
+     while(panel&&root.contains(panel)){panels.unshift(panel);panel=panel.parentElement?.closest<HTMLElement>('[popover]')??null;}
+     for(const item of panels){if(item.matches(':popover-open'))continue;
+      const trigger=Array.from(root.querySelectorAll<HTMLButtonElement>('button[popovertarget]')).find(b=>b.getAttribute('popovertarget')===item.id);
+      positionPropertyPopover(item,trigger??null);item.showPopover();
      }
     });
    };
@@ -47,7 +50,7 @@ export function ObjectProperties({ projectId, type, id, version, archived, child
     <div ref={content} id={contentId} hidden={!expanded}>
     {(schema.isError || object.isError) && <p className="property-error" role="alert">属性刷新失败，当前编辑内容仍保留。<button onClick={() => { void schema.refetch(); void object.refetch(); }}>重试</button></p>}
     <div className="object-properties task-properties" role="group" aria-label="对象属性">
-      {schema.data ? schema.data.properties.filter(property => type !== "pages" || property.key === "relations").map(property => property.kind === "relations" ? <div className="object-property-cell" key={property.key} data-property={property.key}><Relations key={type + id} projectId={projectId} type={type} id={id} archived={readonly}/></div> : <div className="object-property-cell" key={property.key} data-property={property.key}><span className="object-property-label"><span className="property-label-icon" aria-hidden="true"/>{property.label}</span>{fields.get(property.key) ?? <span className="object-property-value">{object.isPending ? "加载中…" : object.data?.properties[property.key] == null ? "未设置" : String(object.data.properties[property.key])}</span>}</div>) : <>{schema.isPending && <span role="status">正在加载属性定义…</span>}{children}</>}
+      {schema.data ? schema.data.properties.filter(property => type !== "pages" || property.key === "relations").map(property => property.kind === "relations" ? <div className="object-property-cell" key={property.key} data-property={property.key}><Relations key={type + id} projectId={projectId} type={type} id={id} archived={readonly}/></div> : <div className="object-property-cell" key={property.key} data-property={property.key}><span className="object-property-label"><PropertyIcon name={property.key}/>{property.label}</span>{fields.get(property.key) ?? <span className="object-property-value">{object.isPending ? "加载中…" : object.data?.properties[property.key] == null ? "未设置" : String(object.data.properties[property.key])}</span>}</div>) : <>{schema.isPending && <span role="status">正在加载属性定义…</span>}{children}</>}
     </div>
     <CustomProperties key={type+id} projectId={projectId} type={type} id={id} archived={readonly}/>
     </div>

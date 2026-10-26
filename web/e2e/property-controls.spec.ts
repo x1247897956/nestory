@@ -1,3 +1,4 @@
+import {openOption,closeOptions} from "./option-actions";
 import {test,expect} from '@playwright/test';
 import {expandProperties} from './property-actions';
 const post=async(request:any,path:string,data:object)=>{const r=await request.post('/api/v1'+path,{data});expect(r.status()).toBe(201);return r.json();};
@@ -22,10 +23,11 @@ test('properties start collapsed, have aligned gutters and preserve saving when 
   const label=await page.locator('.object-property-cell[data-property="stage"] > .object-property-label').evaluate(el=>{const r=document.createRange();r.selectNodeContents(el.lastChild!);return r.getBoundingClientRect().x;});
   await expandProperties(page);
   const relation=await page.locator('.relation-property-name').evaluate(el=>{const r=document.createRange();r.selectNodeContents(el.lastChild!);return r.getBoundingClientRect().x;});
-  const dot=await page.locator('.stage-property > .stage-dot').boundingBox();
+  const stage=await page.getByLabel('阶段',{exact:true}).boundingBox();
   const value=await page.getByLabel('属性值 备注',{exact:true}).boundingBox();
   expect(Math.abs(label-relation)).toBeLessThan(2);
-  expect(dot!.x).toBeGreaterThanOrEqual(value!.x);
+  expect(Math.abs(stage!.x-value!.x)).toBeLessThan(2);
+  await expect(page.locator('.object-property-label .property-icon').first()).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   await page.screenshot({path:`/tmp/noteapp-property-controls-${width}.png`,fullPage:true});
  }
@@ -50,11 +52,10 @@ test('reuse note properties in tasks with independent values and editable option
  const imported=await fields(request,t.id);expect(imported.map((f:any)=>f.value)).toEqual([null,null]);
  expect((await fields(request,other.id)).length).toBe(2);
  await page.getByLabel('属性值 标签',{exact:true}).click();
- await page.getByRole('option',{name:'阅读',exact:true}).click();await page.keyboard.press('Escape');
+ await page.getByRole('option',{name:'阅读',exact:true}).click();await closeOptions(page);
  await expect(page.getByLabel('属性值 标签',{exact:true}).locator('.property-tag')).toHaveAttribute('data-color','blue');
- await page.getByRole('button',{name:'设置属性 标签',exact:true}).click();
- const settings=page.getByRole('group',{name:'属性设置',exact:true});
- await settings.getByLabel('选项颜色 1',{exact:true}).selectOption('purple');
+ const settings=await openOption(page,'标签','阅读');
+ await settings.getByRole('button',{name:'颜色 紫色',exact:true}).click();
  await expect.poll(async()=>(await fields(request,t.id)).find((f:any)=>f.definition.name==='标签').definition.options[0].color).toBe('purple');
  await page.keyboard.press('Escape');
  await expect(page.getByLabel('属性值 标签',{exact:true}).locator('.property-tag')).toHaveAttribute('data-color','purple');
@@ -77,10 +78,10 @@ test('single-select colors and the default fold apply to notes and events too',a
  await expandProperties(page);
  await page.getByLabel('属性值 分类',{exact:true}).click();await page.getByRole('option',{name:'待审核',exact:true}).click();
  await expect(page.getByLabel('属性值 分类',{exact:true}).locator('.property-tag')).toHaveAttribute('data-color','red');
- await page.getByRole('button',{name:'设置属性 分类',exact:true}).click();
- await page.getByRole('group',{name:'属性设置',exact:true}).getByLabel('选项颜色 1',{exact:true}).selectOption('green');
+ const setting=await openOption(page,'分类','待审核');
+ await setting.getByRole('button',{name:'颜色 绿色',exact:true}).click();
  await expect.poll(async()=>(await(await request.get(`/api/v1/projects/${p.id}/property-definitions/pages`)).json()).definitions[0].options[0].color).toBe('green');
- await page.keyboard.press('Escape');await expect(page.getByLabel('属性值 分类',{exact:true}).locator('.property-tag')).toHaveAttribute('data-color','green');
+ await closeOptions(page);await expect(page.getByLabel('属性值 分类',{exact:true}).locator('.property-tag')).toHaveAttribute('data-color','green');
  await page.goto(`/projects/${p.id}/events/${e.id}`);
  await expect(page.getByRole('button',{name:'展开属性',exact:true})).toHaveAttribute('aria-expanded','false');
  await expect(page.getByLabel('开始时间',{exact:true})).toBeHidden();
@@ -93,13 +94,12 @@ test('a definition save failure after folding reopens visible draft recovery con
  await request.patch(`/api/v1/property-definitions/${d.id}`,{data:{version:1,options:[{id:'a',name:'选项',color:'blue'}]}});
  await page.goto(`/projects/${p.id}/tasks/${t.id}`);await expandProperties(page);
  await page.route(`**/api/v1/property-definitions/${d.id}`,route=>route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({error:{message:'颜色保存失败'}})}));
- await page.getByRole('button',{name:'设置属性 标签',exact:true}).click();
- const settings=page.getByRole('group',{name:'属性设置',exact:true});
- await settings.getByLabel('选项颜色 1',{exact:true}).selectOption('pink');
+ const settings=await openOption(page,'标签','选项');
+ await settings.getByRole('button',{name:'颜色 粉色',exact:true}).click();
  await page.getByRole('button',{name:'收起属性',exact:true}).click();
  await expect(settings).toBeVisible();
  await expect(settings.getByRole('alert')).toContainText('颜色保存失败');
- await expect(settings.getByLabel('选项颜色 1',{exact:true})).toHaveValue('pink');
+ await expect(settings.getByRole('button',{name:'颜色 粉色',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.unroute(`**/api/v1/property-definitions/${d.id}`);
  await settings.getByRole('button',{name:'重试保存',exact:true}).click();
  await expect.poll(async()=>(await fields(request,t.id))[0].definition.options[0].color).toBe('pink');
