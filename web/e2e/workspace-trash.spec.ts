@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { openObjectDelete } from "./object-actions";
 import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from "@playwright/test";
@@ -24,12 +25,12 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
       await request.put("/api/v1/relations/task-page/" + t.id + "/" + c.id)
     ).ok(),
   ).toBeTruthy();
-  await page.goto("/projects/" + p.id + "/pages/" + c.id);
+  await page.goto("/projects/" + p.id + "/pages/" + c.id);await expandProperties(page);
   await openObjectDelete(page);
   await expect(page.getByRole("dialog")).toContainText("共 1 个对象");
   await page.getByRole("button", { name: "确认删除 1 个对象" }).click();
   await expect(page).toHaveURL(new RegExp("/projects/" + p.id + "/pages$"));
-  await page.goto("/projects/" + p.id + "/tasks/" + t.id);
+  await page.goto("/projects/" + p.id + "/tasks/" + t.id);await expandProperties(page);
   await page.locator(".relation-property > summary").click();
   await expect(page.getByText("已删除 · 先删后代")).toBeVisible();
   await page.getByLabel("任务标题", { exact: true }).fill("未保存草稿");
@@ -40,7 +41,7 @@ test("workspace search, preview reconfirmation, batch isolation, relations and a
   );
   await page.getByLabel("任务标题", { exact: true }).fill("关联任务");
 
-  await page.goto("/projects/" + p.id + "/pages/" + a.id);
+  await page.goto("/projects/" + p.id + "/pages/" + a.id);await expandProperties(page);
   await openObjectDelete(page);
   await create("/projects/" + p.id + "/pages", {
     title: "后来新增",

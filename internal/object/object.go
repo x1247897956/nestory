@@ -76,8 +76,9 @@ func Describe(typ Type) (Definition, error) {
 
 // CustomDefinition is shared by all objects of one type in one project.
 type CustomOption struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Color string `json:"color,omitempty"`
 }
 type CustomDefinition struct {
 	ID         string         `json:"id"`

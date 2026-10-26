@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { openObjectDelete } from "./object-actions";
 import { archiveCurrentProject, unarchiveCurrentProject } from "./project-actions";
 import { assetIDs } from "./block-fixtures";
@@ -19,7 +20,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
   }) => {
     test.setTimeout(90000);
     const title = "V1完整验收 " + Date.now();
-    await page.goto("/");
+    await page.goto("/");await expandProperties(page);
     await page
       .getByRole("button", { name: "新建项目", exact: true })
       .first()
@@ -75,9 +76,11 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
       "读论文",
     );
     const parent = page.url().split("/").pop()!;
+    await expandProperties(page);
     await page.getByLabel("阶段", { exact: true }).selectOption("done");
     await expect(page.getByRole("status")).toHaveText("已保存");
-    await page.getByRole("button", { name: "添加任务", exact: true }).click();
+    await page.getByRole("link", {name:"返回任务列表",exact:false}).click();
+  await page.getByRole("button", { name: "添加任务", exact: true }).click();
     await page.getByLabel("新任务标题").fill("读摘要");
     await page.getByRole("dialog", { name: "添加任务" }).getByLabel("父任务", { exact: true }).selectOption(parent);
     await page.getByRole("button", { name: "创建任务", exact: true }).click();
@@ -86,9 +89,11 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     );
     const tid = page.url().split("/").pop()!;
     const today = DateTime.now().setZone("Asia/Shanghai").toISODate()!;
+    await expandProperties(page);
     await page.getByLabel("截止日期", { exact: true }).fill(today);
     await importMarkdown(page, "- [ ] 独立检查项");
     await expect(page.getByRole("status")).toHaveText("已保存");
+    await expandProperties(page);
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     await page.getByRole("button", {name:"关联 完整笔记",exact:true}).click();
     await expect(
@@ -113,6 +118,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     const eid = page.url().split("/").pop()!;
     await page.getByLabel("Markdown 正文").fill("日程正文可恢复");
     await expect(page.getByRole("status")).toHaveText("已保存");
+    await expandProperties(page);
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     for (const label of ["完整笔记", "读摘要 · Todo"]) {
       await page.getByRole("button", {name:"关联 " + label,exact:true}).click();
@@ -132,7 +138,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     // FullCalendar's normal overflow disclosure rather than directly visible.
     if (!await calendarEvent.isVisible()) await day.locator('.fc-daygrid-more-link').click();
     await expect(page.locator(`a[href="${eventHref}"]:visible`)).toBeVisible();
-    await page.goto("/projects/" + pid + "/pages/" + pgid);
+    await page.goto("/projects/" + pid + "/pages/" + pgid);await expandProperties(page);
     await archiveCurrentProject(page);
     await expect(page.getByLabel("笔记标题", { exact: true })).toBeDisabled();
     await unarchiveCurrentProject(page);
@@ -145,10 +151,11 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await page
       .getByRole("button", { name: "恢复 完整笔记", exact: true })
       .click();
-    await page.goto("/projects/" + pid + "/pages/" + pgid);
+    await page.goto("/projects/" + pid + "/pages/" + pgid);await expandProperties(page);
     await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       "完整笔记",
     );
+    await expandProperties(page);
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     await expect(
       page.getByRole("link", { name: "读摘要 · Todo", exact: true }),
@@ -220,7 +227,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
           .digest("hex"),
       ).toBe(a.sha256);
     }
-    await page.goto("/projects/" + f.project_id + "/pages/" + f.page_id);
+    await page.goto("/projects/" + f.project_id + "/pages/" + f.page_id);await expandProperties(page);
     await expect(page.getByLabel("Markdown 正文")).toContainText("真实验收");
     await expect(page.locator(".block-editor img")).toBeVisible();
     await expect(page.locator(".block-editor pre code")).toContainText(

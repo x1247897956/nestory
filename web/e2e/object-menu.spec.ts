@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { test, expect } from '@playwright/test';
 import { archiveCurrentProject } from './project-actions';
 test('all object types use title-level more actions without a redundant relation label', async ({page,request}) => {
@@ -9,7 +10,7 @@ test('all object types use title-level more actions without a redundant relation
  }
  for(const width of [1261,390]) for(const object of objects) {
   await page.setViewportSize({width,height:932});
-  await page.goto(`/projects/${p.id}/${object.kind}/${object.id}`);
+  await page.goto(`/projects/${p.id}/${object.kind}/${object.id}`);await expandProperties(page);
   const properties=page.getByRole('group',{name:'对象属性'});
   await expect(properties.locator('[data-property="relations"] .object-property-label')).toHaveCount(0);
   const trigger=page.getByRole('button',{name:'对象菜单',exact:true});

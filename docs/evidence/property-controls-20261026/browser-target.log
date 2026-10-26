@@ -1,0 +1,65 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test property-controls.spec.ts custom-properties.spec.ts object-properties.spec.ts task-summary.spec.ts acceptance-v1.spec.ts overview-layout.spec.ts
+
+(node:95172) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 15 tests using 1 worker
+
+(node:95179) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95179) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:95179) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/acceptance-v1.spec.ts:14:3 › v1 full journey in a fresh browser context (11.2s)
+  ✓   2 e2e/custom-properties.spec.ts:72:1 › type-first shared definitions, all four values, independent notes and stable option IDs (10.9s)
+  ✓   3 e2e/custom-properties.spec.ts:193:1 › value conflicts preserve input, forced-close recovery saves, archive stays read-only (3.7s)
+  ✓   4 e2e/custom-properties.spec.ts:269:1 › lost definition response retries the same creation, task and event fields use the same UI (4.3s)
+  ✓   5 e2e/custom-properties.spec.ts:329:1 › another note can save its own value after a shared definition is edited in a different tab (2.5s)
+  ✓   6 e2e/custom-properties.spec.ts:370:1 › an unopened shared settings draft in another tab never blocks this note value or navigation (2.7s)
+  ✓   7 e2e/custom-properties.spec.ts:420:1 › choice popovers create tags inline and URL values are direct editable links (5.7s)
+  ✓   8 e2e/custom-properties.spec.ts:536:1 › inline option creation preserves concurrent definition edits (1.4s)
+  ✓   9 e2e/object-properties.spec.ts:4:1 › all object types share collapsed relation properties with keyboard and mobile support (2.0s)
+  ✓  10 e2e/overview-layout.spec.ts:3:1 › overview has one project identity and balanced create actions on narrow and wide screens (466ms)
+  ✓  11 e2e/overview-layout.spec.ts:46:1 › notes are flat and legacy child notes remain reachable without child creation controls (468ms)
+  ✓  12 e2e/overview-layout.spec.ts:84:1 › intrinsic and custom property values use the same aligned column (574ms)
+  ✘  13 e2e/property-controls.spec.ts:11:1 › properties start collapsed, have aligned gutters and preserve saving when collapsed (1.6s)
+(node:95515) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95515) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:95515) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  14 e2e/property-controls.spec.ts:73:1 › reuse note properties in tasks with independent values and editable option colors (2.3s)
+  ✓  15 e2e/task-summary.spec.ts:4:1 › top-right create action and dedicated summaries for every task (3.1s)
+
+
+  1) e2e/property-controls.spec.ts:11:1 › properties start collapsed, have aligned gutters and preserve saving when collapsed 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: < [32m2[39m
+    Received:   [31m8[39m
+
+      25 |   const dot=await page.locator('.stage-property > .stage-dot').boundingBox();
+      26 |   const value=await page.getByLabel('属性值 备注',{exact:true}).boundingBox();
+    > 27 |   expect(Math.abs(label!.x-relation!.x)).toBeLessThan(2);
+         |                                          ^
+      28 |   expect(dot!.x).toBeGreaterThanOrEqual(value!.x);
+      29 |   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      30 |   await page.screenshot({path:`/tmp/noteapp-property-controls-${width}.png`,fullPage:true});
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/property-controls.spec.ts:27:42
+
+    Error Context: test-results/property-controls-properti-93295-serve-saving-when-collapsed/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/property-controls-properti-93295-serve-saving-when-collapsed/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/property-controls-properti-93295-serve-saving-when-collapsed/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/property-controls.spec.ts:11:1 › properties start collapsed, have aligned gutters and preserve saving when collapsed 
+  14 passed (54.8s)

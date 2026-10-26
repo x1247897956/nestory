@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -13,5 +13,8 @@ export function renderObjectEditor(element: ReactElement) {
   for (const type of ["tasks", "events"]) for (const id of ["t", "e", "fold"]) for (const archived of [false,true]) client.setQueryData(["object", type, id, 1, archived], {read_only:archived,properties:{}});
   for (const type of ["tasks", "events"]) for (const id of ["t", "e", "fold"]) client.setQueryData(["relations", type, id], []);
   for (const type of ["tasks", "events"]) for (const id of ["t", "e", "fold"]) client.setQueryData(["custom-properties", "p", type, id], {fields:[],read_only:false});
-  return render(<QueryClientProvider client={client}><MemoryRouter>{element}</MemoryRouter></QueryClientProvider>);
+  const result=render(<QueryClientProvider client={client}><MemoryRouter>{element}</MemoryRouter></QueryClientProvider>);
+  // These draft tests edit properties; explicitly open the initially collapsed section.
+  const toggle=result.queryByRole("button",{name:"展开属性"});if(toggle)fireEvent.click(toggle);
+  return result;
 }

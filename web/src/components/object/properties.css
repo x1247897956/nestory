@@ -72,3 +72,35 @@
 .custom-property-popover .property-recovery-actions button { min-height:28px; }
 .editor .custom-option-settings > input { border-color:transparent; background:#f5f6f8; padding:6px 8px; margin:4px 0; }
 .custom-property button:focus-visible,.custom-property-popover button:focus-visible { outline:2px solid #243b63; outline-offset:1px; }
+/* One optical gutter for labels and values, including intrinsic properties. */
+.property-disclosure { display:flex; align-items:center; gap:7px; padding:5px 8px; border:0; background:transparent; color:#69717e; font-size:12px; border-radius:4px; }
+.property-disclosure:hover { background:#f3f4f6; color:#243b63; }
+.property-disclosure[aria-expanded="true"] { margin-bottom:10px; }
+.object-property-section [hidden] { display:none!important; }
+.object-property-section .object-property-label { display:flex; align-items:center; gap:8px; padding:7px 8px; }
+.property-label-icon { display:inline-block; flex:none; width:15px; }
+.object-property-section .object-property-cell { grid-template-columns:minmax(100px,152px) minmax(0,1fr); gap:12px; }
+.object-property-section .relation-property > summary { display:grid; grid-template-columns:152px auto auto; gap:12px; padding:6px 8px; border:0; }
+.relation-property-name { display:flex; align-items:center; padding-left:23px; }
+.object-property-section .object-property-cell .task-property.stage-property { position:relative; }
+.object-property-section .stage-property > .stage-dot { position:absolute; left:8px; top:50%; transform:translateY(-50%); margin:0; pointer-events:none; }
+.object-property-section .stage-property > select { padding-left:25px!important; }
+.object-property-section .object-property-cell .task-property { gap:0; }
+.property-option-edit { display:flex; align-items:center; gap:8px; margin:4px 0; }
+.editor .property-option-edit > input { min-width:0; flex:1; margin:0; padding:6px 8px; border-color:transparent; background:#f5f6f8; }
+.property-option-edit > select { width:76px; flex:none; padding:6px; font-size:11px; border:0; border-radius:4px; }
+.property-tag[data-color="gray"],select[data-color="gray"] { background:#eef0f3; color:#424b58; }
+.property-tag[data-color="brown"],select[data-color="brown"] { background:#eee4dc; color:#694c37; }
+.property-tag[data-color="orange"],select[data-color="orange"] { background:#fae9d7; color:#8a4b15; }
+.property-tag[data-color="yellow"],select[data-color="yellow"] { background:#f6efcc; color:#735b0e; }
+.property-tag[data-color="green"],select[data-color="green"] { background:#e0eee4; color:#2f6244; }
+.property-tag[data-color="blue"],select[data-color="blue"] { background:#e0eaf8; color:#284e82; }
+.property-tag[data-color="purple"],select[data-color="purple"] { background:#ebe3f5; color:#65438a; }
+.property-tag[data-color="pink"],select[data-color="pink"] { background:#f4e0eb; color:#8a3f67; }
+.property-tag[data-color="red"],select[data-color="red"] { background:#f7e1df; color:#943f37; }
+.property-picker-heading { font-size:11px; color:#737986; margin:8px 10px 4px; }
+.property-reuse-list { border-top:1px solid #e8eaee; margin-top:5px; padding-top:4px; }
+.property-type-picker .property-reuse-list > button { display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; padding:9px 10px; background:transparent; border:0; text-align:left; font-size:12px; }
+.property-reuse-list > button:hover { background:#f1f3f7; }
+.property-reuse-list small { color:#737986; font-size:10px; }
+@media(max-width:650px) { .object-property-section .object-property-cell { grid-template-columns:105px minmax(0,1fr); gap:5px; } .object-property-section .relation-property > summary { grid-template-columns:105px auto auto; gap:5px; } }

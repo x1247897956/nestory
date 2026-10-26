@@ -1,5 +1,5 @@
 export type PropertyKind = "text" | "single_select" | "multi_select" | "url";
-export type PropertyOption = {id:string;name:string};
+export type PropertyOption = {id:string;name:string;color?:string};
 export type PropertyDefinition = {id:string;project_id:string;object_type:"tasks"|"pages"|"events";name:string;kind:PropertyKind;options:PropertyOption[];version:number};
 export type PropertyValue = string | string[] | null;
 export type CustomField = {definition:PropertyDefinition;value:PropertyValue;version:number};
@@ -30,3 +30,10 @@ export function normalizePropertyValue(kind:PropertyKind,value:PropertyValue):Pr
  if(kind==="url"&&typeof value==="string")return value.trim()||null;
  return value===""?null:value;
 }
+
+export const propertyColors = [
+ {id:"gray",name:"灰色"},{id:"brown",name:"棕色"},{id:"orange",name:"橙色"},
+ {id:"yellow",name:"黄色"},{id:"green",name:"绿色"},{id:"blue",name:"蓝色"},
+ {id:"purple",name:"紫色"},{id:"pink",name:"粉色"},{id:"red",name:"红色"},
+];
+export const optionColor=(color?:string)=>propertyColors.some(c=>c.id===color)?color:"gray";

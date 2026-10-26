@@ -2,7 +2,7 @@ import { api, ApiError } from "../../app/api";
 import { randomUUID } from "../../app/uuid";
 import { useAutosave } from "../markdown/useAutosave";
 import { PropertyDraftStatus } from "./PropertyDraftStatus";
-import { propertyKinds, type PropertyDefinition, type PropertyOption } from "./propertyTypes";
+import { propertyKinds, propertyColors, optionColor, type PropertyDefinition, type PropertyOption } from "./propertyTypes";
 
 type Draft={name:string;options:PropertyOption[];pendingOption:string};
 export function PropertySettings({definition,archived,onSaved,onReload,focusName}:{definition:PropertyDefinition;archived:boolean;onSaved:(d:PropertyDefinition)=>void;onReload:(discard:()=>void)=>Promise<void>;focusName:boolean}) {
@@ -25,8 +25,9 @@ export function PropertySettings({definition,archived,onSaved,onReload,focusName
     onFocus={event=>{if(focusName)event.target.select();}} onChange={e=>a.setDraft(old=>({...old,name:e.target.value}))}/></label>
   <p className="property-shared-hint">{propertyKinds.find(x=>x.kind===d.kind)?.name} · 项目内所有{d.object_type==="pages"?"笔记":d.object_type==="tasks"?"任务":"日程"}共用</p>
   {d.kind.includes("select")&&<div className="custom-option-settings">
-   {a.draft.options.map((option,index)=><input key={option.id} aria-label={`选项名称 ${index+1}`} value={option.name} maxLength={80} disabled={archived}
-     onChange={event=>a.setDraft(old=>({...old,options:old.options.map(x=>x.id===option.id?{...x,name:event.target.value}:x)}))} onBlur={()=>a.setDraft(old=>({...old,options:old.options.map(x=>({...x,name:x.name.trim()}))}))}/>)}
+   {a.draft.options.map((option,index)=><div className="property-option-edit" key={option.id}><input key={option.id} aria-label={`选项名称 ${index+1}`} value={option.name} maxLength={80} disabled={archived}
+     onChange={event=>a.setDraft(old=>({...old,options:old.options.map(x=>x.id===option.id?{...x,name:event.target.value}:x)}))} onBlur={()=>a.setDraft(old=>({...old,options:old.options.map(x=>({...x,name:x.name.trim()}))}))}/>
+    <select aria-label={`选项颜色 ${index+1}`} value={optionColor(option.color)} data-color={optionColor(option.color)} disabled={archived} onChange={e=>a.setDraft(old=>({...old,options:old.options.map(x=>x.id===option.id?{...x,color:e.target.value}:x)}))}>{propertyColors.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div>)}
    <div className="custom-option-add"><input aria-label="新选项名称" placeholder="输入新选项…" maxLength={80} value={a.draft.pendingOption} disabled={archived||a.draft.options.length>=100}
     onChange={e=>a.setDraft(old=>({...old,pendingOption:e.target.value}))}
     onKeyDown={event=>{if(event.key==="Enter"&&a.draft.pendingOption.trim()&&a.draft.options.length<100){event.preventDefault();a.setDraft(old=>({...old,options:[...old.options,{id:randomUUID(),name:old.pendingOption.trim()}],pendingOption:""}));}}}/>

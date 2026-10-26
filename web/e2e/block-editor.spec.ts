@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { archiveCurrentProject } from "./project-actions";
 import { block, documentOf } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
@@ -27,7 +28,7 @@ test("native blocks preserve checklist identity, slash commands and assets acros
       })
     ).json();
     const path = `/api/v1/${kind}/${item.id}`;
-    await page.goto(`/projects/${p.id}/${kind}/${item.id}`);
+    await page.goto(`/projects/${p.id}/${kind}/${item.id}`);await expandProperties(page);
     const editor = page.getByRole("textbox", { name: "Markdown 正文" });
     await expect(editor.getByRole("heading", { name: "旧标题" })).toBeVisible();
     await expect(editor.getByRole("checkbox")).toHaveCount(2);
@@ -65,7 +66,7 @@ test("native blocks preserve checklist identity, slash commands and assets acros
       editor.getByRole("heading", { name: "新的小节" }),
     ).toBeVisible();
     await expect(page.getByRole("status")).toHaveText("已保存");
-    await page.reload();
+    await page.reload();await expandProperties(page);
     await expect(
       editor.getByRole("heading", { name: "新的小节" }),
     ).toBeVisible();
@@ -88,7 +89,7 @@ test("native blocks preserve checklist identity, slash commands and assets acros
           b.type === "file" && b.props.url.startsWith("/api/v1/assets/"),
       ),
     ).toBe(true);
-    await page.reload();
+    await page.reload();await expandProperties(page);
     await expect(editor).toContainText("proof.txt");
   }
   await page.screenshot({
@@ -111,7 +112,7 @@ test("empty metadata preserves the native document; block copy, undo, slash keyb
     })
   ).json();
   const path = "/api/v1/tasks/" + t.id;
-  await page.goto(`/projects/${p.id}/tasks/${t.id}`);
+  await page.goto(`/projects/${p.id}/tasks/${t.id}`);await expandProperties(page);
   await page.getByLabel("阶段", { exact: true }).selectOption("in_process");
   await expect(page.getByRole("status")).toHaveText("已保存");
   expect((await (await request.get(path)).json()).body_document).toEqual({version: 1, blocks: []});
@@ -160,7 +161,7 @@ test("empty metadata preserves the native document; block copy, undo, slash keyb
     page.getByRole("button", { name: "打开菜单", exact: true }),
   ).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(editor.getByRole("heading", { name: "块标题" })).toHaveCount(2);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),

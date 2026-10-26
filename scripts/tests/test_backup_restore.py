@@ -39,7 +39,7 @@ class BackupRestore(unittest.TestCase):
  def test_custom_properties_survive_clean_volume_restore(self):
   for kind,value in [('text','保留自定义正文'),('url','https://example.com'),('single_select','o1'),('multi_select',['o1','o2'])]:
    definition=self.api('/projects/'+self.project['id']+'/property-definitions/tasks',{'kind':kind})
-   if 'select' in kind:definition=self.api('/property-definitions/'+definition['id'],{'version':1,'options':[{'id':'o1','name':'一'},{'id':'o2','name':'二'}]},'PATCH')
+   if 'select' in kind:definition=self.api('/property-definitions/'+definition['id'],{'version':1,'options':[{'id':'o1','name':'一','color':'blue'},{'id':'o2','name':'二','color':'green'}]},'PATCH')
    self.api('/objects/tasks/'+self.task['id']+'/custom-properties/'+definition['id'],{'version':0,'definition_version':definition['version'],'value':value},'PUT')
   expected=self.api('/objects/tasks/'+self.task['id']+'/custom-properties')
   self.backup();self.restore()

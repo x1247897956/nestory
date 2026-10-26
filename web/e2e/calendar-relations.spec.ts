@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { archiveCurrentProject } from "./project-actions";
 import { test, expect } from "@playwright/test";
 import { DateTime } from "luxon";
@@ -35,7 +36,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       const tomorrow = DateTime.fromISO(today, { zone: "Asia/Shanghai" })
         .plus({ days: 1 })
         .toISODate()!;
-      await page.goto("/projects/" + p.id + "/events");
+      await page.goto("/projects/" + p.id + "/events");await expandProperties(page);
       await expect(page.getByText(/显示与输入时区/)).toHaveCount(0);
       await expect(page.locator(".fc-dayGridMonth-view")).toBeVisible();
       await page
@@ -54,13 +55,14 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await expect(page.getByLabel("日程标题", { exact: true })).toHaveValue(
         "讨论方案",
       );
+      await expandProperties(page);
       await expect(page.getByLabel("开始时间", { exact: true })).toHaveValue(
         today + "T23:00",
       );
       const eventId = page.url().split("/").pop()!;
       await page.getByLabel("Markdown 正文").fill("# 讨论\n\n- [ ] 方案");
       await expect(page.getByRole("status")).toHaveText("已保存");
-      await page.reload();
+      await page.reload();await expandProperties(page);
       await expect(page.getByLabel("Markdown 正文")).toContainText("# 讨论");
       await page.getByRole("button", {name:"关闭日程详情"}).click();
       await page.getByRole("button", { name: "周", exact: true }).click();
@@ -71,7 +73,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await expect(page.locator(".fc-timegrid-event").nth(1)).toContainText(
         "01:00",
       );
-      await page.goto("/projects/"+p.id+"/events/"+eventId);
+      await page.goto("/projects/"+p.id+"/events/"+eventId);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await page.getByRole("button", {name:"关联 方案集 / 实验方案",exact:true}).click();
       await expect(
@@ -83,16 +85,19 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
         page.getByRole("link", { name: "执行实验 · InProcess" }),
       ).toBeVisible();
       // Event time edits do not change task date; UI keeps deployment-zone wall time.
+      await expandProperties(page);
       await page.getByLabel("开始时间", { exact: true }).fill(today + "T22:00");
       await expect(page.getByRole("status")).toHaveText("已保存");
       expect(
         (await (await request.get("/api/v1/tasks/" + task.id)).json()).due_date,
       ).toBe("2026-12-31");
+      await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await page
         .getByRole("link", { name: "方案集 / 实验方案", exact: true })
         .click();
       await expect(page.getByLabel("笔记标题", {exact:true})).toHaveValue("实验方案");
+      await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("link", {
@@ -104,6 +109,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
         .getByRole("link", { name: "执行实验 · InProcess", exact: true })
         .click();
       await expect(page.getByLabel("任务标题", {exact:true})).toHaveValue("执行实验");
+      await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("link", { name: "方案集 / 实验方案", exact: true }),
@@ -114,7 +120,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await page
         .getByRole("button", { name: "移除关联 实验方案", exact: true })
         .click();
-      await page.goto("/projects/" + p.id + "/pages/" + pg.id);
+      await page.goto("/projects/" + p.id + "/pages/" + pg.id);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("button", { name: "移除关联 执行实验", exact: true }),
@@ -122,7 +128,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await page
         .getByRole("button", { name: "移除关联 讨论方案", exact: true })
         .click();
-      await page.goto("/projects/" + p.id + "/events/" + eventId);
+      await page.goto("/projects/" + p.id + "/events/" + eventId);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("button", { name: "移除关联 实验方案", exact: true }),
@@ -130,7 +136,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await page
         .getByRole("button", { name: "移除关联 执行实验", exact: true })
         .click();
-      await page.goto("/projects/" + p.id + "/tasks/" + task.id);
+      await page.goto("/projects/" + p.id + "/tasks/" + task.id);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("button", { name: "移除关联 讨论方案", exact: true }),
@@ -156,7 +162,7 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
         start_at: today + "T09:00:30+08:00",
         end_at: today + "T10:00:45+08:00",
       });
-      await page.goto("/projects/" + p.id + "/events/" + secondsEvent.id);
+      await page.goto("/projects/" + p.id + "/events/" + secondsEvent.id);await expandProperties(page);
       await page.getByLabel("Markdown 正文").fill("只改正文");
       await expect(page.getByRole("status")).toHaveText("已保存");
       const precise = await (
@@ -164,12 +170,14 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       ).json();
       expect(precise.start_at).toBe(today + "T01:00:30Z");
       expect(precise.end_at).toBe(today + "T02:00:45Z");
-      await page.goto("/projects/" + p.id + "/events/" + eventId);
+      await page.goto("/projects/" + p.id + "/events/" + eventId);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
+      await expandProperties(page);
       await expect(page.getByLabel("开始时间", { exact: true })).toHaveValue(
         today + "T22:00",
       );
       await archiveCurrentProject(page);
+      await expandProperties(page);
       await expect(page.getByLabel("开始时间", { exact: true })).toBeDisabled();
       await expect(
         page.getByRole("button", { name: "添加关联", exact: true }),

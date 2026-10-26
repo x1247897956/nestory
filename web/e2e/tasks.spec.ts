@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { archiveCurrentProject, unarchiveCurrentProject } from "./project-actions";
 import { paragraphs, documentText } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
@@ -7,7 +8,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   request,
 }) => {
   const title = "毕业设计 " + Date.now();
-  await page.goto("/");
+  await page.goto("/");await expandProperties(page);
   await page
     .getByRole("button", { name: "新建项目", exact: true })
     .first()
@@ -26,6 +27,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
   const parentURL = page.url();
   const parentID = parentURL.split("/").at(-1)!;
   const projectID = parentURL.split("/")[4];
+  await page.getByRole("link", {name:"返回任务列表",exact:false}).click();
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
   await page.getByLabel("新任务标题").fill("读摘要");
   await page.getByRole("dialog", { name: "添加任务" }).getByLabel("父任务", { exact: true }).selectOption(parentID);
@@ -34,9 +36,11 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
     "读摘要",
   );
   const childID = page.url().split("/").at(-1)!;
-  await page.goto(parentURL);
+  await page.goto(parentURL);await expandProperties(page);
   await page.getByLabel("阶段", { exact: true }).selectOption("done");
+  await expandProperties(page);
   await page.getByLabel("优先级", { exact: true }).selectOption("high");
+  await expandProperties(page);
   await page.getByLabel("截止日期", { exact: true }).fill("2026-10-25");
   await page.getByLabel("Markdown 正文").fill("- [ ] 阅读全文");
   await expect(page.getByRole("status")).toHaveText("已保存");
@@ -49,7 +53,7 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
       })
     ).status(),
   ).toBe(409);
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(page.getByLabel("Markdown 正文")).toHaveText("- [ ] 阅读全文");
   const second = await context.newPage();
   await second.goto(parentURL);
@@ -90,7 +94,7 @@ test("navigation guards an in-flight save after reverting to baseline", async ({
       data: { title: "保稿", body_document: paragraphs("baseline A") },
     })
   ).json();
-  await page.goto("/projects/" + project.id + "/tasks/" + task.id);
+  await page.goto("/projects/" + project.id + "/tasks/" + task.id);await expandProperties(page);
   await expect(page.getByLabel("Markdown 正文")).toHaveText("baseline A");
   let release!: () => void;
   let started!: () => void;

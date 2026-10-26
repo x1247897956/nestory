@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import {test,expect} from '@playwright/test';
 import {DateTime} from 'luxon';
 const post=async(request:any,path:string,data:unknown)=>(await request.post('/api/v1'+path,{data})).json();
@@ -8,10 +9,11 @@ test('upload and parent move cannot overlap, attachment survives move',async({pa
  const child=await post(request,`/projects/${p.id}/tasks`,{title:'上传任务'});
  let release!:()=>void;const gate=new Promise<void>(r=>release=r);let asset:any;
  await page.route('**/api/v1/projects/*/assets',async route=>{const response=await route.fetch();asset=await response.json();await gate;await route.fulfill({response});});
- await page.goto(`/projects/${p.id}/tasks/${child.id}`);
+ await page.goto(`/projects/${p.id}/tasks/${child.id}`);await expandProperties(page);
  await page.getByRole('textbox',{name:'Markdown 正文'}).waitFor();
  await page.getByLabel('上传附件',{exact:true}).setInputFiles({name:'important.txt',mimeType:'text/plain',buffer:Buffer.from('附件不能丢')});
  await expect(page.getByText('正在处理文件…',{exact:true})).toBeVisible();
+ await expandProperties(page);
  const parentSelect=page.getByLabel('父任务',{exact:true});await expect(parentSelect).toBeDisabled();
  release();await expect(page.getByRole('status')).toHaveText('已保存');await expect(parentSelect).toBeEnabled();
  await parentSelect.selectOption(parent.id);
@@ -28,9 +30,9 @@ test('lost creation response retries same intent across reload without duplicate
   ids.push(route.request().postDataJSON().request_id);
   if(first){first=false;await route.fetch();await route.abort('failed');}else await route.continue();
  });
- await page.goto(`/projects/${p.id}/pages`);await page.getByRole('button',{name:'新建笔记',exact:true}).click();
+ await page.goto(`/projects/${p.id}/pages`);await expandProperties(page);await page.getByRole('button',{name:'新建笔记',exact:true}).click();
  await expect(page.getByRole('button',{name:'重试新建',exact:true})).toBeVisible();
- await page.reload();await page.getByRole('button',{name:'新建笔记',exact:true}).click();
+ await page.reload();await expandProperties(page);await page.getByRole('button',{name:'新建笔记',exact:true}).click();
  await expect(page.getByLabel('笔记标题',{exact:true})).toHaveValue('无标题笔记');
  expect(ids[0]).toBeTruthy();expect(ids[1]).toBe(ids[0]);
  expect(await(await request.get(`/api/v1/projects/${p.id}/pages`)).json()).toHaveLength(1);
@@ -45,12 +47,12 @@ test('unsaved native draft survives forced tab close and can be explicitly recov
  const p=await post(request,'/projects',{title:'持久草稿 '+Date.now()});
  const note=await post(request,`/projects/${p.id}/pages`,{title:'待恢复笔记'});
  await page.route(`**/api/v1/pages/${note.id}`,async route=>{if(route.request().method()==='PATCH')await route.abort('failed');else await route.continue();});
- await page.goto(`/projects/${p.id}/pages/${note.id}`);
+ await page.goto(`/projects/${p.id}/pages/${note.id}`);await expandProperties(page);
  await page.getByRole('textbox',{name:'Markdown 正文'}).fill('强制关闭之前的中文草稿');
  await expect(page.getByRole('button',{name:'重试保存'})).toBeVisible();
  expect(await page.evaluate(()=>Object.keys(localStorage).some(k=>k.startsWith('noteapp:draft:')))).toBe(true);
  await page.close({runBeforeUnload:false});
- const restored=await context.newPage();await restored.goto(`/projects/${p.id}/pages/${note.id}`);
+ const restored=await context.newPage();await restored.goto(`/projects/${p.id}/pages/${note.id}`);await expandProperties(restored);
  await expect(restored.getByRole('textbox',{name:'Markdown 正文'})).toContainText('强制关闭之前的中文草稿');
  await expect(restored.getByRole('button',{name:'恢复本机草稿'})).toBeVisible();
  await restored.getByRole('button',{name:'恢复本机草稿'}).click();
@@ -78,7 +80,7 @@ test('calendar lost save response reconciles to the committed time',async({page,
  await page.route(`**/api/v1/events/${event.id}`,async route=>{
   if(route.request().method()==='PATCH'&&patches++===0){const res=await route.fetch();committed=await res.json();await route.abort('failed');}else await route.continue();
  });
- await page.goto(`/projects/${p.id}/events`);
+ await page.goto(`/projects/${p.id}/events`);await expandProperties(page);
  const source=page.locator('.fc-event').filter({hasText:'网络改期'}).first();await expect(source).toBeVisible();
  const box=(await source.boundingBox())!;const cell=(await page.locator(`.fc-daygrid-day[data-date="${start.toISODate()}"]`).boundingBox())!;
  await page.mouse.move(box.x+20,box.y+8);await page.mouse.down();await page.waitForTimeout(250);
@@ -90,7 +92,7 @@ test('calendar lost save response reconciles to the committed time',async({page,
 });
 
 test('copied tabs isolate identical independent creations even with cloned window name',async({page,request})=>{
- await page.goto('/');const title='独立窗口 '+Date.now();
+ await page.goto('/');await expandProperties(page);const title='独立窗口 '+Date.now();
  let release!:()=>void;const gate=new Promise<void>(r=>release=r);let firstID:string|undefined;
  await page.route('**/api/v1/projects',async route=>{
   if(route.request().method()!=='POST'){await route.continue();return;}

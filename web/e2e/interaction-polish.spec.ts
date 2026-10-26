@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { paragraphs } from "./block-fixtures";
 import { test, expect } from "@playwright/test";
 test("project names are plain and parent selection is automatic without losing body drafts", async ({
@@ -13,7 +14,7 @@ test("project names are plain and parent selection is automatic without losing b
     title: "当前任务",
     body_document: paragraphs("原始正文"),
   });
-  await page.goto(`/projects/${p.id}/tasks/${child.id}`);
+  await page.goto(`/projects/${p.id}/tasks/${child.id}`);await expandProperties(page);
   await expect(page.locator(".project-icon")).toHaveCount(0);
   const parent = page.getByRole("combobox", { name: "父任务", exact: true });
   await parent.selectOption(a.id);
@@ -44,7 +45,7 @@ test("project names are plain and parent selection is automatic without losing b
           .parent_id,
     )
     .toBeNull();
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(page.getByLabel("Markdown 正文")).toContainText(
     "移动后继续写作",
   );
@@ -56,7 +57,7 @@ test("project names are plain and parent selection is automatic without losing b
     title: "已有子任务",
     parent_id: child.id,
   });
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(parent).toBeDisabled();
 });
 test("calendar opens a compact default draft and creates automatically after valid input", async ({
@@ -68,7 +69,7 @@ test("calendar opens a compact default draft and creates automatically after val
       data: { title: "日历交互 " + Date.now() },
     })
   ).json();
-  await page.goto(`/projects/${p.id}/events`);
+  await page.goto(`/projects/${p.id}/events`);await expandProperties(page);
   await expect(page.locator(".fc-dayGridMonth-view")).toBeVisible();
   await expect(page.getByText(/显示与输入时区|日程显示与输入时区/)).toHaveCount(
     0,
@@ -101,7 +102,7 @@ test("calendar opens a compact default draft and creates automatically after val
   ).toHaveCount(0);
   await page.getByLabel("日程标题", { exact: true }).fill("改名也自动保存");
   await expect(page.getByRole("status")).toHaveText("已保存");
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(page.getByLabel("日程标题", { exact: true })).toHaveValue(
     "改名也自动保存",
   );

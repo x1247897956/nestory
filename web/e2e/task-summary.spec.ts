@@ -1,10 +1,11 @@
+import {expandProperties} from "./property-actions";
 import { paragraphs } from "./block-fixtures";
 import { test, expect } from '@playwright/test';
 test('top-right create action and dedicated summaries for every task', async ({ page, request }) => {
   const project = await (await request.post('/api/v1/projects', {data:{title:'任务汇总 '+Date.now()}})).json();
   const parent = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'准备方案',body_document:paragraphs('汇总页中的任务正文'),stage:'done'}})).json();
   const child = await (await request.post(`/api/v1/projects/${project.id}/tasks`, {data:{title:'整理素材',parent_id:parent.id}})).json();
-  await page.goto(`/projects/${project.id}/tasks`);
+  await page.goto(`/projects/${project.id}/tasks`);await expandProperties(page);
   const add = page.getByRole('button',{name:'添加任务',exact:true});
   const addBox = await add.boundingBox();
   const filtersBox = await page.getByLabel('筛选优先级').boundingBox();
@@ -14,17 +15,23 @@ test('top-right create action and dedicated summaries for every task', async ({ 
   await expect(page.getByRole('region',{name:'任务汇总'})).toBeVisible();
   await expect(page.getByRole('complementary',{name:'子任务汇总'})).toHaveCount(0);
   await expect(page.getByRole('heading',{name:'所有任务'})).toHaveCount(0);
+  await expandProperties(page);
   await page.getByLabel('阶段',{exact:true}).selectOption('in_process');
+  await expandProperties(page);
   await page.getByLabel('优先级',{exact:true}).selectOption('high');
+  await expandProperties(page);
   await page.getByLabel('截止日期',{exact:true}).fill('2026-12-15');
   await expect(page.getByRole('status')).toHaveText('已保存');
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(page.getByLabel('阶段',{exact:true})).toHaveValue('in_process');
+  await expandProperties(page);
   await expect(page.getByLabel('优先级',{exact:true})).toHaveValue('high');
+  await expandProperties(page);
   await expect(page.getByLabel('截止日期',{exact:true})).toHaveValue('2026-12-15');
-  await page.goto(`/projects/${project.id}/tasks/${child.id}`);
+  await page.goto(`/projects/${project.id}/tasks/${child.id}`);await expandProperties(page);
   await expect(page).toHaveURL(new RegExp('/tasks/'+child.id+'$'));
   await expect(page.getByRole('heading',{name:'整理素材',exact:true})).toBeVisible();
+  await expandProperties(page);
   await expect(page.getByLabel('父任务',{exact:true})).toHaveValue(parent.id);
   await expect(page.getByRole('heading',{name:'任务层级'})).toHaveCount(0);
   await expect(page.getByText('子任务',{exact:true})).toHaveCount(0);
@@ -34,6 +41,6 @@ test('top-right create action and dedicated summaries for every task', async ({ 
   await dialog.getByLabel('新任务标题').fill('新增独立汇总');
   await dialog.getByRole('button',{name:'创建任务',exact:true}).click();
   await expect(page.getByRole('heading',{name:'新增独立汇总',exact:true})).toBeVisible();
-  await page.reload();
+  await page.reload();await expandProperties(page);
   await expect(page.getByRole('region',{name:'任务汇总'})).toBeVisible();
 });

@@ -17,9 +17,11 @@ import (
 )
 
 type CreateInput struct {
-	RequestID string `json:"request_id,omitempty"`
-	Kind      string `json:"kind"`
-	Name      string `json:"name,omitempty"`
+	RequestID     string `json:"request_id,omitempty"`
+	Kind          string `json:"kind,omitempty"`
+	SourceID      string `json:"source_id,omitempty"`
+	SourceVersion int64  `json:"source_version,omitempty"`
+	Name          string `json:"name,omitempty"`
 }
 type UpdateInput struct {
 	Version int64                  `json:"version"`
@@ -65,7 +67,7 @@ func (s *Service) Create(ctx context.Context, pid string, typ object.Type, in Cr
 	if _, e := object.Describe(typ); e != nil {
 		return object.CustomDefinition{}, e
 	}
-	if _, ok := kindNames[in.Kind]; !ok {
+	if _, ok := kindNames[in.Kind]; in.SourceID == "" && !ok {
 		return object.CustomDefinition{}, apperr.Invalid("无效属性类型")
 	}
 	key := in.RequestID
@@ -75,6 +77,26 @@ func (s *Service) Create(ctx context.Context, pid string, typ object.Type, in Cr
 		if e := project.Writable(ctx, tx, pid); e != nil {
 			return d, e
 		}
+		options := []object.CustomOption{}
+		kind, requestedName := in.Kind, in.Name
+		if in.SourceID != "" {
+			if in.Kind != "" || in.Name != "" {
+				return d, apperr.Invalid("复用时不能同时指定新类型或名称")
+			}
+			source, err := definition(ctx, tx, in.SourceID)
+			if err != nil {
+				return d, err
+			}
+			if source.ProjectID != pid || source.ObjectType == typ {
+				return d, apperr.Invalid("只能复用同项目其他对象类型的属性")
+			}
+			if source.Version != in.SourceVersion {
+				return d, apperr.Conflict("来源属性已更新，请重新选择")
+			}
+			kind, requestedName, options = source.Kind, source.Name, source.Options
+		} else if in.SourceVersion != 0 {
+			return d, apperr.Invalid("缺少来源属性")
+		}
 		var count int
 		if e := tx.QueryRowContext(ctx, "SELECT count(*) FROM custom_property_definitions WHERE project_id=? AND object_type=?", pid, typ).Scan(&count); e != nil {
 			return d, e
@@ -82,16 +104,16 @@ func (s *Service) Create(ctx context.Context, pid string, typ object.Type, in Cr
 		if count >= 64 {
 			return d, apperr.Invalid("每种对象最多64个自定义属性")
 		}
-		name := strings.TrimSpace(in.Name)
+		name := strings.TrimSpace(requestedName)
 		if name == "" {
-			name = kindNames[in.Kind]
+			name = kindNames[kind]
 			for i := 2; ; i++ {
 				if e := uniqueName(ctx, tx, pid, typ, name, ""); e == nil {
 					break
 				} else if _, ok := e.(*apperr.Error); !ok {
 					return d, e
 				}
-				name = fmt.Sprintf("%s %d", kindNames[in.Kind], i)
+				name = fmt.Sprintf("%s %d", kindNames[kind], i)
 			}
 		}
 		if e := validName(name, typ); e != nil {
@@ -105,8 +127,12 @@ func (s *Service) Create(ctx context.Context, pid string, typ object.Type, in Cr
 			return d, e
 		}
 		now := clock.Now()
-		d = object.CustomDefinition{ID: key, ProjectID: pid, ObjectType: typ, Name: name, Kind: in.Kind, Options: []object.CustomOption{}, Version: 1, CreatedAt: now, UpdatedAt: now}
-		_, e = tx.ExecContext(ctx, "INSERT INTO custom_property_definitions(id,project_id,object_type,name,name_key,kind,options,created_at,updated_at) VALUES(?,?,?,?,?,?,'[]',?,?)", key, pid, typ, name, strings.ToLower(name), in.Kind, now, now)
+		d = object.CustomDefinition{ID: key, ProjectID: pid, ObjectType: typ, Name: name, Kind: kind, Options: options, Version: 1, CreatedAt: now, UpdatedAt: now}
+		raw, e := json.Marshal(options)
+		if e != nil {
+			return d, e
+		}
+		_, e = tx.ExecContext(ctx, "INSERT INTO custom_property_definitions(id,project_id,object_type,name,name_key,kind,options,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)", key, pid, typ, name, strings.ToLower(name), kind, string(raw), now, now)
 		return d, e
 	})
 }
@@ -116,6 +142,11 @@ func validateOptions(old, options []object.CustomOption) error {
 	}
 	ids, names := map[string]bool{}, map[string]bool{}
 	for _, o := range options {
+		switch o.Color {
+		case "", "gray", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red":
+		default:
+			return apperr.Invalid("无效选项颜色")
+		}
 		if o.ID == "" || len(o.ID) > 64 || !utf8.ValidString(o.ID) || !utf8.ValidString(o.Name) || strings.TrimSpace(o.Name) != o.Name || o.Name == "" || utf8.RuneCountInString(o.Name) > 80 {
 			return apperr.Invalid("选项ID或名称无效")
 		}

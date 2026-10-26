@@ -1,8 +1,9 @@
+import {expandProperties} from "./property-actions";
 import {test,expect} from '@playwright/test';
 
 test('overview has one project identity and balanced create actions on narrow and wide screens',async({page,request})=>{
  const p=await(await request.post('/api/v1/projects',{data:{title:'项目排版验收',description:'项目说明保留'}})).json();
- await page.goto(`/projects/${p.id}`);
+ await page.goto(`/projects/${p.id}`);await expandProperties(page);
  const main=page.getByRole('main');
  await expect(main.getByText(p.title,{exact:true})).toHaveCount(1);
  await expect(main.getByRole('heading',{name:p.title,exact:true})).toBeVisible();
@@ -23,7 +24,7 @@ test('notes are flat and legacy child notes remain reachable without child creat
  const p=await(await request.post('/api/v1/projects',{data:{title:'平铺笔记'}})).json();
  const parent=await(await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title:'原父笔记'}})).json();
  const child=await(await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title:'已有子笔记',parent_id:parent.id}})).json();
- await page.goto(`/projects/${p.id}/pages`);
+ await page.goto(`/projects/${p.id}/pages`);await expandProperties(page);
  await expect(page.getByRole('button',{name:/新建子笔记/})).toHaveCount(0);
  const rows=page.locator('.page-list-row');await expect(rows).toHaveCount(2);
  const pads=await rows.evaluateAll(items=>items.map(item=>getComputedStyle(item).paddingLeft));expect(new Set(pads).size).toBe(1);
@@ -36,11 +37,12 @@ test('intrinsic and custom property values use the same aligned column',async({p
  const p=await(await request.post('/api/v1/projects',{data:{title:'属性对齐'}})).json();
  const t=await(await request.post(`/api/v1/projects/${p.id}/tasks`,{data:{title:'属性排版任务'}})).json();
  await request.post(`/api/v1/projects/${p.id}/property-definitions/tasks`,{data:{kind:'text',name:'补充说明'}});
- await page.goto(`/projects/${p.id}/tasks/${t.id}`);
+ await page.goto(`/projects/${p.id}/tasks/${t.id}`);await expandProperties(page);
  for(const width of [1261,773,390]){
   await page.setViewportSize({width,height:932});
   const stage=await page.locator('.object-property-cell[data-property="stage"] > .task-property').boundingBox();
   const priority=await page.locator('.object-property-cell[data-property="priority"] > .task-property').boundingBox();
+  await expandProperties(page);
   const custom=await page.getByLabel('属性值 补充说明',{exact:true}).boundingBox();
   expect(Math.abs(stage!.x-priority!.x)).toBeLessThan(2);
   expect(Math.abs(stage!.x-custom!.x)).toBeLessThan(8);

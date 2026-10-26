@@ -1,3 +1,4 @@
+import {expandProperties} from "./property-actions";
 import { archiveCurrentProject } from "./project-actions";
 import {test,expect} from '@playwright/test';
 test('all object types share collapsed relation properties with keyboard and mobile support',async({page,request})=>{
@@ -9,7 +10,7 @@ test('all object types share collapsed relation properties with keyboard and mob
  await request.put(`/api/v1/relations/task-page/${t.id}/${n.id}`);
  await request.put(`/api/v1/relations/page-event/${n.id}/${e.id}`);
  for(const [type,id] of [['tasks',t.id],['pages',n.id],['events',e.id]]){
-  await page.goto(`/projects/${p.id}/${type}/${id}`);
+  await page.goto(`/projects/${p.id}/${type}/${id}`);await expandProperties(page);
   const properties=page.getByRole('group',{name:'对象属性'});
   const toggle=properties.locator('.relation-property > summary');
   const panel=properties.getByRole('region',{name:'关联对象列表'});
@@ -28,7 +29,7 @@ test('all object types share collapsed relation properties with keyboard and mob
   await expect(panel).toBeHidden();
  }
  await page.setViewportSize({width:390,height:844});
- await page.goto(`/projects/${p.id}/pages/${n.id}`);
+ await page.goto(`/projects/${p.id}/pages/${n.id}`);await expandProperties(page);
  await page.locator('.relation-property > summary').click();
  const panel=page.getByRole('region',{name:'关联对象列表'});
  await expect(panel).toBeVisible();
@@ -37,6 +38,7 @@ test('all object types share collapsed relation properties with keyboard and mob
  await expect(panel.getByRole('link',{name:/关联行动/})).toHaveCount(0);
  expect((await(await request.get(`/api/v1/tasks/${t.id}/relations`)).json()).length).toBe(0);
  await archiveCurrentProject(page);
+ await expandProperties(page);
  await page.locator('.relation-property > summary').click();
  await expect(panel.getByRole('link',{name:/关联讨论/})).toBeVisible();
  await expect(panel.getByRole('button',{name:'添加关联',exact:true})).toHaveCount(0);
