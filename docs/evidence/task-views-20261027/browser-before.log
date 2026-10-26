@@ -1,0 +1,56 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/task-views.spec.ts --max-failures=1 --timeout=10000
+
+(node:74012) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:74041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:74041) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:74041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/task-views.spec.ts:41:1 › view preference survives details and refresh and is scoped to each project (6.0s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) e2e/task-views.spec.ts:41:1 › view preference survives details and refresh and is scoped to each project
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator: getByRole('group', { name: '任务视图', exact: true }).getByRole('button', { name: '列表', exact: true })
+    Expected: "true"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveAttribute" with timeout 5000ms
+      - waiting for getByRole('group', { name: '任务视图', exact: true }).getByRole('button', { name: '列表', exact: true })
+
+
+      28 |   const item = await task(request, first.id, { title: 'Open from board' });
+      29 |   await page.goto(`/projects/${first.id}/tasks`);
+    > 30 |   await expect(views(page).getByRole('button', { name: '列表', exact: true })).toHaveAttribute('aria-pressed', 'true');
+         |                                                                              ^
+      31 |   await views(page).getByRole('button', { name: '看板', exact: true }).click();
+      32 |   await card(page, item.id).getByRole('button', { name: '打开任务 Open from board', exact: true }).click();
+      33 |   await page.getByRole('button', { name: '关闭任务详情', exact: true }).click();
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/task-views.spec.ts:30:78
+
+    Error Context: test-results/task-views-view-preference-3eb59-d-is-scoped-to-each-project/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/task-views-view-preference-3eb59-d-is-scoped-to-each-project/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/task-views-view-preference-3eb59-d-is-scoped-to-each-project/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/task-views.spec.ts:41:1 › view preference survives details and refresh and is scoped to each project
+  4 did not run
+  1 error was not a part of any test, see above for details

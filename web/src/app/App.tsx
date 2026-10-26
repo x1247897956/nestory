@@ -1,3 +1,5 @@
+import { TaskBoard } from "../features/task/TaskBoard";
+import { TaskViewSwitcher, useProjectTaskView } from "../features/task/TaskViews";
 import { ObjectDialog, useOverviewBackground } from "../components/object/ObjectDialog";
 import { ProjectMenu } from "../features/project/ProjectMenu";
 import { flushSync } from "react-dom";
@@ -29,6 +31,7 @@ import { Pages } from "../features/page/Pages";
 export function App() {
   const { projectId, taskId, pageId, eventId } = useParams();
   const nav = useNavigate();
+  const [taskView,setTaskView]=useProjectTaskView(projectId);
   const qc = useQueryClient();
   const [archived, setArchived] = useState(false);
   const activeProjectHeading = useRef<HTMLDivElement>(null);
@@ -44,6 +47,8 @@ export function App() {
   const [error, setError] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newParent, setNewParent] = useState("");
+  const [newStage,setNewStage]=useState("todo");
+  const initialNewStage=useRef("todo");
   const [creating, setCreating] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const createDialog = useRef<HTMLDialogElement>(null);
@@ -53,14 +58,14 @@ export function App() {
   }, [createOpen]);
   const closeCreate = () => {
     if (creating) return;
-    if ((newTitle.trim() || newParent) && !confirm("放弃未保存的新任务吗？")) return;
+    if ((newTitle.trim() || newParent || newStage!==initialNewStage.current) && !confirm("放弃未保存的新任务吗？")) return;
     try { for (const input of createAttempts.current) abandonCreateIntent("/projects/" + projectId + "/tasks", input); }
     catch(e) { setError((e as Error).message); return; }
     createAttempts.current = [];
-    setCreateOpen(false); setNewTitle(""); setNewParent("");
+    setCreateOpen(false); setNewTitle(""); setNewParent(""); setNewStage("todo"); initialNewStage.current="todo";
   };
-  const openCreate = (parent = "") => {
-    setNewParent(parent); setCreateOpen(true);
+  const openCreate = (parent = "", stage = "todo") => {
+    initialNewStage.current=stage; setNewStage(stage); setNewParent(parent); setCreateOpen(true);
   };
   const [editorEpoch, setEditorEpoch] = useState(0);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -117,6 +122,7 @@ export function App() {
   useEffect(() => {
     setNewTitle("");
     setNewParent("");
+    setNewStage("todo"); initialNewStage.current="todo";
     setCreateOpen(false);
   }, [path]);
   useEffect(() => {
@@ -376,16 +382,16 @@ export function App() {
                 archived={readOnly}
               />
             ) : (
-              <div className="workspace">
+              <div className="workspace task-views-workspace">
                 {!overviewBackground && <section className="task-list" aria-hidden={taskId?true:undefined} inert={!!taskId}>
                   <div className="list-toolbar">
                     <div>
                       <h2>所有任务</h2>
                       <span>{all.length} 个任务，专注当下的一步</span>
                     </div>
-                    <div className="task-toolbar-actions"><button onClick={() => setGroup(!group)}>
+                    <div className="task-toolbar-actions"><TaskViewSwitcher view={taskView} onChange={setTaskView}/>{taskView==="list"&&<button onClick={() => setGroup(!group)}>
                       {group ? "取消分组" : "按阶段分组"}
-                    </button>{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
+                    </button>}{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
                   </div>
                   <div className="filters">
                     <label>
@@ -404,12 +410,12 @@ export function App() {
                     </label>
                   </div>
                   {stageBusy && <p className="stage-update-status" role="status">正在更新阶段…</p>}
-                  {tasks.isError ? (
+                  {tasks.isPending ? <p role="status">正在加载任务…</p> : tasks.isError ? (
                     <div role="alert">
                       任务加载失败
                       <button onClick={() => tasks.refetch()}>重试</button>
                     </div>
-                  ) : group ? (
+                  ) : taskView==="board" ? <TaskBoard key={projectId} projectId={projectId} tasks={all.filter(visible)} allTasks={all} readOnly={readOnly} busy={stageBusy} onOpen={openTask} onStageChange={changeStage} onCreate={stage=>openCreate("",stage)}/> : group ? (
                     stages.map(([id, name]) => {
                         const items = roots.filter(
                           (t) =>
@@ -517,13 +523,13 @@ export function App() {
       {createOpen && !readOnly && <dialog ref={createDialog} className="create-task-dialog" aria-label="添加任务" onCancel={e => { e.preventDefault(); closeCreate(); }}>
                     <form
                       className="create-task-form"
-                      data-dirty={!!newTitle.trim() || !!newParent || creating}
+                      data-dirty={!!newTitle.trim() || !!newParent || newStage!==initialNewStage.current || creating}
                       onSubmit={async (e) => {
                         e.preventDefault();
                         setCreating(true);
                         setError("");
                         try {
-                          const input = { title: newTitle, parent_id: newParent || null };
+                          const input = { title: newTitle, parent_id: newParent || null, ...(newStage!=="todo"?{stage:newStage}:{}) };
                           createAttempts.current.push(input);
                           const t = await api<Task>(
                             "/projects/" + projectId + "/tasks",
@@ -535,6 +541,7 @@ export function App() {
                           flushSync(() => {
                             setNewTitle("");
                             setNewParent("");
+                            setNewStage("todo"); initialNewStage.current="todo";
                             setCreating(false);
                             setCreateOpen(false);
                           });
@@ -564,6 +571,7 @@ export function App() {
                         required
                         autoFocus
                       /></label>
+                      <label>阶段<select aria-label="新任务阶段" disabled={creating} value={newStage} onChange={event=>setNewStage(event.target.value)}>{stages.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
                       <label>父任务<select
                         disabled={creating}
                         aria-label="父任务"
