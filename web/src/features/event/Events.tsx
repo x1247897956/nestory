@@ -1,4 +1,4 @@
-import { ObjectDialog } from "../../components/object/ObjectDialog";
+import { ObjectDialog, useOverviewBackground } from "../../components/object/ObjectDialog";
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import "./events.css";
 import { SaveIndicator } from "../../components/markdown/SaveIndicator";
@@ -52,6 +52,7 @@ export function Events({
   archived: boolean;
 }) {
   const nav = useNavigate();
+  const overviewBackground=useOverviewBackground(projectId);
   const [params] = useSearchParams();
   const qc = useQueryClient();
   const [range, setRange] = useState<{ from: string; to: string }>();
@@ -266,7 +267,7 @@ export function Events({
       className="calendar-workspace"
       data-dirty={busy}
     >
-      {(
+      {!overviewBackground && (
         <section aria-label="项目日历" aria-hidden={eventId?true:undefined} inert={!!eventId}>
           <div className="calendar-heading">
             <div>

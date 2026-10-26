@@ -1,4 +1,4 @@
-import { ObjectDialog } from "../components/object/ObjectDialog";
+import { ObjectDialog, useOverviewBackground } from "../components/object/ObjectDialog";
 import { ProjectMenu } from "../features/project/ProjectMenu";
 import { flushSync } from "react-dom";
 import { Workspace } from "../features/workspace/Workspace";
@@ -92,6 +92,7 @@ export function App() {
     enabled: !!taskId,
   });
   const path = useLocation().pathname;
+  const overviewBackground=useOverviewBackground(projectId);
   useEffect(() => {
     const dismiss = (event: PointerEvent) => {
       const menu = projectOptions.current;
@@ -309,16 +310,16 @@ export function App() {
 
       </aside>
       <main>
-        <div aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)} className={"topbar" + (projectId && overview ? " project-overview-topbar" : "")}>
+        <div aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)} className={"topbar" + (projectId && (overview || overviewBackground) ? " project-overview-topbar" : "")}>
           <div className="topbar-identity">
           <nav className="breadcrumbs" aria-label="面包屑">
             {projectId ? <>
-              {overview ? <h1 aria-label={p?.title ?? "项目"}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current="page">{p?.title ?? "项目"}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总">{p?.title ?? "项目"}</Link>}
-              {!overview && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
+              {(overview || overviewBackground) ? <h1 aria-label={p?.title ?? "项目"}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current="page">{p?.title ?? "项目"}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总">{p?.title ?? "项目"}</Link>}
+              {!overview && !overviewBackground && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
 
             </> : <span aria-current="page">{path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
           </nav>
-          {projectId && overview && p?.description && <p className="overview-description">{p.description}</p>}
+          {projectId && (overview || overviewBackground) && p?.description && <p className="overview-description">{p.description}</p>}
           </div>
 
         </div>
@@ -356,9 +357,10 @@ export function App() {
                 {error}
               </p>
             )}
-            {overview ? (
+            {(overview || overviewBackground) && <div aria-hidden={overviewBackground?true:undefined} inert={overviewBackground} className="overview-background">
               <ProjectOverview projectId={projectId} tasks={all} loadingTasks={tasks.isPending} tasksError={tasks.isError} retryTasks={() => void tasks.refetch()} archived={readOnly} onCreateTask={() => openCreate()} />
-            ) : calendar ? (
+            </div>}
+            {overview ? null : calendar ? (
               <Events
                 projectId={projectId}
                 projectTitle={p?.title ?? "项目"}
@@ -374,7 +376,7 @@ export function App() {
               />
             ) : (
               <div className="workspace">
-                <section className="task-list" aria-hidden={taskId?true:undefined} inert={!!taskId}>
+                {!overviewBackground && <section className="task-list" aria-hidden={taskId?true:undefined} inert={!!taskId}>
                   <div className="list-toolbar">
                     <div>
                       <h2>所有任务</h2>
@@ -466,7 +468,7 @@ export function App() {
                       .map(renderRoot)
                   )}
 
-                </section>
+                </section>}
                 {taskId && (
                   <ObjectDialog projectId={projectId} projectTitle={p?.title ?? "项目"} type="tasks" title={detail.data?.title ?? "加载中…"}>
                   <div className="task-summary-page">

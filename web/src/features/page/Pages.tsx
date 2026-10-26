@@ -1,4 +1,4 @@
-import { ObjectDialog } from "../../components/object/ObjectDialog";
+import { ObjectDialog, useOverviewBackground } from "../../components/object/ObjectDialog";
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
@@ -33,6 +33,7 @@ export function Pages({
   const [params] = useSearchParams();
   const qc = useQueryClient();
   const nav = useNavigate();
+  const overviewBackground=useOverviewBackground(projectId);
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
   const pending = useRef(false);
@@ -114,7 +115,7 @@ export function Pages({
         "page-workspace page-list-workspace"
       }
     >
-      {(
+      {!overviewBackground && (
         <section className="page-tree" aria-label="笔记列表" aria-hidden={pageId?true:undefined} inert={!!pageId}>
           <header className="page-list-header">
             <h2>笔记</h2>

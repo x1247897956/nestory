@@ -1,9 +1,14 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./object-dialog.css";
 
 const ObjectPortalContext = createContext<HTMLElement | undefined>(undefined);
 export const useObjectPortal = () => useContext(ObjectPortalContext);
+// Navigation origin is scoped to this project and survives history/reload.
+export function useOverviewBackground(projectId?:string) {
+  const location=useLocation();
+  return !!projectId && location.state?.overviewProject===projectId && /^\/projects\/[^/]+\/(tasks|pages|events)\/[^/]+$/.test(location.pathname);
+}
 const labels = { tasks: "任务", pages: "笔记", events: "日程" };
 
 export function ObjectDialog({ projectId, projectTitle, type, title, children }: {
@@ -12,7 +17,8 @@ export function ObjectDialog({ projectId, projectTitle, type, title, children }:
   const dialog = useRef<HTMLDialogElement>(null);
   const [portal, setPortal] = useState<HTMLDivElement | null>(null);
   const nav = useNavigate();
-  const close = () => nav(`/projects/${projectId}/${type}`);
+  const fromOverview=useOverviewBackground(projectId);
+  const close = () => nav(fromOverview?`/projects/${projectId}`:`/projects/${projectId}/${type}`);
   useEffect(() => {
     const node = dialog.current;
     if (!node) return;
