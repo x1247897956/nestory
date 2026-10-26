@@ -13,8 +13,8 @@ test("project, independent children, refresh, archive and two-tab conflict", asy
     .getByRole("button", { name: "新建项目", exact: true })
     .first()
     .click();
-  await page.getByLabel("项目名称").fill(title);
-  await page.getByLabel("项目说明").fill("阅读与思考");
+  await page.getByRole("dialog", {name:"新建项目", exact:true}).getByLabel("项目名称", {exact:true}).fill(title);
+  await page.getByRole("dialog", {name:"新建项目", exact:true}).getByLabel("项目说明", {exact:true}).fill("阅读与思考");
   await page.getByRole("button", { name: "保存项目" }).click();
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
   await page.getByRole("link", { name: "任务", exact: true }).click();

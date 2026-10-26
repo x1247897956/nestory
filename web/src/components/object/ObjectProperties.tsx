@@ -29,6 +29,8 @@ export function ObjectProperties({ projectId, type, id, version, archived, child
     // Reveal its actual recovery controls, including those inside a closed popover.
     requestAnimationFrame(()=>{
      if(!root.isConnected||!error.isConnected)return;
+     let details=error.closest<HTMLDetailsElement>('details');
+     while(details&&root.contains(details)){details.open=true;details=details.parentElement?.closest<HTMLDetailsElement>('details')??null;}
      const panels:HTMLElement[]=[];
      let panel=error.closest<HTMLElement>('[popover]');
      while(panel&&root.contains(panel)){panels.unshift(panel);panel=panel.parentElement?.closest<HTMLElement>('[popover]')??null;}

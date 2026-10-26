@@ -1,0 +1,117 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.35kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+#4 DONE 11.1s
+
+#3 [internal] load metadata for docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c
+#3 DONE 11.7s
+
+#2 [internal] load metadata for docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#2 DONE 11.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 124B done
+#5 DONE 0.0s
+
+#6 [backend 1/7] FROM docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c
+#6 resolve docker.io/library/golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c done
+#6 DONE 0.0s
+
+#7 [stage-2 1/3] FROM docker.io/library/alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+#7 resolve docker.io/library/alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f 0.0s done
+#7 DONE 0.0s
+
+#8 [frontend 1/6] FROM docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070
+#8 resolve docker.io/library/node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070 done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 951.83kB 0.1s done
+#9 DONE 0.1s
+
+#10 [frontend 2/6] WORKDIR /src/web
+#10 CACHED
+
+#11 [frontend 3/6] COPY web/package*.json ./
+#11 CACHED
+
+#12 [backend 3/7] COPY go.mod go.sum ./
+#12 CACHED
+
+#13 [backend 2/7] WORKDIR /src
+#13 CACHED
+
+#14 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --fetch-timeout=30000 --fetch-retries=1 --foreground-scripts --loglevel=verbose
+#14 CACHED
+
+#15 [backend 4/7] RUN go mod download
+#15 CACHED
+
+#16 [frontend 5/6] COPY web/ ./
+#16 DONE 0.1s
+
+#17 [backend 5/7] COPY . .
+#17 DONE 0.1s
+
+#18 [frontend 6/6] RUN npm run build
+#18 0.349
+#18 0.349 > noteapp-web@0.1.0 build
+#18 0.349 > tsc -b && vite build
+#18 0.349
+#18 2.700 vite v7.3.7 building client environment for production...
+#18 2.731 transforming...
+#18 4.517 ✓ 515 modules transformed.
+#18 4.658 rendering chunks...
+#18 4.991 computing gzip size...
+#18 5.019 dist/index.html                     0.62 kB │ gzip:   0.40 kB
+#18 5.019 dist/assets/index-De2r8E0o.css    144.36 kB │ gzip:  26.32 kB
+#18 5.019 dist/assets/module-RjUF93sV.js     77.27 kB │ gzip:  27.77 kB
+#18 5.019 dist/assets/native-48B9X9Wg.js    432.75 kB │ gzip:  82.80 kB
+#18 5.019 dist/assets/index-LkmN-HV9.js   1,704.49 kB │ gzip: 529.82 kB
+#18 5.019
+#18 5.019 (!) Some chunks are larger than 500 kB after minification. Consider:
+#18 5.019 - Using dynamic import() to code-split the application
+#18 5.019 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#18 5.019 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#18 5.019 ✓ built in 2.30s
+#18 5.073 npm notice
+#18 5.073 npm notice New major version of npm available! 11.19.1 -> 12.2.1
+#18 5.073 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+#18 5.073 npm notice To update run: npm install -g npm@12.2.1
+#18 5.073 npm notice
+#18 DONE 5.1s
+
+#19 [backend 6/7] COPY --from=frontend /src/web/dist ./web/dist
+#19 DONE 0.0s
+
+#20 [backend 7/7] RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /noteapp ./cmd/noteapp
+#20 DONE 7.3s
+
+#21 [stage-2 2/3] RUN apk add --no-cache ca-certificates tzdata && addgroup -g 10001 noteapp && adduser -D -u 10001 -G noteapp noteapp && mkdir -p /data/assets && chown -R noteapp:noteapp /data
+#21 CACHED
+
+#22 [stage-2 3/3] COPY --from=backend /noteapp /usr/local/bin/noteapp
+#22 DONE 0.0s
+
+#23 exporting to image
+#23 exporting layers
+#23 exporting layers 0.4s done
+#23 exporting manifest sha256:8ff5e4d50598aaa45d08029ceda40f66d0b242ace11d6b447be8b42868077bee done
+#23 exporting config sha256:4fc08b2b133cffdeaf90580fc73b5145108b6bb76f98627d97596b1f31437453 done
+#23 exporting attestation manifest sha256:92fa73b3512864cdbe00af824fd76ae96084e7e91f474f53e62e32d7f46c9947 done
+#23 exporting manifest list sha256:9b02839874eefaaed990cec59a5ab47343bc1faf797f7aeb70bd660b7cdc0663 done
+#23 naming to docker.io/library/noteapp:recent-audit-20261026 done
+#23 unpacking to docker.io/library/noteapp:recent-audit-20261026 0.0s done
+#23 DONE 0.4s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/4uv7me2ieireshjssx8y05ujg

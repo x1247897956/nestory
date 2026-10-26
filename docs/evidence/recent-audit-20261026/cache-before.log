@@ -1,0 +1,49 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/recent-audit-regressions.spec.ts --grep removing an option
+
+(node:95807) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:95815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95815) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:95815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/recent-audit-regressions.spec.ts:7:1 › removing an option also refreshes previously visited objects before another selection (6.5s)
+
+
+  1) e2e/recent-audit-regressions.spec.ts:7:1 › removing an option also refreshes previously visited objects before another selection
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    Expected: ["keep"]
+    Received: null
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      20 |  await page.getByRole('button',{name:'已缓存对象',exact:true}).click();await expandProperties(page);
+      21 |  await page.getByLabel('属性值 标签',{exact:true}).click();await page.getByRole('option',{name:'保留选项',exact:true}).click();
+    > 22 |  await expect.poll(async()=>(await(await request.get(`/api/v1/objects/tasks/${b.id}/custom-properties`)).json()).fields[0].value).toEqual(['keep']);
+         |  ^
+      23 | });
+      24 | test('relations stay anchored beside the trigger with many custom properties',async({page,request})=>{
+      25 |  const p=await post(request,'/projects',{title:'关联定位'}),t=await post(request,`/projects/${p.id}/tasks`,{title:'关联属性'});
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/recent-audit-regressions.spec.ts:22:2
+
+    Error Context: test-results/recent-audit-regressions-r-3326b-ts-before-another-selection/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recent-audit-regressions-r-3326b-ts-before-another-selection/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recent-audit-regressions-r-3326b-ts-before-another-selection/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/recent-audit-regressions.spec.ts:7:1 › removing an option also refreshes previously visited objects before another selection

@@ -1,0 +1,1 @@
+govulncheck: loading packages: err: exit status 1: stderr: go: golang.org/toolchain@v0.0.1-go1.27.3.darwin-arm64: verifying module: golang.org/toolchain@v0.0.1-go1.27.3.darwin-arm64: open /Users/seyr1n/Library/Caches/go/1.25.12/pkg/sumdb/sum.golang.org/latest: no such file or directory

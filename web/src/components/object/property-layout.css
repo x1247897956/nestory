@@ -41,3 +41,6 @@ section.object-property-section input::-webkit-datetime-edit-fields-wrapper,
 section.object-property-section input::-webkit-datetime-edit-year-field,
 section.object-property-section input::-webkit-datetime-edit-month-field,
 section.object-property-section input::-webkit-datetime-edit-day-field { padding:0; }
+
+/* display:contents removes the group box; anchor relations to their own row. */
+section.object-property-section .relation-property { position:relative; }

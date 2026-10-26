@@ -14,3 +14,9 @@
 .object-dialog-portals > * { pointer-events:auto; }
 @media(max-width:700px) { .object-dialog { width:calc(100vw - 24px); height:calc(100dvh - 24px); border-radius:8px; } .object-dialog-body { padding:22px 20px 36px; } .object-dialog-header { padding:10px 14px; gap:12px; } .object-dialog-header nav { gap:8px; } .object-dialog-header nav a:first-child { max-width:100px; overflow:hidden; text-overflow:ellipsis; } }
 .calendar-workspace:has(> .object-dialog) { grid-template-columns:minmax(0,1fr); }
+
+/* Long valid names must yield space to the type, current object and close button. */
+.object-dialog-header nav { flex:1; overflow:hidden; }
+.object-dialog-header nav > a:first-child { min-width:0; max-width:min(240px,40%); overflow:hidden; text-overflow:ellipsis; }
+.object-dialog-header nav > a:not(:first-child),.object-dialog-header nav > span[aria-hidden] { flex:none; }
+.object-dialog-header nav > [aria-current] { min-width:0; flex:1; }
