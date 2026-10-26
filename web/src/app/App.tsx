@@ -22,6 +22,7 @@ import "./styles.css";
 import "./workspace.css";
 import "../components/object/property-layout.css";
 import "./context-header.css";
+import "./project-surfaces.css";
 import "./menus.css";
 import { Events } from "../features/event/Events";
 import { Pages } from "../features/page/Pages";

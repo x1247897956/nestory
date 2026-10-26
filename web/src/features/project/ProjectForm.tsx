@@ -25,9 +25,9 @@ export function ProjectForm({
   const [busy, setBusy] = useState(false);
   const attempts = useRef<{title:string;description:string}[]>([]);
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop project-form-backdrop">
       <section
-        className="modal"
+        className="modal project-form"
         role="dialog"
         aria-modal="true"
         aria-label={project ? "修改项目" : "新建项目"}

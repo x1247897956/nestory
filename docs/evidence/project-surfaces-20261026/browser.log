@@ -1,0 +1,34 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/project-surface-consistency.spec.ts e2e/project-overview.spec.ts e2e/overview-dialog-origin.spec.ts e2e/overview-layout.spec.ts e2e/create-drafts.spec.ts e2e/menu-style.spec.ts e2e/acceptance-v1.spec.ts
+
+(node:88279) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:88289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88289) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:88289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/acceptance-v1.spec.ts:15:3 › v1 full journey in a fresh browser context (11.7s)
+  ✓   2 e2e/create-drafts.spec.ts:5:1 › new Page and Task drafts guard routing and closing without flagging empty defaults (2.0s)
+  ✓   3 e2e/create-drafts.spec.ts:73:1 › new Project draft guards closing and cancel while empty form stays clean (412ms)
+  ✓   4 e2e/menu-style.spec.ts:3:3 › project menu and deletion use separate consistent surfaces at 1280px (615ms)
+  ✓   5 e2e/menu-style.spec.ts:3:3 › project menu and deletion use separate consistent surfaces at 390px (522ms)
+  ✓   6 e2e/menu-style.spec.ts:73:1 › deletion confirmation stays open during a pending delete (473ms)
+  ✓   7 e2e/menu-style.spec.ts:127:1 › a failed conflict refresh keeps the error in the dialog and blocks stale confirmation (559ms)
+  ✓   8 e2e/overview-dialog-origin.spec.ts:2:50 › tasks: overview opens details without switching background and closes back to overview (980ms)
+  ✓   9 e2e/overview-dialog-origin.spec.ts:2:50 › pages: overview opens details without switching background and closes back to overview (956ms)
+  ✓  10 e2e/overview-dialog-origin.spec.ts:2:50 › events: overview opens details without switching background and closes back to overview (951ms)
+  ✓  11 e2e/overview-layout.spec.ts:3:1 › overview has one project identity and balanced create actions on narrow and wide screens (456ms)
+  ✓  12 e2e/overview-layout.spec.ts:46:1 › notes are flat and legacy child notes remain reachable without child creation controls (478ms)
+  ✓  13 e2e/overview-layout.spec.ts:84:1 › intrinsic and custom property values use the same aligned column (614ms)
+  ✓  14 e2e/project-overview.spec.ts:4:1 › project opens overview and links to tasks pages and events (1.1s)
+  ✓  15 e2e/project-overview.spec.ts:99:1 › empty project overview offers clear entry points (341ms)
+  ✓  16 e2e/project-surface-consistency.spec.ts:2:1 › project form uses neutral colors and preserves creation (618ms)
+  ✓  17 e2e/project-surface-consistency.spec.ts:39:1 › empty and populated overview rows have matching height across object types (674ms)
+
+  17 passed (24.8s)
