@@ -1,0 +1,8 @@
+../opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/stringprep.py:411: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1083f0d60>
+  c22_specials = set([1757, 1807, 6158, 8204, 8205, 8232, 8233, 65279] + list(range(8288,8292)) + list(range(8298,8304)) + list(range(65529,65533)) + list(range(119155,119163)))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+........
+----------------------------------------------------------------------
+Ran 10 tests in 10.077s
+
+OK

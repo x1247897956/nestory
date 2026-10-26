@@ -1,0 +1,56 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/drag-responsiveness.spec.ts --max-failures=1
+
+(node:4496) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:4517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:4517) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:4517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/drag-responsiveness.spec.ts:3:3 › 列表: drop moves immediately while the save is pending without shifting the workspace (2.2s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) e2e/drag-responsiveness.spec.ts:3:3 › 列表: drop moves immediately while the save is pending without shifting the workspace
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Done阶段', exact: true }).getByText('Immediate move', { exact: true })
+    Expected: visible
+    Timeout: 1000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 1000ms
+      - waiting for getByRole('region', { name: 'Done阶段', exact: true }).getByText('Immediate move', { exact: true })
+
+
+      23 |     try {
+      24 |       await source.dragTo(target);
+    > 25 |       await expect(target.getByText('Immediate move',{exact:true})).toBeVisible({timeout:1000});
+         |                                                                     ^
+      26 |       expect((await surface.boundingBox())!.y).toBe(before);
+      27 |     } finally { release(); }
+      28 |     await expect.poll(async()=> (await (await request.get(`/api/v1/tasks/${item.id}`)).json()).stage).toBe('done');
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/drag-responsiveness.spec.ts:25:69
+
+    Error Context: test-results/drag-responsiveness-列表-dro-1e1ab-hout-shifting-the-workspace/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/drag-responsiveness-列表-dro-1e1ab-hout-shifting-the-workspace/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/drag-responsiveness-列表-dro-1e1ab-hout-shifting-the-workspace/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/drag-responsiveness.spec.ts:3:3 › 列表: drop moves immediately while the save is pending without shifting the workspace
+  1 did not run
+  1 error was not a part of any test, see above for details

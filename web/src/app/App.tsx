@@ -6,7 +6,7 @@ import { flushSync } from "react-dom";
 import { Workspace } from "../features/workspace/Workspace";
 import { Search } from "../features/search/Search";
 import { Trash } from "../features/trash/Trash";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   Link,
   useNavigate,
@@ -41,7 +41,8 @@ export function App() {
   const [priority, setPriority] = useState("all");
   const [group, setGroup] = useState(true);
   const draggedTask = useRef<string | null>(null);
-  const [dropStage, setDropStage] = useState<string | null>(null);
+  const dropTarget = useRef<HTMLElement | null>(null);
+  const clearDropTarget = () => { dropTarget.current?.classList.remove("drop-target"); dropTarget.current = null; };
   const [stageBusy, setStageBusy] = useState(false);
   const stageMutation = useRef(false);
   const [error, setError] = useState("");
@@ -179,31 +180,59 @@ export function App() {
     nav("/projects/" + projectId + "/tasks/" + t.id);
   };
   const changeStage = async (id: string, stage: string) => {
-    const task = all.find(t => t.id === id);
-    if (!task || task.stage === stage || readOnly || stageMutation.current) return;
+    const key = ["tasks", projectId];
+    const task = qc.getQueryData<Task[]>(key)?.find(t => t.id === id);
+    if (!task || task.stage === stage || readOnly || stageMutation.current || !stages.some(([value]) => value === stage)) return;
     stageMutation.current = true;
     setStageBusy(true);
     setError("");
-    try {
-      const next = await api<Task>(`/tasks/${id}`, "PATCH", { version: task.version, stage });
+    const replaceTask = (next: Task) => {
+      qc.setQueryData<Task[]>(key, items => items?.map(item => item.id === id ? next : item));
       qc.setQueryData(["task", id], next);
-      await Promise.all([
-        qc.invalidateQueries({queryKey:["tasks", projectId]}),
-        qc.invalidateQueries({queryKey:["relations"]}),
-        qc.invalidateQueries({queryKey:["relation-options", projectId]}),
-        qc.invalidateQueries({queryKey:["workspace"]}),
-      ]);
+    };
+    const refreshStageDependents = () => { void Promise.all([
+      qc.invalidateQueries({queryKey:["relations"]}),
+      qc.invalidateQueries({queryKey:["relation-options", projectId]}),
+      qc.invalidateQueries({queryKey:["workspace"]}),
+    ]); };
+    try {
+      await qc.cancelQueries({queryKey:key, exact:true});
+      // Keep the server version until PATCH acknowledges the optimistic move.
+      qc.setQueryData<Task[]>(key, items => items?.map(item => item.id === id ? {...item, stage} : item));
+      const next = await api<Task>(`/tasks/${id}`, "PATCH", { version: task.version, stage });
+      replaceTask(next);
+      refreshStageDependents();
     } catch (e) {
-      setError("阶段更新失败，请重试：" + (e as Error).message);
-      void tasks.refetch();
+      // A lost response may still mean the write succeeded. Read the authoritative
+      // version before allowing another move; never guess a new CAS version.
+      try {
+        const actual = await api<Task>(`/tasks/${id}`);
+        replaceTask(actual);
+        refreshStageDependents();
+        if (actual.stage !== stage) setError("阶段更新失败，请重试：" + (e as Error).message);
+      } catch {
+        replaceTask(task);
+        setError("阶段更新失败，请重试：" + (e as Error).message);
+        void qc.invalidateQueries({queryKey:key, exact:true});
+      }
     } finally {
       stageMutation.current = false;
       setStageBusy(false);
     }
   };
   const visible = (t: Task) => priority === "all" || t.priority === priority;
-  const roots = all.filter((t) => !t.parent_id);
-  const children = (id: string) => all.filter((t) => t.parent_id === id);
+  const taskIndex = useMemo(() => {
+    const byId = new Map(all.map(task => [task.id, task]));
+    const byParent = new Map<string, Task[]>();
+    const roots: Task[] = [];
+    for (const task of all) {
+      if (!task.parent_id) roots.push(task);
+      else { const siblings = byParent.get(task.parent_id) ?? []; siblings.push(task); byParent.set(task.parent_id, siblings); }
+    }
+    return {byId, byParent, roots};
+  }, [all]);
+  const roots = taskIndex.roots;
+  const children = (id: string) => taskIndex.byParent.get(id) ?? [];
   const groupedChildren = (t: Task) => children(t.id).filter(child => !group || child.stage === t.stage);
   const row = (t: Task, child = false) => (
     <div
@@ -221,7 +250,7 @@ export function App() {
           event.dataTransfer.effectAllowed = "move";
           event.dataTransfer.setData("application/x-noteapp-task", t.id);
         }}
-        onDragEnd={() => { draggedTask.current = null; setDropStage(null); }}>
+        onDragEnd={() => { draggedTask.current = null; clearDropTarget(); }}>
         <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" fill="currentColor">{[5,9,13].map(y=><g key={y}><circle cx="5" cy={y} r="1"/><circle cx="9" cy={y} r="1"/></g>)}</svg>
       </button>}
       <label className="task-stage-control" title="更改阶段">
@@ -387,7 +416,7 @@ export function App() {
                   <div className="list-toolbar">
                     <div>
                       <h2>所有任务</h2>
-                      <span>{all.length} 个任务，专注当下的一步</span>
+                      <span aria-live="polite">{stageBusy ? "正在更新阶段…" : `${all.length} 个任务，专注当下的一步`}</span>
                     </div>
                     <div className="task-toolbar-actions"><TaskViewSwitcher view={taskView} onChange={setTaskView}/>{taskView==="list"&&<button onClick={() => setGroup(!group)}>
                       {group ? "取消分组" : "按阶段分组"}
@@ -409,7 +438,6 @@ export function App() {
                       </select>
                     </label>
                   </div>
-                  {stageBusy && <p className="stage-update-status" role="status">正在更新阶段…</p>}
                   {tasks.isPending ? <p role="status">正在加载任务…</p> : tasks.isError ? (
                     <div role="alert">
                       任务加载失败
@@ -427,23 +455,21 @@ export function App() {
                             t.parent_id &&
                             t.stage === id &&
                             visible(t) &&
-                            !items.some((p) => p.id === t.parent_id) &&
-                            roots.find((p) => p.id === t.parent_id)?.stage !==
-                              id,
+                            taskIndex.byId.get(t.parent_id)?.stage !== id,
                         );
                         return (
-                          <div className={"task-group" + (dropStage === id ? " drop-target" : "")} key={id}
+                          <div className="task-group" key={id}
                             role="region" aria-label={name + "阶段"} data-stage={id}
                             onDragOver={event => {
                               if (!readOnly && !stageMutation.current && draggedTask.current) {
-                                event.preventDefault(); event.dataTransfer.dropEffect = "move"; setDropStage(id);
+                                event.preventDefault(); event.dataTransfer.dropEffect = "move"; if (dropTarget.current !== event.currentTarget) { clearDropTarget(); dropTarget.current = event.currentTarget; event.currentTarget.classList.add("drop-target"); }
                               }
                             }}
-                            onDragLeave={event => { if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setDropStage(null); }}
+                            onDragLeave={event => { if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) clearDropTarget(); }}
                             onDrop={event => {
                               event.preventDefault();
                               const task = draggedTask.current;
-                              draggedTask.current = null; setDropStage(null);
+                              draggedTask.current = null; clearDropTarget();
                               if (task && event.dataTransfer.getData("application/x-noteapp-task") === task) void changeStage(task, id);
                             }}>
                             <h3>
@@ -458,7 +484,7 @@ export function App() {
                               <div key={t.id}>
                                 <small className="parent-hint">
                                   ↳{" "}
-                                  {all.find((p) => p.id === t.parent_id)?.title}
+                                  {taskIndex.byId.get(t.parent_id ?? "")?.title}
                                 </small>
                                 {row(t, true)}
                               </div>

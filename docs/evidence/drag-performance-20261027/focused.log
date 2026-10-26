@@ -1,0 +1,19 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/drag-responsiveness.spec.ts --max-failures=1
+
+(node:5746) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:5752) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5752) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:5752) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/drag-responsiveness.spec.ts:3:3 › 列表: drop moves immediately while the save is pending without shifting the workspace (1.5s)
+  ✓  2 e2e/drag-responsiveness.spec.ts:3:3 › 看板: drop moves immediately while the save is pending without shifting the workspace (1.0s)
+
+  2 passed (4.3s)

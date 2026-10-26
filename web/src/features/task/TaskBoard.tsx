@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { useRef, useMemo, type DragEvent } from 'react';
 import { type Task, stages, priorities } from '../../app/api';
 import './task-board.css';
 
@@ -18,8 +18,10 @@ const knownStage = (stage: string) => stages.some(([value]) => value === stage);
 
 export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, onStageChange, onCreate }: TaskBoardProps) {
   const dragging = useRef<{ id: string; projectId: string } | null>(null);
-  const [overStage, setOverStage] = useState<string | null>(null);
-  const parents = new Map(allTasks.map(task => [task.id, task]));
+  const overTarget = useRef<HTMLElement | null>(null);
+  const clearOver = () => { overTarget.current?.classList.remove('is-drag-over'); overTarget.current = null; };
+  const parents = useMemo(() => new Map(allTasks.map(task => [task.id, task])), [allTasks]);
+  const visibleIds = useMemo(() => new Set(tasks.filter(task => task.project_id === projectId).map(task => task.id)), [tasks, projectId]);
   const disabled = readOnly || busy;
   const changeStage = (task: Task, stage: string) => {
     if (disabled || task.project_id !== projectId || stage === task.stage || !knownStage(stage)) return;
@@ -27,10 +29,10 @@ export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, 
     void onStageChange(task.id, stage).catch(() => {});
   };
   const canDrop = () => !disabled && dragging.current?.projectId === projectId &&
-    tasks.some(task => task.id === dragging.current?.id && task.project_id === projectId);
+    visibleIds.has(dragging.current?.id ?? "");
   const drop = (event: DragEvent<HTMLElement>, stage: string) => {
     event.preventDefault();
-    setOverStage(null);
+    clearOver();
     if (!canDrop()) return;
     const ownDrag = dragging.current;
     dragging.current = null;
@@ -46,16 +48,16 @@ export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, 
     <div className="task-board-track">
       {stages.map(([stage, label]) => {
         const columnTasks = tasks.filter(task => task.stage === stage || (stage === 'todo' && !knownStage(task.stage)));
-        return <section key={stage} className={`task-board-column${overStage === stage ? ' is-drag-over' : ''}`}
+        return <section key={stage} className="task-board-column"
           role="region" aria-label={`${label}看板列`} data-stage={stage}
           onDragOver={event => {
             if (!canDrop()) return;
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
-            setOverStage(stage);
+            if (overTarget.current !== event.currentTarget) { clearOver(); overTarget.current = event.currentTarget; event.currentTarget.classList.add('is-drag-over'); }
           }}
           onDragLeave={event => {
-            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOverStage(null);
+            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) clearOver();
           }}
           onDrop={event => drop(event, stage)}>
           <header className="task-board-column-header">
@@ -77,7 +79,7 @@ export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, 
                   event.dataTransfer.effectAllowed = 'move';
                   event.dataTransfer.setData(dragType, JSON.stringify(dragging.current));
                 }}
-                onDragEnd={() => { dragging.current = null; setOverStage(null); }}>
+                onDragEnd={() => { dragging.current = null; clearOver(); }}>
                 <button type="button" className="task-board-open" aria-label={`打开任务 ${task.title}`} onClick={() => onOpen(task)}>
                   {task.parent_id && <span className="task-board-parent">父任务 · {parent?.title ?? '未找到父任务'}</span>}
                   <span className="task-board-title">{task.title}</span>
