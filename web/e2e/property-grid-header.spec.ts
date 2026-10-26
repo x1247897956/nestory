@@ -34,6 +34,24 @@ test('workspace project and detail headers share one compact navigation rhythm',
   expect((await bar.boundingBox())!.height).toBe(56);
   expect(await bar.locator('nav').evaluate(e=>getComputedStyle(e).fontSize)).toBe('13px');
   await expect(bar.getByRole('navigation',{name:'面包屑'})).toBeVisible();
+  const typography=await bar.locator('nav a,nav span,nav h1').evaluateAll(es=>es.map(e=>{const s=getComputedStyle(e);return [s.fontSize,s.fontWeight,s.lineHeight].join('/');}));
+  expect(new Set(typography)).toEqual(new Set(['13px/400/24px']));
  }
  await page.goto(`/projects/${p.id}`);await page.screenshot({path:'/tmp/noteapp-unified-header.png'});
+});
+
+test('every detail breadcrumb level uses identical typography on desktop and mobile',async({page,request})=>{
+ const p=await(await request.post('/api/v1/projects',{data:{title:'导航字号一致'}})).json();
+ for(const type of ['tasks','pages','events']){
+  const object=await(await request.post(`/api/v1/projects/${p.id}/${type}`,{data:{title:'当前对象',...(type==='events'?{start_at:'2026-10-26T01:00:00Z',end_at:'2026-10-26T02:00:00Z'}:{})}})).json();
+  await page.goto(`/projects/${p.id}/${type}/${object.id}`);
+  const nav=page.getByRole('dialog',{name:type==='tasks'?'任务详情':type==='pages'?'笔记详情':'日程详情',exact:true}).getByRole('navigation',{name:'面包屑'});
+  await expect(nav.locator('[aria-current="page"]')).toHaveText('当前对象');
+  for(const width of [1261,390]){
+   await page.setViewportSize({width,height:932});
+   const styles=await nav.locator('a,span').evaluateAll(es=>es.map(e=>{const s=getComputedStyle(e);return [s.fontSize,s.fontWeight,s.lineHeight].join('/');}));
+   expect(new Set(styles)).toEqual(new Set(['13px/400/24px']));
+   await page.screenshot({path:`/tmp/noteapp-breadcrumb-${type}-${width}.png`});
+  }
+ }
 });
