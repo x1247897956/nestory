@@ -1,0 +1,43 @@
+/* One row-major grid for native and project-defined properties. */
+section.object-property-section { --property-label-width:116px; --property-gap:12px; --property-inset:0px; container-type:inline-size; }
+section.object-property-section .property-layout:not([hidden]) { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 40px; align-items:start; }
+section.object-property-section .object-properties,
+section.object-property-section .custom-properties,
+section.object-property-section .custom-properties-fields { display:contents; }
+section.object-property-section .object-property-cell,
+section.object-property-section .custom-property-entry { display:grid; grid-template-columns:var(--property-label-width) minmax(0,1fr); gap:var(--property-gap); align-items:start; min-height:36px; min-width:0; margin:0; }
+section.object-property-section .custom-property { min-width:0; margin:0; }
+section.object-property-section .object-property-label,
+section.object-property-section .custom-property-name,
+section.object-property-section .relation-property-name { box-sizing:border-box; min-height:36px; padding:8px 0; margin:0; line-height:20px; }
+section.object-property-section .object-property-label { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+section.object-property-section .object-property-cell[data-property="relations"] { display:block; }
+section.object-property-section .relation-property > summary { width:100%; margin:0; padding:0; grid-template-columns:var(--property-label-width) minmax(0,1fr); gap:var(--property-gap); }
+section.object-property-section .relation-property > summary > .relation-property-name { padding:8px 0; }
+section.object-property-section .relation-property > summary > .relation-property-value { padding:8px 0; min-height:36px; box-sizing:border-box; }
+section.object-property-section .object-property-cell .task-property { width:100%; min-width:0; min-height:36px; padding:0; margin:0; }
+section.object-property-section .object-property-cell .task-property select,
+section.object-property-section .object-property-cell .task-property input,
+section.object-property-section .custom-property-value textarea,
+section.object-property-section .custom-property-value input { width:100%; min-width:0; max-width:100%; min-height:36px; box-sizing:border-box; padding:8px 0!important; border:0; margin:0; line-height:20px; border-radius:4px; }
+section.object-property-section .object-property-cell .task-property select { appearance:none; padding-right:24px!important; background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23737986' stroke-width='1.4'%3E%3Cpath d='m4 5 3 3 3-3'/%3E%3C/svg%3E") no-repeat right 6px center; }
+section.object-property-section input::-webkit-datetime-edit { padding:0; }
+section.object-property-section .property-value-trigger,
+section.object-property-section .property-url-value > a { padding:8px 0; min-height:36px; line-height:20px; box-sizing:border-box; }
+section.object-property-section .property-url-value { min-width:0; }
+section.object-property-section .relation-count { padding:1px 4px; margin:0; }
+section.object-property-section .add-property,
+section.object-property-section .property-error,
+section.object-property-section .custom-properties-loading,
+section.object-property-section .property-layout > [role="alert"] { grid-column:1/-1; justify-self:start; }
+section.object-property-section .add-property { margin:8px 0 0; padding:6px 0; }
+.task-inline-header:has(.object-property-section) { border-bottom:0; }
+@container(max-width:720px) {
+ section.object-property-section .property-layout:not([hidden]) { grid-template-columns:minmax(0,1fr); gap:4px; }
+}
+@media(max-width:650px) { section.object-property-section { --property-label-width:104px; --property-gap:12px; } }
+
+section.object-property-section input::-webkit-datetime-edit-fields-wrapper,
+section.object-property-section input::-webkit-datetime-edit-year-field,
+section.object-property-section input::-webkit-datetime-edit-month-field,
+section.object-property-section input::-webkit-datetime-edit-day-field { padding:0; }

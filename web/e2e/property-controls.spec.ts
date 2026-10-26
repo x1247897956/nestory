@@ -26,7 +26,9 @@ test('properties start collapsed, have aligned gutters and preserve saving when 
   const stage=await page.getByLabel('阶段',{exact:true}).boundingBox();
   const value=await page.getByLabel('属性值 备注',{exact:true}).boundingBox();
   expect(Math.abs(label-relation)).toBeLessThan(2);
-  expect(Math.abs(stage!.x-value!.x)).toBeLessThan(2);
+  const nativeRow=await page.locator('.object-property-cell[data-property="stage"]').boundingBox();
+  const customRow=await page.locator('.custom-property-entry').first().boundingBox();
+  expect(Math.abs((stage!.x-nativeRow!.x)-(value!.x-customRow!.x))).toBeLessThan(2);
   await expect(page.locator('.object-property-label .property-icon').first()).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   await page.screenshot({path:`/tmp/noteapp-property-controls-${width}.png`,fullPage:true});

@@ -20,6 +20,8 @@ import { TaskSummary } from "../features/task/TaskSummary";
 import { TaskEditor, type TaskDraft } from "../features/task/TaskEditor";
 import "./styles.css";
 import "./workspace.css";
+import "../components/object/property-layout.css";
+import "./context-header.css";
 import "./menus.css";
 import { Events } from "../features/event/Events";
 import { Pages } from "../features/page/Pages";

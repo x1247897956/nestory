@@ -44,8 +44,11 @@ test('intrinsic and custom property values use the same aligned column',async({p
   const priority=await page.locator('.object-property-cell[data-property="priority"] > .task-property').boundingBox();
   await expandProperties(page);
   const custom=await page.getByLabel('属性值 补充说明',{exact:true}).boundingBox();
-  expect(Math.abs(stage!.x-priority!.x)).toBeLessThan(2);
-  expect(Math.abs(stage!.x-custom!.x)).toBeLessThan(8);
+  const rows=page.locator('.object-property-cell');
+  const stageRow=await rows.nth(0).boundingBox(),priorityRow=await rows.nth(1).boundingBox();
+  const customRow=await page.locator('.custom-property-entry').first().boundingBox();
+  expect(Math.abs((stage!.x-stageRow!.x)-(priority!.x-priorityRow!.x))).toBeLessThan(2);
+  expect(Math.abs((stage!.x-stageRow!.x)-(custom!.x-customRow!.x))).toBeLessThan(2);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   await page.screenshot({path:`/tmp/noteapp-properties-layout-${width}.png`,fullPage:true});
  }
