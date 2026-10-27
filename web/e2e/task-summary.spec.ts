@@ -8,7 +8,7 @@ test('top-right create action and dedicated summaries for every task', async ({ 
   await page.goto(`/projects/${project.id}/tasks`);await expandProperties(page);
   const add = page.getByRole('button',{name:'添加任务',exact:true});
   const addBox = await add.boundingBox();
-  const filtersBox = await page.getByLabel('筛选优先级').boundingBox();
+  const filtersBox = await page.getByRole('button',{name:'筛选任务',exact:true}).boundingBox();
   expect(addBox!.y).toBeLessThan(filtersBox!.y);
   await page.getByRole('button',{name:'准备方案',exact:true}).click();
   await expect(page.getByRole('heading',{name:'准备方案',exact:true})).toBeVisible();

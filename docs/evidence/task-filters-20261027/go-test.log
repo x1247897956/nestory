@@ -1,0 +1,24 @@
+?   	noteapp/cmd/noteapp	[no test files]
+ok  	noteapp/internal/app	5.616s
+?   	noteapp/internal/apperr	[no test files]
+ok  	noteapp/internal/asset	(cached)
+ok  	noteapp/internal/customproperty	(cached)
+ok  	noteapp/internal/document	(cached)
+ok  	noteapp/internal/event	(cached)
+ok  	noteapp/internal/idempotency	(cached)
+?   	noteapp/internal/object	[no test files]
+ok  	noteapp/internal/objectquery	(cached)
+ok  	noteapp/internal/page	(cached)
+?   	noteapp/internal/platform/clock	[no test files]
+ok  	noteapp/internal/platform/config	(cached)
+ok  	noteapp/internal/platform/database	(cached)
+ok  	noteapp/internal/platform/httpx	(cached)
+?   	noteapp/internal/platform/id	[no test files]
+?   	noteapp/internal/project	[no test files]
+ok  	noteapp/internal/relation	(cached)
+ok  	noteapp/internal/task	(cached)
+?   	noteapp/internal/taskmeta	[no test files]
+ok  	noteapp/internal/trash	(cached)
+ok  	noteapp/internal/workspace	(cached)
+?   	noteapp/migrations	[no test files]
+?   	noteapp/web	[no test files]

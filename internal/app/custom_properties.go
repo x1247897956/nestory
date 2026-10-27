@@ -8,6 +8,10 @@ import (
 )
 
 func registerCustomProperties(mux *http.ServeMux, s *customproperty.Service) {
+	mux.HandleFunc("GET /api/v1/projects/{id}/property-snapshot/{type}", func(w http.ResponseWriter, r *http.Request) {
+		v, e := s.Snapshot(r.Context(), r.PathValue("id"), object.Type(r.PathValue("type")))
+		respond(w, 200, v, e)
+	})
 	mux.HandleFunc("GET /api/v1/projects/{id}/property-definitions/{type}", func(w http.ResponseWriter, r *http.Request) {
 		v, e := s.Definitions(r.Context(), r.PathValue("id"), object.Type(r.PathValue("type")))
 		respond(w, 200, map[string]any{"definitions": v}, e)

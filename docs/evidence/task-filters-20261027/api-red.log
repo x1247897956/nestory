@@ -1,0 +1,17 @@
+go: downloading go1.27.3 (darwin/arm64)
+go: downloading modernc.org/sqlite v1.39.1
+go: downloading modernc.org/libc v1.66.10
+go: downloading golang.org/x/sys v0.36.0
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading github.com/mattn/go-isatty v0.0.20
+go: downloading golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
+go: downloading github.com/ncruces/go-strftime v0.1.9
+go: downloading github.com/google/uuid v1.6.0
+go: downloading modernc.org/memory v1.11.0
+go: downloading modernc.org/mathutil v1.7.1
+go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+--- FAIL: TestProjectPropertySnapshotScopesAndDeletion (0.02s)
+    property_snapshot_test.go:14: GET /projects/ddb08ca8705cfa24cf0ff3e60c218108/property-snapshot/tasks: want 200 got 404: {"error":{"code":"not_found","message":"对象不存在"}}
+FAIL
+FAIL	noteapp/internal/app	0.635s
+FAIL

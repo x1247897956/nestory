@@ -1,3 +1,5 @@
+import { TaskFilters } from "../features/task/TaskFilters";
+import { useTaskFilters } from "../features/task/useTaskFilters";
 import { TaskBoard } from "../features/task/TaskBoard";
 import { TaskViewSwitcher, useProjectTaskView } from "../features/task/TaskViews";
 import { ObjectDialog, useOverviewBackground } from "../components/object/ObjectDialog";
@@ -38,7 +40,6 @@ export function App() {
   const projectOptions = useRef<HTMLDetailsElement>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectForm, setProjectForm] = useState<"new" | "edit" | null>(null);
-  const [priority, setPriority] = useState("all");
   const [group, setGroup] = useState(true);
   const draggedTask = useRef<string | null>(null);
   const dropTarget = useRef<HTMLElement | null>(null);
@@ -157,6 +158,7 @@ export function App() {
   if (p && !navigationProjects.some(project => project.id === p.id)) navigationProjects.push(p);
   const all = tasks.data ?? [];
   const readOnly = !!p?.archived_at;
+  const filterState = useTaskFilters(projectId, all, path.includes("/tasks"));
   const invalidate = async () => {
     await Promise.all([
       qc.invalidateQueries({ queryKey: ["projects"] }),
@@ -220,7 +222,7 @@ export function App() {
       setStageBusy(false);
     }
   };
-  const visible = (t: Task) => priority === "all" || t.priority === priority;
+  const visible = (t: Task) => filterState.ids.has(t.id);
   const taskIndex = useMemo(() => {
     const byId = new Map(all.map(task => [task.id, task]));
     const byParent = new Map<string, Task[]>();
@@ -290,7 +292,7 @@ export function App() {
   const renderRoot = (t: Task) => (
     <div key={t.id}>
       {row(t)}
-      {(expanded.has(t.id) || priority !== "all") &&
+      {(expanded.has(t.id) || filterState.filters.length > 0) &&
         groupedChildren(t)
           .filter(visible)
           .map((c) => row(c, true))}
@@ -422,28 +424,15 @@ export function App() {
                       {group ? "取消分组" : "按阶段分组"}
                     </button>}{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
                   </div>
-                  <div className="filters">
-                    <label>
-                      筛选优先级
-                      <select
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value)}
-                      >
-                        <option value="all">全部优先级</option>
-                        {priorities.map(([id, name]) => (
-                          <option value={id} key={id}>
-                            {name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
+                  <TaskFilters key={projectId} state={filterState}/>
+                  {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{filterState.ids.size} / {all.length} 个任务符合条件</p>}
+                  {!filterState.blocked&&filterState.filters.length>0&&filterState.ids.size===0&&<div className="task-filter-empty"><p>没有符合条件的任务</p><button onClick={()=>filterState.setFilters([])}>清除筛选</button></div>}
                   {tasks.isPending ? <p role="status">正在加载任务…</p> : tasks.isError ? (
                     <div role="alert">
                       任务加载失败
                       <button onClick={() => tasks.refetch()}>重试</button>
                     </div>
-                  ) : taskView==="board" ? <TaskBoard key={projectId} projectId={projectId} tasks={all.filter(visible)} allTasks={all} readOnly={readOnly} busy={stageBusy} onOpen={openTask} onStageChange={changeStage} onCreate={stage=>openCreate("",stage)}/> : group ? (
+                  ) : (filterState.blocked || (filterState.filters.length>0&&filterState.ids.size===0)) ? null : taskView==="board" ? <TaskBoard key={projectId} projectId={projectId} tasks={all.filter(visible)} allTasks={all} readOnly={readOnly} busy={stageBusy} onOpen={openTask} onStageChange={changeStage} onCreate={stage=>openCreate("",stage)}/> : group ? (
                     stages.map(([id, name]) => {
                         const items = roots.filter(
                           (t) =>

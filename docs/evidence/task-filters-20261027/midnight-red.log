@@ -1,0 +1,52 @@
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/task-filter-midnight.spec.ts
+
+(node:48847) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:48850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48850) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:48850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/task-filter-midnight.spec.ts:3:1 › reentering task view after midnight refreshes relative filters (2.7s)
+
+
+  1) e2e/task-filter-midnight.spec.ts:3:1 › reentering task view after midnight refreshes relative filters
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Today task', exact: true })
+    Expected: visible
+    Timeout: 1500ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 1500ms
+      - waiting for getByRole('button', { name: 'Today task', exact: true })
+
+
+      10 |  await page.clock.setSystemTime(new Date('2026-10-27T16:01:00Z'));
+      11 |  await page.getByRole('link',{name:/查看全部任务/}).click();
+    > 12 |  await expect(page.getByRole('button',{name:'Today task',exact:true})).toBeVisible({timeout:1500});
+         |                                                                        ^
+      13 |  await expect(page.getByRole('button',{name:'Yesterday task',exact:true})).toHaveCount(0);
+      14 | });
+      15 |
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/task-filter-midnight.spec.ts:12:72
+
+    Error Context: test-results/task-filter-midnight-reent-e7ab4--refreshes-relative-filters/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/task-filter-midnight-reent-e7ab4--refreshes-relative-filters/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/task-filter-midnight-reent-e7ab4--refreshes-relative-filters/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/task-filter-midnight.spec.ts:3:1 › reentering task view after midnight refreshes relative filters

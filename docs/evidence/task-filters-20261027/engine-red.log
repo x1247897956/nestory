@@ -1,0 +1,35 @@
+
+> noteapp-web@0.1.0 test
+> vitest --run src/features/task/taskFilters.test.ts
+
+
+ RUN  v4.1.12 /Users/seyr1n/01-Project/noteapp/web
+
+ ❯ src/features/task/taskFilters.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/task/taskFilters.test.ts [ src/features/task/taskFilters.test.ts ]
+Error: Failed to resolve import "./taskFilters" from "src/features/task/taskFilters.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/seyr1n/01-Project/noteapp/web/src/features/task/taskFilters.test.ts:2:83
+  1  |  import { describe, it, expect } from "vitest";
+  2  |  import { matchesFilters, filterFields, validFilters, readFilters } from "./taskFilters";
+     |                                                                           ^
+  3  |  const task = { id: "t", title: "Read Report", stage: "todo", priority: "high", due_date: "2026-10-27" };
+  4  |  const snapshot = { definitions: [{ id: "tags", name: "标签", kind: "multi_select", options: [{ id: "a", name: "A" }, { ...
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:29250:43
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:29247:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/config.js:27370:18
+ ❯ node_modules/vite/dist/node/chunks/config.js:27428:32
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:27396:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:29048:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/config.js:22914:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  07:57:56
+   Duration  479ms (transform 15ms, setup 82ms, import 0ms, tests 0ms, environment 284ms)

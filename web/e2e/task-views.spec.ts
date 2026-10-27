@@ -1,3 +1,4 @@
+import {addTaskFilter} from './task-filter-actions';
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 import { paragraphs } from './block-fixtures';
 import { archiveCurrentProject } from './project-actions';
@@ -61,11 +62,11 @@ test('board moves independent parent and child through native drag and select an
   await page.reload();
   await expect(column(page, 'InProcess').locator(`article[data-task-id="${parent.id}"]`)).toBeVisible();
   await expect(column(page, 'Done').locator(`article[data-task-id="${child.id}"]`)).toBeVisible();
-  await page.getByRole('combobox', {name:'筛选优先级', exact:true}).selectOption('high');
+  await addTaskFilter(page,'priority','is','high');
   await expect(card(page, child.id)).toHaveCount(0);
   await expect(card(page, parent.id)).toBeVisible();
   await views(page).getByRole('button', { name: '列表', exact: true }).click();
-  await expect(page.getByRole('combobox', {name:'筛选优先级', exact:true})).toHaveValue('high');
+  await expect(page.getByRole('button',{name:/编辑筛选 优先级/})).toBeVisible();
   await views(page).getByRole('button', { name: '看板', exact: true }).click();
   await expect(card(page, child.id)).toHaveCount(0);
 });
