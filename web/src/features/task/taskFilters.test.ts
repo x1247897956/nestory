@@ -34,3 +34,17 @@ describe('task filter semantics',()=>{
   expect(readFilters(JSON.stringify([f('stage','is','todo')]))).toEqual([f('stage','is','todo')]);
  });
 });
+
+describe('note filters',()=>{
+ it('offers note fields rather than task-only properties',()=>{
+  const ids=filterFields([], 'pages').map(f=>f.id);
+  expect(ids).toEqual(['title','created_at','updated_at']);
+ });
+ it('interprets note timestamps as local calendar days, including midnight and empty legacy values',()=>{
+  const note={id:'n',title:'Note',created_at:Date.parse('2026-10-27T16:30:00Z'),updated_at:Date.parse('2026-10-28T16:30:00Z')};
+  expect(matchesFilters(note,[f('created_at','today')],{},'Asia/Shanghai','2026-10-28T01:00:00Z')).toBe(true);
+  expect(matchesFilters(note,[f('created_at','today')],{},'UTC','2026-10-28T01:00:00Z')).toBe(false);
+  expect(matchesFilters(note,[f('updated_at','between',['2026-10-29','2026-10-29'])],{},'Asia/Shanghai')).toBe(true);
+  expect(matchesFilters({id:'legacy',title:'Old'},[f('created_at','empty')],{},'Asia/Shanghai')).toBe(true);
+ });
+});

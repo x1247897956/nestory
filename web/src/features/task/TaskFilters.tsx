@@ -3,9 +3,9 @@ import {randomUUID} from '../../app/uuid';
 import {noValue,operators,validFilters,type TaskFilter} from './filterEngine';
 import type {TaskFilterState} from './useTaskFilters';
 import './task-filters.css';
-const blank=():TaskFilter=>({id:randomUUID(),field:'stage',op:'is',value:''});
-export function TaskFilters({state}:{state:TaskFilterState}){
+export function TaskFilters({state,label:objectLabel='任务'}:{state:TaskFilterState;label?:string}){
  const {filters,setFilters,fields}=state;
+ const blank=():TaskFilter=>({id:randomUUID(),field:fields.some(f=>f.id==='stage')?'stage':'title',op:fields.some(f=>f.id==='stage')?'is':'contains',value:''});
  const [draft,setDraft]=useState<TaskFilter>(blank);
  const [editing,setEditing]=useState(false);
  const [opened,setOpened]=useState(false);
@@ -26,9 +26,9 @@ export function TaskFilters({state}:{state:TaskFilterState}){
   const val=Array.isArray(filter.value)?filter.value.map(v=>f?.options?.find(o=>o.id===v)?.name??v).join('、'):f?.options?.find(o=>o.id===filter.value)?.name??filter.value;
   return `${f?.name??'已删除属性'} · ${op??'失效条件'}${noValue(filter.op)?'':` ${val}`}`;
  };
- return <div className="task-filters" aria-label="任务筛选器">
+ return <div className="task-filters" aria-label={`${objectLabel}筛选器`}>
   <div className="task-filter-line">
-   <button className={`task-filter-trigger${filters.length?' active':''}`} type="button" aria-label="筛选任务" aria-expanded={opened} aria-controls={id} onClick={e=>open(e.currentTarget)} disabled={filters.length>=30}>
+   <button className={`task-filter-trigger${filters.length?' active':''}`} type="button" aria-label={`筛选${objectLabel}`} aria-expanded={opened} aria-controls={id} onClick={e=>open(e.currentTarget)} disabled={filters.length>=30}>
     <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M3 5h14M6 10h8M8 15h4"/></svg>筛选{filters.length>0&&<span className="task-filter-count">{filters.length}</span>}
    </button>
    {filters.map(f=><span className="task-filter-chip" key={f.id}>

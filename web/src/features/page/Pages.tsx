@@ -1,3 +1,5 @@
+import {TaskFilters} from "../task/TaskFilters";
+import {useTaskFilters} from "../task/useTaskFilters";
 import { CollectionHeader } from "../view/CollectionHeader";
 import {SortControl} from "../view/SortControl";
 import {useProjectPreferences} from "../view/preferences";
@@ -73,7 +75,8 @@ export function Pages({
     ]);
   const nodes = list.data ?? [];
   // Legacy nested notes remain accessible, but the interface is a flat list.
-  const flat = sortObjects(nodes, sort);
+  const filterState=useTaskFilters(projectId,nodes,true,'pages');
+  const flat = sortObjects(nodes, sort).filter(page=>filterState.ids.has(page.id));
   const createPage = async () => {
     if (pending.current || archived) return;
     pending.current = true;
@@ -124,10 +127,10 @@ export function Pages({
     >
       {!overviewBackground && (
         <section className="page-tree" aria-label="笔记列表" aria-hidden={pageId?true:undefined} inert={!!pageId}>
-          <CollectionHeader title="笔记" count={list.isPending?"…":flat.length}
+          <CollectionHeader title="笔记" count={list.isPending?"…":nodes.length}
             actions={!archived&&<button disabled={creating||!!error} onClick={()=>void createPage()}>新建笔记</button>}
             views={<div className="collection-view-switch"><span className="collection-current-view">列表</span></div>}
-            tools={<SortControl key={projectId} value={sort} onChange={setSort} fields={noteSortFields} label="笔记排序"/>}/>
+            tools={<><TaskFilters key={projectId} state={filterState} label="笔记"/><SortControl key={projectId} value={sort} onChange={setSort} fields={noteSortFields} label="笔记排序"/></>}/>
           {error && (
             <p role="alert">
               {error}{" "}
@@ -146,6 +149,7 @@ export function Pages({
               }}>放弃此次新建</button>
             </p>
           )}
+          {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{flat.length} / {nodes.length} 篇笔记符合条件</p>}
           <div className="page-list">
             {flat.map((page) => (
               <div
@@ -160,9 +164,9 @@ export function Pages({
               </div>
             ))}
             {list.isLoading && <p className="page-list-empty">加载笔记…</p>}
-            {!list.isLoading && !list.isError && !flat.length && (
+            {!list.isLoading && !list.isError && !filterState.blocked && !flat.length && (
               <p className="page-list-empty">
-                还没有笔记，创建第一篇笔记开始记录。
+                {filterState.filters.length?<>没有符合条件的笔记<button onClick={()=>filterState.setFilters([])}>清除筛选</button></>:"还没有笔记，创建第一篇笔记开始记录。"}
               </p>
             )}
           </div>

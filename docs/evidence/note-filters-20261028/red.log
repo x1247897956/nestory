@@ -1,0 +1,62 @@
+
+> noteapp-web@0.1.0 test
+> vitest --run src/features/task/taskFilters.test.ts
+
+
+ RUN  v4.1.12 /Users/seyr1n/01-Project/noteapp/web
+
+ ❯ src/features/task/taskFilters.test.ts (7 tests | 2 failed) 38ms
+     × offers note fields rather than task-only properties 3ms
+     × interprets note timestamps as local calendar days, including midnight and empty legacy values 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/task/taskFilters.test.ts > note filters > offers note fields rather than task-only properties
+AssertionError: expected [ 'title', 'stage', 'priority', …(1) ] to deeply equal [ 'title', 'created_at', 'updated_at' ]
+
+- Expected
++ Received
+
+  [
+    "title",
+-   "created_at",
+-   "updated_at",
++   "stage",
++   "priority",
++   "due_date",
+  ]
+
+ ❯ src/features/task/taskFilters.test.ts:41:15
+     39|  it('offers note fields rather than task-only properties',()=>{
+     40|   const ids=filterFields([], 'pages').map(f=>f.id);
+     41|   expect(ids).toEqual(['title','created_at','updated_at']);
+       |               ^
+     42|  });
+     43|  it('interprets note timestamps as local calendar days, including midn…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/task/taskFilters.test.ts > note filters > interprets note timestamps as local calendar days, including midnight and empty legacy values
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/features/task/taskFilters.test.ts:45:100
+     43|  it('interprets note timestamps as local calendar days, including midn…
+     44|   const note={id:'n',title:'Note',created_at:Date.parse('2026-10-27T16…
+     45|   expect(matchesFilters(note,[f('created_at','today')],{},'Asia/Shangh…
+       |                                                                                                    ^
+     46|   expect(matchesFilters(note,[f('created_at','today')],{},'UTC','2026-…
+     47|   expect(matchesFilters(note,[f('updated_at','between',['2026-10-29','…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  10:13:36
+   Duration  523ms (transform 34ms, setup 80ms, import 25ms, tests 38ms, environment 293ms)

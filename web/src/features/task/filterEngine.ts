@@ -1,6 +1,7 @@
 import {DateTime} from 'luxon';
-import {stages,priorities,type Task} from '../../app/api';
+import {stages,priorities} from '../../app/api';
 import type {PropertyDefinition,PropertyValue} from '../../components/object/propertyTypes';
+export type FilterObject={id:string;title:string;stage?:string;priority?:string;due_date?:string|null;created_at?:number;updated_at?:number};
 export type TaskFilter={id:string;field:string;op:string;value:string|string[]};
 export type FilterField={id:string;name:string;kind:'text'|'url'|'single_select'|'multi_select'|'date';options?:{id:string;name:string}[]};
 export type PropertySnapshot={definitions:PropertyDefinition[];values:Record<string,Record<string,PropertyValue>>};
@@ -12,11 +13,13 @@ export const operators:Record<FilterField['kind'],[string,string][]>= {
  date:[['before','早于'],['after','晚于'],['between','介于'],['today','今天'],['week','本周'],['empty','为空'],['not_empty','不为空']],
 };
 export const noValue=(op:string)=>['empty','not_empty','today','week'].includes(op);
-export function filterFields(definitions:PropertyDefinition[]):FilterField[] {return [
+export function filterFields(definitions:PropertyDefinition[],type:'tasks'|'pages'='tasks'):FilterField[] {return [
  {id:'title',name:'标题',kind:'text'},
- {id:'stage',name:'阶段',kind:'single_select',options:stages.map(([id,name])=>({id,name}))},
- {id:'priority',name:'优先级',kind:'single_select',options:priorities.map(([id,name])=>({id,name}))},
- {id:'due_date',name:'截止日期',kind:'date'},
+ ...(type==='tasks'?[
+  {id:'stage',name:'阶段',kind:'single_select',options:stages.map(([id,name])=>({id,name}))},
+  {id:'priority',name:'优先级',kind:'single_select',options:priorities.map(([id,name])=>({id,name}))},
+  {id:'due_date',name:'截止日期',kind:'date'},
+ ]:[{id:'created_at',name:'创建时间',kind:'date'},{id:'updated_at',name:'更新时间',kind:'date'}]) as FilterField[],
  ...definitions.map(d=>({id:d.id,name:d.name,kind:d.kind,options:d.options})),
 ];}
 const dateValid=(value:string)=>/^\d{4}-\d{2}-\d{2}$/.test(value)&&DateTime.fromISO(value).isValid;
@@ -29,9 +32,11 @@ export function validFilters(filters:TaskFilter[],fields:FilterField[]):boolean 
  if(typeof f.value!=='string'||!f.value.trim())return false;
  return field.kind!=='single_select'||!!field.options?.some(o=>o.id===f.value);
 });}
-export function matchesFilters(task:Task,filters:TaskFilter[],values:PropertySnapshot['values'],zone:string,now?:string):boolean {
+export function matchesFilters(task:FilterObject,filters:TaskFilter[],values:PropertySnapshot['values'],zone:string,now?:string):boolean {
  return filters.every(f=>{
- const value:PropertyValue=f.field==='title'?task.title:f.field==='stage'?task.stage:f.field==='priority'?task.priority:f.field==='due_date'?task.due_date:values[task.id]?.[f.field]??null;
+ const timestamp=f.field==='created_at'?task.created_at:f.field==='updated_at'?task.updated_at:undefined;
+ const localDate=typeof timestamp==='number'&&Number.isFinite(timestamp)?DateTime.fromMillis(timestamp,{zone}).toISODate():null;
+ const value:PropertyValue=['created_at','updated_at'].includes(f.field)?localDate:f.field==='title'?task.title:f.field==='stage'?task.stage??null:f.field==='priority'?task.priority??null:f.field==='due_date'?task.due_date??null:values[task.id]?.[f.field]??null;
  const empty=value==null||value===''||(Array.isArray(value)&&value.length===0);
  if(f.op==='empty')return empty;
  if(f.op==='not_empty')return !empty;
