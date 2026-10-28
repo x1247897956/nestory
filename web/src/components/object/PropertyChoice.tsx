@@ -11,6 +11,7 @@ export function PropertyChoice({definition:d,value,disabled,pending,onChange,onD
  const menuId=useId(), menu=useRef<HTMLDivElement>(null);
  const [menuOption,setMenuOption]=useState<(typeof d.options)[number]|null>(null),[optionPending,setOptionPending]=useState(false);
  const selected=Array.isArray(value)?value:typeof value==="string"?[value]:[];
+ const selectedOptions=d.options.filter(o=>selected.includes(o.id));
  const options=d.options.filter(o=>o.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
  const choose=(optionId:string)=>{if(disabled||busy||optionPending)return;onChange(d.kind==="single_select"?optionId:selected.includes(optionId)?selected.filter(x=>x!==optionId):[...selected,optionId]);if(d.kind==="single_select")panel.current?.hidePopover();};
  const create=async()=>{
@@ -34,7 +35,7 @@ export function PropertyChoice({definition:d,value,disabled,pending,onChange,onD
  };
  return <div data-dirty={busy}>
   <button ref={trigger} className="property-value-trigger" aria-label={`属性值 ${d.name}`} disabled={disabled} popoverTarget={id} onClick={()=>{positionPropertyPopover(panel.current,trigger.current);setQuery("");setError("");requestAnimationFrame(()=>search.current?.focus());}}>
-   {selected.length?d.options.filter(o=>selected.includes(o.id)).map(o=><span className="property-tag" data-color={optionColor(o.color)} key={o.id}>{o.name}</span>):<span className="property-empty">未选择</span>}
+   {selectedOptions.length?selectedOptions.map(o=><span className="property-tag" data-color={optionColor(o.color)} key={o.id}>{o.name}</span>):<span className="property-empty">未选择</span>}
   </button>
   <div id={id} ref={panel} popover="auto" className="custom-property-popover property-choice" aria-label={`选择 ${d.name}`}>
    <input ref={search} aria-label="搜索或创建选项" placeholder="搜索或创建选项…" maxLength={80} value={query} disabled={busy||disabled||optionPending} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="ArrowDown"){e.preventDefault();panel.current?.querySelector<HTMLButtonElement>('[role="option"]')?.focus();}if(e.key==="Enter"&&!e.nativeEvent.isComposing){e.preventDefault();if(options.length)choose(options[0].id);else void create();}}}/>

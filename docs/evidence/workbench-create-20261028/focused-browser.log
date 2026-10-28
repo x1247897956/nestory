@@ -1,0 +1,23 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/workbench-create.spec.ts e2e/workspace-design.spec.ts
+
+(node:99611) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:99615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:99615) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:99615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/workbench-create.spec.ts:2:1 › workbench day click creates in a selected active project and refreshes calendar (1.9s)
+  ✓  2 e2e/workbench-create.spec.ts:68:1 › workbench creation locks pending input and retries a lost response without duplicates (1.5s)
+  ✓  3 e2e/workbench-create.spec.ts:138:1 › workbench week time click preserves the clicked time and invalid drafts remain open (606ms)
+  ✓  4 e2e/workspace-design.spec.ts:4:1 › workspace emphasizes overdue work and removes status navigation and creation CTA (642ms)
+  ✓  5 e2e/workspace-design.spec.ts:93:1 › archived projects remain reachable on a phone (463ms)
+  ✓  6 e2e/workspace-design.spec.ts:109:1 › workbench navigates future calendar ranges and includes undated and future tasks (1.5s)
+
+  6 passed (8.8s)

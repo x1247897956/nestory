@@ -1,0 +1,55 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/workbench-create.spec.ts --max-failures=1
+
+(node:75146) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:75177) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75177) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:75177) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/workbench-create.spec.ts:2:1 › workbench day click creates in a selected active project and refreshes calendar (6.0s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) e2e/workbench-create.spec.ts:2:1 › workbench day click creates in a selected active project and refreshes calendar
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('dialog', { name: '新建日程', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByRole('dialog', { name: '新建日程', exact: true })
+
+
+       6 |  const archived=await(await request.post('/api/v1/projects',{data:{title:'Archived choice'}})).json();await request.patch(`/api/v1/projects/${archived.id}`,{data:{version:archived.version,archived:true}});
+       7 |  await page.goto('/');const calendar=page.getByRole('region',{name:'日程日历',exact:true});await calendar.locator(`.fc-daygrid-day[data-date="${day}"] .fc-daygrid-day-number`).click();
+    >  8 |  const dialog=page.getByRole('dialog',{name:'新建日程',exact:true});await expect(dialog).toBeVisible();
+         |                                                                                      ^
+       9 |  await expect(dialog.getByLabel('所属项目',{exact:true}).locator(`option[value="${archived.id}"]`)).toHaveCount(0);
+      10 |  await dialog.getByLabel('所属项目',{exact:true}).selectOption(p.id);await expect(dialog.getByLabel('新日程开始',{exact:true})).toHaveValue(day+'T09:00');await expect(dialog.getByLabel('新日程结束',{exact:true})).toHaveValue(day+'T10:00');
+      11 |  await dialog.getByLabel('新日程标题',{exact:true}).fill('Created from workbench');await expect(dialog).toBeHidden();
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/workbench-create.spec.ts:8:86
+
+    Error Context: test-results/workbench-create-workbench-fa44a-ject-and-refreshes-calendar/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workbench-create-workbench-fa44a-ject-and-refreshes-calendar/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workbench-create-workbench-fa44a-ject-and-refreshes-calendar/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/workbench-create.spec.ts:2:1 › workbench day click creates in a selected active project and refreshes calendar
+  1 error was not a part of any test, see above for details

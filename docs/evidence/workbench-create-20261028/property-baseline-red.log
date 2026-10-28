@@ -1,0 +1,35 @@
+
+> noteapp-web@0.1.0 test
+> vitest --run src/components/object/PropertyChoice.test.tsx
+
+
+ RUN  v4.1.12 /Users/seyr1n/01-Project/noteapp/web
+
+ ❯ src/components/object/PropertyChoice.test.tsx (1 test | 1 failed) 51ms
+   × shows an empty choice when selected IDs were removed from the definition 50ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/object/PropertyChoice.test.tsx > shows an empty choice when selected IDs were removed from the definition
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  未选择
+Received:
+
+ ❯ src/components/object/PropertyChoice.test.tsx:9:53
+      7|  const definition={id:'d',project_id:'p',object_type:'tasks',name:'标签'…
+      8|  render(<PropertyChoice definition={definition} value={['a']} disabled…
+      9|  expect(screen.getByRole('button',{name:'属性值 标签'})).toHaveTextContent(…
+       |                                                     ^
+     10| });
+     11|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  17:09:54
+   Duration  643ms (transform 77ms, setup 138ms, import 45ms, tests 51ms, environment 311ms)
+
