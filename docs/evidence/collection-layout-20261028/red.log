@@ -1,0 +1,56 @@
+curl: (52) Empty reply from server
+
+> noteapp-web@0.1.0 e2e
+> playwright test e2e/collection-layout.spec.ts --max-failures=1
+
+(node:15891) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:15899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15899) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:15899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/collection-layout.spec.ts:3:1 › tasks notes and events share header and toolbar geometry at desktop and mobile widths (5.7s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) e2e/collection-layout.spec.ts:3:1 › tasks notes and events share header and toolbar geometry at desktop and mobile widths
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.collection-header')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('.collection-header')
+
+
+       6 |  const metrics:Record<string,{x:number;y:number;height:number}>={};
+       7 |  for(const type of ['tasks','pages','events']){
+    >  8 |   await page.goto(`/projects/${p.id}/${type}`);await expect(page.locator('.collection-header')).toBeVisible();
+         |                                                                                                 ^
+       9 |   const header=(await page.locator('.collection-header').boundingBox())!,toolbar=(await page.locator('.collection-toolbar').boundingBox())!;
+      10 |   metrics[type]={x:header.x,y:toolbar.y,height:header.height};
+      11 |   await expect(page.locator('.collection-header h2')).toHaveCSS('font-size','20px');
+        at /Users/seyr1n/01-Project/noteapp/web/e2e/collection-layout.spec.ts:8:97
+
+    Error Context: test-results/collection-layout-tasks-no-85b52-t-desktop-and-mobile-widths/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/collection-layout-tasks-no-85b52-t-desktop-and-mobile-widths/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/collection-layout-tasks-no-85b52-t-desktop-and-mobile-widths/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/collection-layout.spec.ts:3:1 › tasks notes and events share header and toolbar geometry at desktop and mobile widths
+  1 did not run
+  1 error was not a part of any test, see above for details

@@ -1,3 +1,4 @@
+import { CollectionHeader } from "../view/CollectionHeader";
 import { EventTimeline } from "./EventTimeline";
 import { timelineRange, type TimelineSpan } from "./timeline";
 import { useProjectPreferences } from "../view/preferences";
@@ -271,36 +272,18 @@ export function Events({
   };
   return (
     <div
-      className="calendar-workspace"
+      className="calendar-workspace collection-workspace"
       data-dirty={busy}
     >
       {!overviewBackground && (
         <section aria-label="项目日历" aria-hidden={eventId?true:undefined} inert={!!eventId}>
-          <div className="calendar-heading">
-            <div>
-              <h1>日程</h1>
-            </div>
-            {!archived && (
-              <button
-                className="calendar-new"
-                disabled={busy}
-                onClick={() => {
-                  const start = DateTime.now()
-                    .setZone(zone)
-                    .startOf("day")
-                    .set({ hour: 9 });
-                  choose(start.toISO()!, start.plus({ hours: 1 }).toISO()!);
-                }}
-              >
-                新建日程
-              </button>
-            )}
-          </div>
-          <div className="calendar-view-switch" aria-label="日程视图">
-            <button aria-pressed={preferences.view==='calendar'} onClick={()=>setPreferences(old=>({...old,view:'calendar'}))}>日历</button>
-            <button aria-pressed={preferences.view==='timeline'} onClick={()=>setPreferences(old=>({...old,view:'timeline'}))}>时间轴</button>
-            {preferences.view==='timeline' && <SortControl value={preferences.sort} fields={eventSortFields} onChange={sort=>setPreferences(old=>({...old,sort}))}/>}
-          </div>
+          <CollectionHeader title="日程" count={events.isPending?"…":events.data?.length??0}
+            actions={!archived&&<button className="calendar-new" disabled={busy} onClick={()=>{const start=DateTime.now().setZone(zone).startOf("day").set({hour:9});choose(start.toISO()!,start.plus({hours:1}).toISO()!);}}>新建日程</button>}
+            views={<div className="collection-view-switch" role="group" aria-label="日程视图">
+              <button aria-pressed={preferences.view==='calendar'} onClick={()=>setPreferences(old=>({...old,view:'calendar'}))}>日历</button>
+              <button aria-pressed={preferences.view==='timeline'} onClick={()=>setPreferences(old=>({...old,view:'timeline'}))}>时间轴</button>
+            </div>}
+            tools={preferences.view==='timeline'?<SortControl key={projectId} value={preferences.sort} fields={eventSortFields} onChange={sort=>setPreferences(old=>({...old,sort}))}/>:undefined}/>
           {archived && <p className="timeline-readonly">项目已归档，日程只读</p>}
           {preferences.view==='timeline' ? <EventTimeline events={sortObjects(events.data??[],preferences.sort)} date={selectedDate} span={preferences.span} zone={zone} onDateChange={date=>setPreferences(old=>({...old,date}))} onSpanChange={span=>setPreferences(old=>({...old,span}))} onOpen={id=>nav("/projects/"+projectId+"/events/"+id)} loading={events.isPending} error={events.isError} onRetry={()=>void events.refetch()}/> : <FullCalendar
             key={projectId}

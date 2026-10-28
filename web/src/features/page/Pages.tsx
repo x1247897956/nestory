@@ -1,3 +1,4 @@
+import { CollectionHeader } from "../view/CollectionHeader";
 import {SortControl} from "../view/SortControl";
 import {useProjectPreferences} from "../view/preferences";
 import {normalizeSort, noteSortFields, sortObjects, type SortSpec} from "../view/sorting";
@@ -118,20 +119,15 @@ export function Pages({
   return (
     <div
       className={
-        "page-workspace page-list-workspace"
+        "page-workspace page-list-workspace collection-workspace"
       }
     >
       {!overviewBackground && (
         <section className="page-tree" aria-label="笔记列表" aria-hidden={pageId?true:undefined} inert={!!pageId}>
-          <header className="page-list-header">
-            <h2>笔记</h2>
-            {!archived && (
-              <button disabled={creating || !!error} onClick={() => void createPage()}>
-                新建笔记
-              </button>
-            )}
-          </header>
-          <div className="page-list-controls"><SortControl value={sort} onChange={setSort} fields={noteSortFields} label="笔记排序" /></div>
+          <CollectionHeader title="笔记" count={list.isPending?"…":flat.length}
+            actions={!archived&&<button disabled={creating||!!error} onClick={()=>void createPage()}>新建笔记</button>}
+            views={<div className="collection-view-switch"><span className="collection-current-view">列表</span></div>}
+            tools={<SortControl key={projectId} value={sort} onChange={setSort} fields={noteSortFields} label="笔记排序"/>}/>
           {error && (
             <p role="alert">
               {error}{" "}

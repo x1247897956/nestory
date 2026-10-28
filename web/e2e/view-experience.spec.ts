@@ -1,3 +1,4 @@
+import {setSort,expectSort} from './sort-actions';
 import {test,expect,type APIRequestContext} from '@playwright/test';
 async function project(request:APIRequestContext,title:string){return (await(await request.post('/api/v1/projects',{data:{title}})).json());}
 async function task(request:APIRequestContext,pid:string,title:string,due_date?:string){return (await(await request.post(`/api/v1/projects/${pid}/tasks`,{data:{title,due_date}})).json());}
@@ -6,12 +7,12 @@ test('task sorting, grouping and stage folds persist by project and folded stage
  const p=await project(request,'View settings A'),other=await project(request,'View settings B');
  const early=await task(request,p.id,'Early','2026-11-02');await task(request,p.id,'Late','2026-11-20');await task(request,p.id,'Undated');
  await page.goto(`/projects/${p.id}/tasks`);
- await page.getByLabel('任务排序字段',{exact:true}).selectOption('due_date');await page.getByLabel('任务排序方向',{exact:true}).selectOption('desc');
+ await setSort(page,'任务排序','due_date','desc');
  await expect(page.locator('.task-row .task-title')).toHaveText(['Late','Early','Undated']);
  await page.getByRole('button',{name:'收起Todo阶段',exact:true}).click();
  await expect(page.getByRole('button',{name:'Early',exact:true})).toBeHidden();
  await page.reload();await expect(page.getByRole('button',{name:'展开Todo阶段',exact:true})).toHaveAttribute('aria-expanded','false');
- await expect(page.getByLabel('任务排序方向',{exact:true})).toHaveValue('desc');
+ await expectSort(page,'任务排序','due_date','desc');
  await page.getByRole('button',{name:'展开Todo阶段',exact:true}).click();
  await page.getByRole('button',{name:'收起Done阶段',exact:true}).click();
  await page.getByRole('button',{name:'拖动任务 Early',exact:true}).dragTo(page.getByRole('region',{name:'Done阶段',exact:true}));
@@ -20,7 +21,7 @@ test('task sorting, grouping and stage folds persist by project and folded stage
  await page.getByRole('button',{name:'任务显示设置',exact:true}).click();await page.getByRole('button',{name:'全部收起',exact:true}).click();
  await expect(page.locator('.task-group-content:not([hidden])')).toHaveCount(0);
  await page.keyboard.press('Escape');
- await page.goto(`/projects/${other.id}/tasks`);await expect(page.getByLabel('任务排序字段',{exact:true})).toHaveValue('position');await expect(page.getByRole('button',{name:'收起Todo阶段',exact:true})).toBeVisible();
+ await page.goto(`/projects/${other.id}/tasks`);await expectSort(page,'任务排序','position');await expect(page.getByRole('button',{name:'收起Todo阶段',exact:true})).toBeVisible();
  await page.goto(`/projects/${p.id}/tasks`);await expect(page.getByRole('button',{name:'展开Done阶段',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'任务显示设置',exact:true}).click();await page.getByRole('checkbox',{name:'按阶段分组',exact:true}).uncheck();await page.keyboard.press('Escape');
  await expect(page.getByRole('region',{name:'Todo阶段',exact:true})).toHaveCount(0);await page.reload();await expect(page.getByRole('region',{name:'Todo阶段',exact:true})).toHaveCount(0);
@@ -29,10 +30,10 @@ test('task sorting, grouping and stage folds persist by project and folded stage
 test('note sorting persists through centered detail and matches shared editor structure',async({page,request})=>{
  const p=await project(request,'Note sort');
  for(const title of ['Z note','A note'])await request.post(`/api/v1/projects/${p.id}/pages`,{data:{title}});
- await page.goto(`/projects/${p.id}/pages`);await page.getByLabel('笔记排序字段',{exact:true}).selectOption('title');
+ await page.goto(`/projects/${p.id}/pages`);await setSort(page,'笔记排序','title');
  await expect(page.locator('.page-list-row a')).toHaveText(['A note','Z note']);await page.locator('.page-list-row a').first().click();
  const dialog=page.getByRole('dialog',{name:'笔记详情',exact:true});await expect(dialog.locator('.object-editor-header .object-property-section')).toHaveCount(1);await expect(dialog.locator('.object-editor-body')).toBeVisible();await expect(dialog.locator('.object-editor-footer')).toBeVisible();
- await page.getByRole('button',{name:'关闭笔记详情',exact:true}).click();await page.reload();await expect(page.getByLabel('笔记排序字段',{exact:true})).toHaveValue('title');
+ await page.getByRole('button',{name:'关闭笔记详情',exact:true}).click();await page.reload();await expectSort(page,'笔记排序','title');
  await expect(page.locator('.page-list-row a')).toHaveText(['A note','Z note']);
 });
 
@@ -44,13 +45,13 @@ test('event timeline remembers range and zoom, opens shared details and remains 
  await page.goto(`/projects/${p.id}/events`);await expect(page.getByRole('button',{name:'时间轴',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(page.locator('.timeline-bar')).toHaveCount(1);await page.locator('.timeline-bar').click();
  const dialog=page.getByRole('dialog',{name:'日程详情',exact:true});await expect(dialog.locator('.object-editor-header .object-property-section')).toHaveCount(1);await expect(dialog.locator('.object-editor-footer')).toBeVisible();await page.getByRole('button',{name:'关闭日程详情',exact:true}).click();
- await page.getByLabel('排序字段',{exact:true}).selectOption('title');await page.getByRole('button',{name:'月',exact:true}).click();await expect(page.getByRole('button',{name:'月',exact:true})).toHaveAttribute('aria-pressed','true');await page.getByRole('button',{name:'下一区间',exact:true}).click();
+ await setSort(page,'排序','title');await page.getByRole('button',{name:'月',exact:true}).click();await expect(page.getByRole('button',{name:'月',exact:true})).toHaveAttribute('aria-pressed','true');await page.getByRole('button',{name:'下一区间',exact:true}).click();
  await expect(page.getByText('此区间暂无日程',{exact:true})).toBeVisible();
  const stored=await page.evaluate(pid=>localStorage.getItem(`noteapp:view:${pid}:events`),p.id);
  expect(JSON.parse(stored!).date).toBe('2026-12-01');
  await page.goto(`/projects/${other.id}/events`);await expect(page.getByRole('button',{name:'日历',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.goto(`/projects/${p.id}/events`);await expect(page.getByRole('button',{name:'时间轴',exact:true})).toHaveAttribute('aria-pressed','true');
- await page.reload();await expect(page.getByLabel('排序字段',{exact:true})).toHaveValue('title');await expect(page.locator('.timeline-toolbar h2')).toContainText('2026年12月');
+ await page.reload();await expectSort(page,'排序','title');await expect(page.locator('.timeline-toolbar h2')).toContainText('2026年12月');
  await page.getByRole('button',{name:'上一区间',exact:true}).click();await expect(page.locator('.timeline-bar')).toHaveCount(1);await page.screenshot({path:'/tmp/noteapp-timeline-desktop.png'});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/tmp/noteapp-timeline-mobile.png'});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);

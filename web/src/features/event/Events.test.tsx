@@ -188,7 +188,10 @@ it("remembers timeline span, date and sorting while archived projects remain rea
   expect(screen.queryByRole('button',{name:'新建日程'})).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button',{name:'下一区间'}));
   expect(JSON.parse(localStorage.getItem('noteapp:view:p:events')!).date).toBe('2026-11-01');
+  HTMLElement.prototype.showPopover=function(){this.style.display='block';};HTMLElement.prototype.hidePopover=function(){this.style.display='none';};
+  fireEvent.click(screen.getByRole('button',{name:'排序器'}));
   fireEvent.change(screen.getByLabelText('排序字段'),{target:{value:'duration'}});
+  fireEvent.click(screen.getByRole('button',{name:'应用排序'}));
   expect(JSON.parse(localStorage.getItem('noteapp:view:p:events')!).sort.field).toBe('duration');
   view.unmount();
   localStorage.removeItem('noteapp:view:p:events');
@@ -200,7 +203,7 @@ it('preserves the calendar focused date when switching to a timeline week', asyn
   act(()=>calendar.props.datesSet({startStr:'2026-09-28',endStr:'2026-11-02',view:{type:'dayGridMonth',currentStart:new Date('2026-09-30T16:00:00Z'),calendar:{getDate:()=>new Date('2026-10-27T16:00:00Z')}}}));
   expect(JSON.parse(localStorage.getItem('noteapp:view:focus:events')!).date).toBe('2026-10-28');
   fireEvent.click(screen.getByRole('button',{name:'时间轴'}));
-  expect(screen.getByRole('heading',{level:2})).toHaveTextContent('2026年10月26日');
+  expect(screen.getByRole('heading',{name:/2026年10月26日/})).toHaveTextContent('2026年10月26日');
   view.unmount();
   localStorage.removeItem('noteapp:view:focus:events');
 });

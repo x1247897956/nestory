@@ -1,3 +1,4 @@
+import { CollectionHeader } from "../features/view/CollectionHeader";
 import { useProjectPreferences } from "../features/view/preferences";
 import { sortObjects,taskSortFields } from "../features/view/sorting";
 import { SortControl } from "../features/view/SortControl";
@@ -421,16 +422,12 @@ export function App() {
                 archived={readOnly}
               />
             ) : (
-              <div className="workspace task-views-workspace">
+              <div className="workspace task-views-workspace collection-workspace">
                 {!overviewBackground && <section className="task-list" aria-hidden={taskId?true:undefined} inert={!!taskId}>
-                  <div className="list-toolbar">
-                    <div>
-                      <h2>所有任务</h2>
-                      <span aria-live="polite">{stageBusy ? "正在更新阶段…" : `${all.length} 个任务，专注当下的一步`}</span>
-                    </div>
-                    <div className="task-toolbar-actions"><TaskViewSwitcher view={taskView} onChange={setTaskView}/><SortControl value={taskDisplay.sort} onChange={sort=>setTaskDisplay(old=>({...old,sort}))} fields={taskSortFields} label="任务排序"/>{taskView==="list"&&<TaskDisplaySettings value={taskDisplay} onChange={setTaskDisplay}/>}{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
-                  </div>
-                  <TaskFilters key={projectId} state={filterState}/>
+                  <CollectionHeader title="任务" count={all.length} status={stageBusy?"正在更新阶段…":undefined}
+                    actions={!readOnly&&<button className="primary" onClick={()=>openCreate()}>添加任务</button>}
+                    views={<TaskViewSwitcher view={taskView} onChange={setTaskView}/>}
+                    tools={<><TaskFilters key={projectId} state={filterState}/><SortControl key={projectId} value={taskDisplay.sort} onChange={sort=>setTaskDisplay(old=>({...old,sort}))} fields={taskSortFields} label="任务排序"/>{taskView==="list"&&<TaskDisplaySettings value={taskDisplay} onChange={setTaskDisplay}/>}</>}/>
                   {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{filterState.ids.size} / {all.length} 个任务符合条件</p>}
                   {!filterState.blocked&&filterState.filters.length>0&&filterState.ids.size===0&&<div className="task-filter-empty"><p>没有符合条件的任务</p><button onClick={()=>filterState.setFilters([])}>清除筛选</button></div>}
                   {tasks.isPending ? <p role="status">正在加载任务…</p> : tasks.isError ? (

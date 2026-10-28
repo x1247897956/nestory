@@ -1,8 +1,7 @@
-import { act, renderHook, render, screen, fireEvent } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import { useProjectPreferences } from './preferences';
 import { normalizeSort, sortObjects } from './sorting';
-import { SortControl } from './SortControl';
 const normalize = (raw: unknown) => typeof raw === 'number' ? raw : 0;
 beforeEach(() => localStorage.clear());
 afterEach(() => vi.restoreAllMocks());
@@ -44,10 +43,4 @@ it('sorts numbers numerically, date instants accurately and ties by ascending ID
  expect(sortObjects(items,{field:'duration',direction:'desc'}).map(x=>x.id)).toEqual(['a','b','c']);
  expect(sortObjects(items,{field:'title',direction:'desc'}).map(x=>x.id)).toEqual(['a','b','c']);
  expect(sortObjects(items,{field:'updated_at',direction:'desc'}).map(x=>x.id)).toEqual(['a','b','c']);
-});
-it('renders named compact sorting controls and emits changes', () => {
- const onChange = vi.fn(); render(<SortControl value={{field:'title',direction:'asc'}} fields={[{value:'title',label:'标题'}]} onChange={onChange}/>);
- fireEvent.change(screen.getByRole('combobox',{name:'排序方向'}),{target:{value:'desc'}});
- expect(onChange).toHaveBeenCalledWith({field:'title',direction:'desc'});
- expect(screen.getByRole('combobox',{name:'排序字段'})).toBeTruthy();
 });

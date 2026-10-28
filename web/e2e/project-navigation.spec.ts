@@ -23,5 +23,5 @@ test('flat sidebar and overview are the project entry point',async({page,request
   await expect(page.getByRole('region',{name:'项目日历'})).toBeVisible();
   await page.getByRole('link',{name:'汇总',exact:true}).click();
   await page.getByRole('link',{name:'任务',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'所有任务'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'任务',exact:true})).toBeVisible();
 });
