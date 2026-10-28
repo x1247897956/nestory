@@ -1,3 +1,8 @@
+import { useProjectPreferences } from "../features/view/preferences";
+import { sortObjects,taskSortFields } from "../features/view/sorting";
+import { SortControl } from "../features/view/SortControl";
+import { defaultTaskDisplay,normalizeTaskDisplay } from "../features/task/taskDisplay";
+import { TaskDisplaySettings } from "../features/task/TaskDisplaySettings";
 import { TaskFilters } from "../features/task/TaskFilters";
 import { useTaskFilters } from "../features/task/useTaskFilters";
 import { TaskBoard } from "../features/task/TaskBoard";
@@ -40,7 +45,9 @@ export function App() {
   const projectOptions = useRef<HTMLDetailsElement>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectForm, setProjectForm] = useState<"new" | "edit" | null>(null);
-  const [group, setGroup] = useState(true);
+  const [taskDisplay,setTaskDisplay] = useProjectPreferences(projectId??"","tasks",defaultTaskDisplay,normalizeTaskDisplay);
+  const group=taskDisplay.grouped;
+  const toggleStage = (stage:string) => setTaskDisplay(old=>({...old,collapsed:old.collapsed.includes(stage)?old.collapsed.filter(id=>id!==stage):[...old.collapsed,stage]}));
   const draggedTask = useRef<string | null>(null);
   const dropTarget = useRef<HTMLElement | null>(null);
   const clearDropTarget = () => { dropTarget.current?.classList.remove("drop-target"); dropTarget.current = null; };
@@ -223,16 +230,17 @@ export function App() {
     }
   };
   const visible = (t: Task) => filterState.ids.has(t.id);
+  const orderedTasks = useMemo(()=>sortObjects(all,taskDisplay.sort),[all,taskDisplay.sort]);
   const taskIndex = useMemo(() => {
     const byId = new Map(all.map(task => [task.id, task]));
     const byParent = new Map<string, Task[]>();
     const roots: Task[] = [];
-    for (const task of all) {
+    for (const task of orderedTasks) {
       if (!task.parent_id) roots.push(task);
       else { const siblings = byParent.get(task.parent_id) ?? []; siblings.push(task); byParent.set(task.parent_id, siblings); }
     }
     return {byId, byParent, roots};
-  }, [all]);
+  }, [all,orderedTasks]);
   const roots = taskIndex.roots;
   const children = (id: string) => taskIndex.byParent.get(id) ?? [];
   const groupedChildren = (t: Task) => children(t.id).filter(child => !group || child.stage === t.stage);
@@ -420,9 +428,7 @@ export function App() {
                       <h2>所有任务</h2>
                       <span aria-live="polite">{stageBusy ? "正在更新阶段…" : `${all.length} 个任务，专注当下的一步`}</span>
                     </div>
-                    <div className="task-toolbar-actions"><TaskViewSwitcher view={taskView} onChange={setTaskView}/>{taskView==="list"&&<button onClick={() => setGroup(!group)}>
-                      {group ? "取消分组" : "按阶段分组"}
-                    </button>}{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
+                    <div className="task-toolbar-actions"><TaskViewSwitcher view={taskView} onChange={setTaskView}/><SortControl value={taskDisplay.sort} onChange={sort=>setTaskDisplay(old=>({...old,sort}))} fields={taskSortFields} label="任务排序"/>{taskView==="list"&&<TaskDisplaySettings value={taskDisplay} onChange={setTaskDisplay}/>}{!readOnly && <button className="primary" onClick={() => openCreate()}>添加任务</button>}</div>
                   </div>
                   <TaskFilters key={projectId} state={filterState}/>
                   {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{filterState.ids.size} / {all.length} 个任务符合条件</p>}
@@ -432,14 +438,14 @@ export function App() {
                       任务加载失败
                       <button onClick={() => tasks.refetch()}>重试</button>
                     </div>
-                  ) : (filterState.blocked || (filterState.filters.length>0&&filterState.ids.size===0)) ? null : taskView==="board" ? <TaskBoard key={projectId} projectId={projectId} tasks={all.filter(visible)} allTasks={all} readOnly={readOnly} busy={stageBusy} onOpen={openTask} onStageChange={changeStage} onCreate={stage=>openCreate("",stage)}/> : group ? (
+                  ) : (filterState.blocked || (filterState.filters.length>0&&filterState.ids.size===0)) ? null : taskView==="board" ? <TaskBoard key={projectId} projectId={projectId} tasks={orderedTasks.filter(visible)} allTasks={all} readOnly={readOnly} busy={stageBusy} onOpen={openTask} onStageChange={changeStage} onCreate={stage=>openCreate("",stage)}/> : group ? (
                     stages.map(([id, name]) => {
                         const items = roots.filter(
                           (t) =>
                             t.stage === id &&
                             (visible(t) || children(t.id).some(visible)),
                         );
-                        const orphanChildren = all.filter(
+                        const orphanChildren = orderedTasks.filter(
                           (t) =>
                             t.parent_id &&
                             t.stage === id &&
@@ -459,15 +465,16 @@ export function App() {
                               event.preventDefault();
                               const task = draggedTask.current;
                               draggedTask.current = null; clearDropTarget();
-                              if (task && event.dataTransfer.getData("application/x-noteapp-task") === task) void changeStage(task, id);
+                              if (task && event.dataTransfer.getData("application/x-noteapp-task") === task) {
+                                if(taskDisplay.collapsed.includes(id))setTaskDisplay(old=>({...old,collapsed:old.collapsed.filter(stage=>stage!==id)}));
+                                void changeStage(task, id);
+                              }
                             }}>
-                            <h3>
-                              <span className={"stage-dot " + id} />
-                              {name}
-                              <span>
-                                {items.length + orphanChildren.length}
-                              </span>
-                            </h3>
+                            <h3><button type="button" className="task-stage-toggle" aria-label={`${taskDisplay.collapsed.includes(id)?"展开":"收起"}${name}阶段`} aria-expanded={!taskDisplay.collapsed.includes(id)} onClick={()=>toggleStage(id)}>
+                              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d={taskDisplay.collapsed.includes(id)?"m8 5 5 5-5 5":"m5 8 5 5 5-5"}/></svg>
+                              <span className={"stage-dot " + id}/>{name}<span>{items.length+orphanChildren.length}</span>
+                            </button></h3>
+                            <div className="task-group-content" hidden={taskDisplay.collapsed.includes(id)}>
                             {items.map(renderRoot)}
                             {orphanChildren.map((t) => (
                               <div key={t.id}>
@@ -481,6 +488,7 @@ export function App() {
                             {!items.length && !orphanChildren.length && (
                               <div className="empty-group">暂无任务</div>
                             )}
+                            </div>
                           </div>
                         );
                       })

@@ -1,5 +1,11 @@
+import { EventTimeline } from "./EventTimeline";
+import { timelineRange, type TimelineSpan } from "./timeline";
+import { useProjectPreferences } from "../view/preferences";
+import { SortControl } from "../view/SortControl";
+import { eventSortFields, normalizeSort, sortObjects, type SortSpec } from "../view/sorting";
+import { EventEditor } from "./EventEditor";
+export { EventEditor } from "./EventEditor";
 import { ObjectDialog, useOverviewBackground } from "../../components/object/ObjectDialog";
-import { ObjectMenu } from "../../components/object/ObjectMenu";
 import "./events.css";
 import { SaveIndicator } from "../../components/markdown/SaveIndicator";
 import type { EventChangeArg } from "@fullcalendar/core";
@@ -16,9 +22,6 @@ import luxonPlugin from "@fullcalendar/luxon3";
 import zhCN from "@fullcalendar/core/locales/zh-cn";
 import { DateTime } from "luxon";
 import { api, abandonCreateIntent } from "../../app/api";
-import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
-import { useAutosave } from "../../components/markdown/useAutosave";
-import { ObjectProperties } from "../../components/object/ObjectProperties";
 import { toInput, fromInput } from "./time";
 export type CalendarEvent = {
   id: string;
@@ -34,12 +37,12 @@ function validTimes(start: string, end: string, zone: string) {
   const b = DateTime.fromISO(end, { zone });
   return a.isValid && b.isValid && b.toMillis() > a.toMillis();
 }
-type Draft = {
-  title: string;
-  body_document: BodyDocument;
-  start_at: string;
-  end_at: string;
-};
+type EventPreferences = { view: 'calendar' | 'timeline'; calendarView: 'dayGridMonth' | 'timeGridWeek'; span: TimelineSpan; date: string; sort: SortSpec };
+const defaultPreferences: EventPreferences = {view:'calendar',calendarView:'dayGridMonth',span:'week',date:'',sort:{field:'start_at',direction:'asc'}};
+function normalizePreferences(raw: unknown): EventPreferences {
+ const v = raw && typeof raw === 'object' ? raw as Partial<EventPreferences> : {};
+ return {view:v.view === 'timeline'?'timeline':'calendar',calendarView:v.calendarView === 'timeGridWeek'?'timeGridWeek':'dayGridMonth',span:v.span === 'month'?'month':'week',date:typeof v.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v.date) && DateTime.fromISO(v.date).isValid?v.date:'',sort:normalizeSort(v.sort,eventSortFields,defaultPreferences.sort)};
+}
 export function Events({
   projectId,
   projectTitle = "项目",
@@ -52,6 +55,7 @@ export function Events({
   archived: boolean;
 }) {
   const nav = useNavigate();
+  const [preferences,setPreferences] = useProjectPreferences(projectId,"events",defaultPreferences,normalizePreferences);
   const overviewBackground=useOverviewBackground(projectId);
   const [params] = useSearchParams();
   const qc = useQueryClient();
@@ -117,13 +121,16 @@ export function Events({
       });
     }
   }, [zone, params, archived, eventId, projectId]);
+  const selectedDate = preferences.date || (zone ? DateTime.now().setZone(zone).toISODate()! : '');
+  const visibleTimelineRange = zone && selectedDate ? timelineRange(selectedDate,preferences.span,zone) : undefined;
+  const queryRange = preferences.view === 'timeline' && visibleTimelineRange ? {from:visibleTimelineRange.start.toISO()!,to:visibleTimelineRange.end.toISO()!} : range;
   const events = useQuery({
-    queryKey: ["events", projectId, range],
+    queryKey: ["events", projectId, queryRange],
     queryFn: () =>
       api<CalendarEvent[]>(
-        "/projects/" + projectId + "/events?" + new URLSearchParams(range!),
+        "/projects/" + projectId + "/events?" + new URLSearchParams(queryRange!),
       ),
-    enabled: !!range,
+    enabled: !!zone && !!queryRange,
   });
   const detail = useQuery({
     queryKey: ["event", eventId],
@@ -289,7 +296,14 @@ export function Events({
               </button>
             )}
           </div>
-          <FullCalendar
+          <div className="calendar-view-switch" aria-label="日程视图">
+            <button aria-pressed={preferences.view==='calendar'} onClick={()=>setPreferences(old=>({...old,view:'calendar'}))}>日历</button>
+            <button aria-pressed={preferences.view==='timeline'} onClick={()=>setPreferences(old=>({...old,view:'timeline'}))}>时间轴</button>
+            {preferences.view==='timeline' && <SortControl value={preferences.sort} fields={eventSortFields} onChange={sort=>setPreferences(old=>({...old,sort}))}/>}
+          </div>
+          {archived && <p className="timeline-readonly">项目已归档，日程只读</p>}
+          {preferences.view==='timeline' ? <EventTimeline events={sortObjects(events.data??[],preferences.sort)} date={selectedDate} span={preferences.span} zone={zone} onDateChange={date=>setPreferences(old=>({...old,date}))} onSpanChange={span=>setPreferences(old=>({...old,span}))} onOpen={id=>nav("/projects/"+projectId+"/events/"+id)} loading={events.isPending} error={events.isError} onRetry={()=>void events.refetch()}/> : <FullCalendar
+            key={projectId}
             plugins={[
               dayGridPlugin,
               timeGridPlugin,
@@ -298,8 +312,8 @@ export function Events({
             ]}
             locale={zhCN}
             timeZone={zone}
-            initialView="dayGridMonth"
-            initialDate={detail.data?.start_at}
+            initialView={preferences.calendarView}
+            initialDate={selectedDate}
             headerToolbar={{
               left: "prev,next today",
               center: "title",
@@ -321,13 +335,15 @@ export function Events({
               end: e.end_at,
               allDay: false,
             }))}
-            datesSet={(a) =>
-              setRange((old) =>
-                old?.from === a.startStr && old?.to === a.endStr
-                  ? old
-                  : { from: a.startStr, to: a.endStr },
-              )
-            }
+            datesSet={(a) => {
+              setRange(old=>old?.from===a.startStr && old?.to===a.endStr ? old : {from:a.startStr,to:a.endStr});
+              const anchor = a.view?.calendar?.getDate?.() ?? a.view?.currentStart;
+              if (anchor) {
+                const date=DateTime.fromJSDate(anchor,{zone}).toISODate()!;
+                const calendarView=a.view.type==='timeGridWeek'?'timeGridWeek':'dayGridMonth';
+                if (preferences.date!==date || preferences.calendarView!==calendarView) setPreferences(old=>({...old,date,calendarView}));
+              }
+            }}
             select={(a) => {
               const start = DateTime.fromISO(a.startStr, { zone });
               const chosen = a.allDay ? start.set({ hour: 9 }) : start;
@@ -353,8 +369,8 @@ export function Events({
               hour12: false,
             }}
             displayEventEnd
-          />
-          {events.isError && (
+          />}
+          {preferences.view==='calendar' && events.isError && (
             <p role="alert">
               日程加载失败
               <button onClick={() => void events.refetch()}>重试</button>
@@ -498,138 +514,5 @@ export function Events({
         </ObjectDialog>
       )}
     </div>
-  );
-}
-export function EventEditor({
-  event,
-  zone,
-  archived,
-  onSave,
-  onReload,
-}: {
-  event: CalendarEvent;
-  zone: string;
-  archived: boolean;
-  onSave: (d: Draft, v: number) => Promise<unknown>;
-  onReload: (beforeReset?: () => void) => Promise<void>;
-}) {
-  const a = useAutosave(
-    {
-      title: event.title,
-      body_document: event.body_document ?? { version: 1, blocks: [] },
-      start_at: toInput(event.start_at, zone),
-      end_at: toInput(event.end_at, zone),
-    },
-    event.version,
-    async (d, v) =>
-      onSave(
-        {
-          ...d,
-          start_at:
-            d.start_at === toInput(event.start_at, zone)
-              ? event.start_at
-              : fromInput(d.start_at, zone),
-          end_at:
-            d.end_at === toInput(event.end_at, zone)
-              ? event.end_at
-              : fromInput(d.end_at, zone),
-        },
-        v,
-      ),
-    archived,
-    (d) => !!d.title.trim() && validTimes(d.start_at, d.end_at, zone),
-    `events:${event.project_id}:${event.id}`,
-  );
-  const [error, setError] = useState("");
-  const [bodyPending, setBodyPending] = useState(false);
-  return (
-    <article
-      className="editor"
-      aria-label="日程详情"
-      data-dirty={a.dirty || a.busy || bodyPending}
-    >
-      <header className="task-inline-header">
-        <div className="object-title-row">
-        <h2 aria-label={a.draft.title}>
-          <input
-            className="task-inline-title"
-            aria-label="日程标题"
-            disabled={archived}
-            value={a.draft.title}
-            onChange={(e) =>
-              a.setDraft((d) => ({ ...d, title: e.target.value }))
-            }
-          />
-        </h2>
-        <ObjectMenu type="events" id={event.id} projectId={event.project_id} archived={archived}/>
-        </div>
-        <ObjectProperties
-          projectId={event.project_id}
-          type="events"
-          id={event.id}
-          version={event.version}
-          archived={archived}
-        >
-          {(["start_at", "end_at"] as const).map((key) => (
-            <label key={key} className="task-property" data-property={key}>
-              <input
-                aria-label={key === "start_at" ? "开始时间" : "结束时间"}
-                type="datetime-local"
-                disabled={archived}
-                value={a.draft[key]}
-                onChange={(e) =>
-                  a.setDraft((d) => ({ ...d, [key]: e.target.value }))
-                }
-              />
-            </label>
-          ))}
-        </ObjectProperties>
-      </header>
-      <MarkdownEditor
-        projectId={event.project_id}
-        onPendingChange={setBodyPending}
-        body_document={a.draft.body_document}
-        disabled={archived}
-        onChange={(body_document) =>
-          a.setDraft((d) => ({ ...d, body_document }))
-        }
-      />
-      {!a.draft.title.trim() && <p role="alert">请输入日程标题</p>}
-      {!validTimes(a.draft.start_at, a.draft.end_at, zone) && (
-        <p role="alert">结束时间必须晚于开始时间</p>
-      )}
-      <SaveIndicator busy={a.busy} dirty={a.dirty} error={a.error} />
-      {(a.error || error) && (
-        <div role="alert">
-          {a.error || error}
-          <p>请保留此页面；可复制草稿备份。</p>
-          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>恢复本机草稿</button>}
-          <button onClick={() => void a.save()}>重试保存</button>
-          <button
-            onClick={() =>
-              void navigator.clipboard
-                .writeText(JSON.stringify(a.draft.body_document, null, 2))
-                .catch(() => setError("复制失败，请手动复制"))
-            }
-          >
-            复制草稿
-          </button>
-          <button
-            disabled={bodyPending || a.busy}
-            onClick={async () => {
-              if (bodyPending || a.busy) return;
-              if (confirm("重新载入会丢弃本地草稿，是否继续？"))
-                try {
-                  await onReload(a.discardRecovery);
-                } catch (e) {
-                  setError((e as Error).message);
-                }
-            }}
-          >
-            重新载入
-          </button>
-        </div>
-      )}
-    </article>
   );
 }

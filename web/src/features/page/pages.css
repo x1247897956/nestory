@@ -11,3 +11,5 @@
 .page-list-row button:hover { color:#172b4d; background:#eef1f5; }
 .page-list-empty { color:#667085; padding:28px 16px; }
 @media(max-width:650px) { .page-workspace.page-list-workspace { padding:20px 18px; } }
+
+.page-list-controls { display:flex; justify-content:flex-end; margin:-8px 0 14px; }

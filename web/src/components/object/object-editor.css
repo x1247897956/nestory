@@ -1,0 +1,5 @@
+.object-editor-header { width:100%; }
+.object-editor-body { min-width:0; width:100%; }
+.object-editor-footer { width:100%; margin-top:16px; }
+.object-editor-footer > [role="alert"] { margin-top:10px; color:#9b3030; }
+.object-editor-footer > [role="alert"] button { margin:4px 8px 0 0; }

@@ -180,3 +180,27 @@ it("blocks dragging when reconciliation fails and resumes only after explicit sy
   act(() => calendar.props.eventChange({ event: { id: "e", start: new Date("2026-10-24T03:00:00Z"), end: new Date("2026-10-24T04:00:00Z") }, revert }));
   await waitFor(() => expect(api).toHaveBeenCalledWith("/events/e", "PATCH", expect.objectContaining({ version: 8 })));
 });
+it("remembers timeline span, date and sorting while archived projects remain read only", async () => {
+  localStorage.setItem('noteapp:view:p:events',JSON.stringify({view:'timeline',span:'month',date:'2026-10-28',sort:{field:'title',direction:'desc'}}));
+  const view=render(<Events projectId="p" archived />);
+  expect(screen.getByRole('button',{name:'时间轴'})).toHaveAttribute('aria-pressed','true');
+  expect(screen.getByRole('button',{name:'月'})).toHaveAttribute('aria-pressed','true');
+  expect(screen.queryByRole('button',{name:'新建日程'})).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button',{name:'下一区间'}));
+  expect(JSON.parse(localStorage.getItem('noteapp:view:p:events')!).date).toBe('2026-11-01');
+  fireEvent.change(screen.getByLabelText('排序字段'),{target:{value:'duration'}});
+  expect(JSON.parse(localStorage.getItem('noteapp:view:p:events')!).sort.field).toBe('duration');
+  view.unmount();
+  localStorage.removeItem('noteapp:view:p:events');
+  expect(api).not.toHaveBeenCalledWith(expect.anything(),'POST',expect.anything());
+});
+it('preserves the calendar focused date when switching to a timeline week', async () => {
+  const {act}=await import('@testing-library/react');
+  const view=render(<Events projectId="focus" archived={false}/>);
+  act(()=>calendar.props.datesSet({startStr:'2026-09-28',endStr:'2026-11-02',view:{type:'dayGridMonth',currentStart:new Date('2026-09-30T16:00:00Z'),calendar:{getDate:()=>new Date('2026-10-27T16:00:00Z')}}}));
+  expect(JSON.parse(localStorage.getItem('noteapp:view:focus:events')!).date).toBe('2026-10-28');
+  fireEvent.click(screen.getByRole('button',{name:'时间轴'}));
+  expect(screen.getByRole('heading',{level:2})).toHaveTextContent('2026年10月26日');
+  view.unmount();
+  localStorage.removeItem('noteapp:view:focus:events');
+});

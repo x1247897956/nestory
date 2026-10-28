@@ -1,7 +1,7 @@
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
-import { SaveIndicator } from "../../components/markdown/SaveIndicator";
+import {ObjectEditorHeader, ObjectEditorBody, ObjectEditorFooter} from "../../components/object/ObjectEditor";
 import { useState } from "react";
 import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
 import { useAutosave } from "../../components/markdown/useAutosave";
@@ -77,21 +77,7 @@ export function TaskEditor({
       data-dirty={dirty || busy || moving || bodyPending}
       aria-label="任务详情"
     >
-      <header className="task-inline-header">
-        <div className="object-title-row">
-        <h2 aria-label={draft.title}>
-          <input
-            className="task-inline-title"
-            aria-label="任务标题"
-            value={draft.title}
-            onChange={(e) => change("title", e.target.value)}
-            disabled={locked}
-            placeholder="任务标题"
-          />
-        </h2>
-        <ObjectMenu type="tasks" id={task.id} projectId={task.project_id} archived={archived}/>
-        </div>
-        <ObjectProperties
+      <ObjectEditorHeader title={draft.title} menu={<ObjectMenu type="tasks" id={task.id} projectId={task.project_id} archived={archived}/>} properties={<ObjectProperties
           projectId={task.project_id}
           type="tasks"
           id={task.id}
@@ -175,9 +161,17 @@ export function TaskEditor({
               ))}
             </select>
           </label>
-        </ObjectProperties>
-      </header>
-      <div className="body-label">
+        </ObjectProperties>}>
+          <input
+            className="task-inline-title"
+            aria-label="任务标题"
+            value={draft.title}
+            onChange={(e) => change("title", e.target.value)}
+            disabled={locked}
+            placeholder="任务标题"
+          />
+      </ObjectEditorHeader>
+      <ObjectEditorBody>
         <MarkdownEditor
           body_document={draft.body_document}
           onChange={(body_document) =>
@@ -187,17 +181,20 @@ export function TaskEditor({
           onPendingChange={setBodyPending}
           projectId={task.project_id}
         />
-      </div>
-      <SaveIndicator
+      </ObjectEditorBody>
+      <ObjectEditorFooter
         busy={busy || moving}
         dirty={dirty}
         error={error || saveError}
-      />
+      >
       {(error || saveError) && (
         <div className="error" role="alert">
           {error || saveError}
           <p>本地草稿已保留。可先复制正文，再重新载入。</p>
           {canRecover && <button disabled={bodyPending || busy || moving} onClick={() => { if (!bodyPending && !busy && !moving) recover(); }}>恢复本机草稿</button>}
+          <button onClick={save} disabled={busy}>
+            重试保存
+          </button>
           <button
             onClick={() =>
               navigator.clipboard
@@ -221,11 +218,9 @@ export function TaskEditor({
           >
             重新载入
           </button>
-          <button onClick={save} disabled={busy}>
-            重试保存
-          </button>
         </div>
       )}
+      </ObjectEditorFooter>
     </section>
   );
 }

@@ -1,8 +1,11 @@
+import {SortControl} from "../view/SortControl";
+import {useProjectPreferences} from "../view/preferences";
+import {normalizeSort, noteSortFields, sortObjects, type SortSpec} from "../view/sorting";
 import { ObjectDialog, useOverviewBackground } from "../../components/object/ObjectDialog";
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
-import { SaveIndicator } from "../../components/markdown/SaveIndicator";
+import {ObjectEditorHeader, ObjectEditorBody, ObjectEditorFooter} from "../../components/object/ObjectEditor";
 import "./pages.css";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -18,6 +21,8 @@ export type Page = {
   body_document: BodyDocument;
   position: number;
   version: number;
+  created_at?: number;
+  updated_at?: number;
 };
 export function Pages({
   projectId,
@@ -30,6 +35,7 @@ export function Pages({
   pageId?: string;
   archived: boolean;
 }) {
+  const [sort, setSort] = useProjectPreferences<SortSpec>(projectId, "pages:sort", {field:"position",direction:"asc"}, raw => normalizeSort(raw, noteSortFields, {field:"position",direction:"asc"}));
   const [params] = useSearchParams();
   const qc = useQueryClient();
   const nav = useNavigate();
@@ -66,7 +72,7 @@ export function Pages({
     ]);
   const nodes = list.data ?? [];
   // Legacy nested notes remain accessible, but the interface is a flat list.
-  const flat = [...nodes].sort((a,b)=>a.position-b.position||a.id.localeCompare(b.id));
+  const flat = sortObjects(nodes, sort);
   const createPage = async () => {
     if (pending.current || archived) return;
     pending.current = true;
@@ -125,6 +131,7 @@ export function Pages({
               </button>
             )}
           </header>
+          <div className="page-list-controls"><SortControl value={sort} onChange={setSort} fields={noteSortFields} label="笔记排序" /></div>
           {error && (
             <p role="alert">
               {error}{" "}
@@ -255,9 +262,13 @@ export function PageEditor({
       aria-label="笔记详情"
       data-dirty={a.dirty || a.busy || bodyPending}
     >
-      <header className="task-inline-header">
-        <div className="object-title-row">
-        <h2 aria-label={a.draft.title}>
+      <ObjectEditorHeader title={a.draft.title} menu={<ObjectMenu type="pages" id={page.id} projectId={page.project_id} archived={archived}/>} properties={      <ObjectProperties
+        projectId={page.project_id}
+        type="pages"
+        id={page.id}
+        version={page.version}
+        archived={archived}
+      />}>
           <input
             ref={titleInput}
             className="task-inline-title"
@@ -268,17 +279,9 @@ export function PageEditor({
               a.setDraft((d) => ({ ...d, title: e.target.value }))
             }
           />
-        </h2>
-        <ObjectMenu type="pages" id={page.id} projectId={page.project_id} archived={archived}/>
-        </div>
-      </header>
-      <ObjectProperties
-        projectId={page.project_id}
-        type="pages"
-        id={page.id}
-        version={page.version}
-        archived={archived}
-      />
+      </ObjectEditorHeader>
+
+      <ObjectEditorBody>
       <MarkdownEditor
         projectId={page.project_id}
         onPendingChange={setBodyPending}
@@ -288,7 +291,8 @@ export function PageEditor({
           a.setDraft((d) => ({ ...d, body_document }))
         }
       />
-      <SaveIndicator busy={a.busy} dirty={a.dirty} error={a.error} />
+      </ObjectEditorBody>
+      <ObjectEditorFooter busy={a.busy} dirty={a.dirty} error={a.error || error} >
       {(a.error || error) && (
         <div role="alert">
           {a.error || error}
@@ -320,6 +324,7 @@ export function PageEditor({
           </button>
         </div>
       )}
+      </ObjectEditorFooter>
     </article>
   );
 }
