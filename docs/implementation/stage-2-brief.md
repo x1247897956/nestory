@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 ## 阶段 2：页面树、Markdown 与附件
 
 **文件范围：** internal/page/、internal/asset/、migrations/002_pages_assets.sql、web/src/features/page/、web/src/components/markdown/{MarkdownEditor,MarkdownPreview,useAutosave}.tsx（hook 使用 .ts）、web/src/components/markdown/markdown.css、web/e2e/notes.spec.ts。

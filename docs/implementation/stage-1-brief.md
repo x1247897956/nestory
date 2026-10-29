@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 ## 阶段 1：项目与任务闭环
 
 **文件范围：** cmd/noteapp/main.go、internal/app/app.go、internal/platform/{config,database,httpx,clock,id}/、internal/project/、internal/task/、migrations/001_core.sql、web/src/app/、web/src/features/{project,task}/、web/e2e/tasks.spec.ts、Dockerfile、compose.yaml、.env.example、README.md。

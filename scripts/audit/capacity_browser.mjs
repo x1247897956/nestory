@@ -17,7 +17,8 @@ try {
   ['edit',`/projects/${pid}/pages/${note}`,'[role="textbox"][aria-label="Markdown 正文"]'],
  ]) {
   const start=performance.now();await page.goto(base+path);await page.locator(selector).first().waitFor();
-  results[key]={ready_ms:Math.round(performance.now()-start),nodes:await page.locator('*').count(),heap_bytes:await page.evaluate(()=>performance.memory?.usedJSHeapSize)};
+  const resources=await page.evaluate(()=>performance.getEntriesByType('resource').map(e=>({name:e.name,encoded:e.encodedBodySize,decoded:e.decodedBodySize})));
+  results[key]={script_bytes:resources.filter(e=>new URL(e.name).pathname.endsWith('.js')).reduce((n,e)=>n+e.encoded,0),tasks_requests:resources.filter(e=>new URL(e.name).pathname===`/api/v1/projects/${pid}/tasks`).length,api_decoded_bytes:resources.filter(e=>new URL(e.name).pathname.startsWith('/api/v1/')).reduce((n,e)=>n+e.decoded,0),ready_ms:Math.round(performance.now()-start),nodes:await page.locator('*').count(),heap_bytes:await page.evaluate(()=>performance.memory?.usedJSHeapSize)};
  }
  const start=performance.now();await page.getByRole('textbox',{name:'Markdown 正文'}).press('End');await page.getByRole('textbox',{name:'Markdown 正文'}).pressSequentially(' audit-edit');
  results.type_ms=Math.round(performance.now()-start);

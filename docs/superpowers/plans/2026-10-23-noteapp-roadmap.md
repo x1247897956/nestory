@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 # Noteapp 分阶段开发计划
 
 > **For agentic workers:** 后续实施使用 executing-plans 按阶段执行；需要并行工作时再选择 subagent-driven-development。阶段使用 checkbox 跟踪。

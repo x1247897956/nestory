@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 ## 阶段 4：今日工作台、搜索、回收站与归档体验
 
 **文件范围：** internal/workspace/、internal/trash/、migrations/004_workspace_trash.sql、web/src/features/{workspace,search,trash}/、web/e2e/workspace-trash.spec.ts；补齐所有已有模块的软删除与只读展示。

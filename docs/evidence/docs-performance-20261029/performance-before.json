@@ -1,0 +1,193 @@
+{
+  "image": "sha256:76e1bf31d61885f354c62e9958c9d129504740dd9569163c864fc29d15c1f686",
+  "container": "noteapp-audit-probe-6c8f170edf",
+  "count_per_type": 1000,
+  "cross_origin": 403,
+  "foreign_host": 403,
+  "malformed_documents": [
+    {
+      "status": 400,
+      "id": null,
+      "block": {
+        "id": "bad-style",
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "untrusted",
+            "styles": {
+              "unknown": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "status": 400,
+      "id": null,
+      "block": {
+        "id": "bad-table",
+        "type": "table",
+        "content": {
+          "type": "tableContent",
+          "headerRows": 4294967296,
+          "rows": [
+            {
+              "cells": [
+                []
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "idempotency": {
+    "statuses": [
+      201,
+      201,
+      201,
+      201,
+      201,
+      201,
+      201,
+      201
+    ],
+    "unique_ids": 1
+  },
+  "last_seed": [
+    "events",
+    999
+  ],
+  "attachments": [
+    {
+      "id": "858229204e15d412c516c9e1f28799bb",
+      "bytes": 1048576,
+      "sha256": "d6aaaeb2693c087ff7b58bc30644632cf49309fc38372ebb4f0157568aeaac6e"
+    },
+    {
+      "id": "f87da5a3872701c26585b46348ba9032",
+      "bytes": 1048576,
+      "sha256": "81eaf3c70ed124e05d2258dcd0fb98345f59392ba29b47c0298e8be4c6662b6d"
+    },
+    {
+      "id": "d1ad02d5d1e9c31cedc7caa58221a69b",
+      "bytes": 1048576,
+      "sha256": "7c1a3b2cc9ee47a58499064525b365ef5deb07a7585a32ede1a1d57a5e46d1f3"
+    },
+    {
+      "id": "a32735ae0a789296eec4f26efd830186",
+      "bytes": 1048576,
+      "sha256": "462416237bbe7e06406f58eb288b7759638f6664f6679b49de5955d5ca522f11"
+    },
+    {
+      "id": "3e5e8c1446c2213322b7a9b5e1599b86",
+      "bytes": 1048576,
+      "sha256": "a3bec636578c26fd8584ab2c64ad7e223bc974609c98b38dabb6be9e458da24e"
+    },
+    {
+      "id": "05355be7caf6c920f447c7d3d8e3378f",
+      "bytes": 1048576,
+      "sha256": "61cb41e52e437ba073882b4120f5ea0c9864f96398fb03703d94fa1e076d2c11"
+    },
+    {
+      "id": "3f5b5542b4a42056240fd1bf5b4747d9",
+      "bytes": 1048576,
+      "sha256": "19cfc0919ed5fac3bc9421c8e1d3ca9d6786f3c24816edb279f78c89d19a73c6"
+    },
+    {
+      "id": "34e6a103cf4267d446ee8a5d3b0e73bf",
+      "bytes": 1048576,
+      "sha256": "d714026e5ecaff76099fd2c61cc10c37980062a676c9db0ec3793a5671b9e77e"
+    },
+    {
+      "id": "b00ac8f6800215f4b3517275501ef29b",
+      "bytes": 1048576,
+      "sha256": "d151c3212fc5a95b7b0501effe50033b2c0101e9208e13f0389b4ef859a8f693"
+    },
+    {
+      "id": "8b0cacbb125a6594b4ba631ea2f93d67",
+      "bytes": 1048576,
+      "sha256": "cf3bdb7ed873cc8808a95331ccfe9b9734974809254dbab233c9e6459585b229"
+    }
+  ],
+  "seed_seconds": 17.113,
+  "measurements": {
+    "pages": {
+      "bytes": 8355782,
+      "median_ms": 82.23,
+      "max_ms": 117.11
+    },
+    "tasks": {
+      "bytes": 8413078,
+      "median_ms": 77.87,
+      "max_ms": 90.85
+    },
+    "events": {
+      "bytes": 8390892,
+      "median_ms": 66.91,
+      "max_ms": 72.45
+    },
+    "search_miss": {
+      "bytes": 45,
+      "median_ms": 107.41,
+      "max_ms": 107.9
+    },
+    "search_body": {
+      "bytes": 4187,
+      "median_ms": 92.13,
+      "max_ms": 93.17
+    },
+    "dashboard": {
+      "bytes": 503054,
+      "median_ms": 13.99,
+      "max_ms": 32.17
+    }
+  },
+  "concurrent_search": {
+    "statuses": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "max_ms": 772.09,
+    "edit_status": 200,
+    "edit_ms": 444.21
+  },
+  "browser": {
+    "task_list": {
+      "script_bytes": 1740458,
+      "tasks_requests": 1,
+      "api_decoded_bytes": 8413916,
+      "ready_ms": 415,
+      "nodes": 23211,
+      "heap_bytes": 34889185
+    },
+    "note_list": {
+      "script_bytes": 1740458,
+      "tasks_requests": 1,
+      "api_decoded_bytes": 16769702,
+      "ready_ms": 328,
+      "nodes": 2122,
+      "heap_bytes": 88306172
+    },
+    "edit": {
+      "script_bytes": 1740458,
+      "tasks_requests": 1,
+      "api_decoded_bytes": 17278991,
+      "ready_ms": 278,
+      "nodes": 14220,
+      "heap_bytes": 140859287
+    },
+    "type_ms": 171,
+    "autosaved_ms": 1527
+  },
+  "memory": "75.06MiB / 7.748GiB",
+  "kill_restart_equal": true,
+  "logs": ""
+}

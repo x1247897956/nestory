@@ -75,6 +75,19 @@ def main():
             concurrent_results=[f.result() for f in pending];edit_result=editing.result()
         result['concurrent_search']={'statuses':[x[0] for x in concurrent_results],'max_ms':round(max(x[3] for x in concurrent_results),2),'edit_status':edit_result[0],'edit_ms':round(edit_result[3],2)}
         assert edit_result[0]==200
+        # Negotiate the same complete JSON records; verify decompression is byte-identical.
+        import gzip
+        result['transport']={}
+        for key in ('tasks','pages','events'):
+            responses=[]
+            for encoding in ('identity','gzip'):
+                r=urllib.request.Request(base+paths[key],headers={'Accept-Encoding':encoding})
+                with opener.open(r,timeout=60) as response:
+                    wire=response.read();actual=response.headers.get('Content-Encoding','identity')
+                    decoded=gzip.decompress(wire) if actual=='gzip' else wire
+                    responses.append((wire,decoded,actual))
+            assert responses[0][1]==responses[1][1],key+' compression changed JSON'
+            result['transport'][key]={'identity_bytes':len(responses[0][0]),'negotiated_bytes':len(responses[1][0]),'encoding':responses[1][2],'decoded_equal':True}
         if args.browser:
             browser_script=pathlib.Path(__file__).with_name('capacity_browser.mjs')
             result['browser']=json.loads(run('node',str(browser_script),name,base.removesuffix('/api/v1'),pid,firstnote))

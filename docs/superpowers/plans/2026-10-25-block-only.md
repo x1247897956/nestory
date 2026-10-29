@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 # Block-only正文 Implementation Plan
 
 > **For agentic workers:** Use subagent-driven-development for independent frontend, migration tooling and test work. Keep the backend contract below binding.

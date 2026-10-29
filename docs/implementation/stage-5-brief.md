@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 ## 阶段 5：备份恢复与第一版交付
 
 **文件范围：** scripts/backup.sh、scripts/restore.sh、scripts/smoke.sh、docs/operations.md、docs/acceptance-v1.md、README.md；完善 Dockerfile、compose.yaml、.env.example。

@@ -97,18 +97,18 @@ export function App() {
     queryFn: () => api<Project>("/projects/" + projectId),
     enabled: !!projectId,
   });
+  const path = useLocation().pathname;
+  const overviewBackground=useOverviewBackground(projectId);
   const tasks = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: () => api<Task[]>("/projects/" + projectId + "/tasks"),
-    enabled: !!projectId,
+    enabled: !!projectId && (!/\/(pages|events)(?:\/|$)/.test(path) || overviewBackground),
   });
   const detail = useQuery({
     queryKey: ["task", taskId],
     queryFn: () => api<Task>("/tasks/" + taskId),
     enabled: !!taskId,
   });
-  const path = useLocation().pathname;
-  const overviewBackground=useOverviewBackground(projectId);
   useEffect(() => {
     const dismiss = (event: PointerEvent) => {
       const menu = projectOptions.current;

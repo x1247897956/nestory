@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 # 阶段 3 独立审查
 
 审查依据：`stage-3-brief.md`、产品设计与技术设计两份 spec，以及 `/tmp/noteapp-stage3-review.diff` 和当前实现。只读审查业务实现，未修改代码。检查结果以协调者提供的 Go event/relation/app 测试、前端 17 个单测与构建、Brave LA/London 两种浏览器时区 E2E 均通过为既有证据，未重复执行这些检查。

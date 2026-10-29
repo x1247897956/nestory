@@ -1,0 +1,5 @@
+# noteapp/internal/platform/httpx [noteapp/internal/platform/httpx.test]
+internal/platform/httpx/compression_test.go:28:12: undefined: CompressJSON
+internal/platform/httpx/compression_test.go:39:31: undefined: CompressJSON
+FAIL	noteapp/internal/platform/httpx [build failed]
+FAIL

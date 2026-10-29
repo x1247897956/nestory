@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 # 阶段 4 独立审查
 
 依据：`stage-4-brief.md`、产品和技术设计两份 spec、`/tmp/noteapp-stage4-review.diff` 及当前文件。只读业务实现，未派代理、未修改实现。沿用协调者已实际完成的 Go test/vet、前端 19 单测及 build、6 个 E2E 全绿结果，不重复执行。

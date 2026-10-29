@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 # 阶段 2 审查
 
 依据：stage-2-brief.md、产品设计与技术设计，核对当前工作树和 /tmp/noteapp-stage2-review.diff（包含新增文件）。本次仅静态审查，不修改实现、不重跑检查。主线程已报告 Go test/vet、前端 typecheck、12 项单测、build、notes 与 tasks 浏览器验收 2/2、附件重启 SHA 验证通过；这些是实施者提供的验证结果，不是审查者重跑的证据。

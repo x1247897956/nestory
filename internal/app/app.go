@@ -291,6 +291,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		}
 		static.ServeHTTP(w, r)
 	})
+	compressed := httpx.CompressJSON(mux)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if v := recover(); v != nil {
@@ -313,7 +314,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 				}
 			}
 		}
-		mux.ServeHTTP(w, r)
+		compressed.ServeHTTP(w, r)
 	})
 }
 func respond(w http.ResponseWriter, status int, v any, err error) {

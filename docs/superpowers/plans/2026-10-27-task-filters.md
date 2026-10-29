@@ -1,3 +1,5 @@
+> 历史设计/实施记录：保留当时范围与验证结果。当前界面、正文格式及功能请以[现行产品说明](../../current-product.md)为准；旧Markdown三模式、多层笔记界面等描述不代表当前行为。
+
 # Task Filters Implementation Plan
 
 **Goal:** 已确认的 Notion 风格任务筛选器，列表/看板共用，项目隔离。
