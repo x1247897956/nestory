@@ -1,64 +1,32 @@
-# Nestory
+<p align="center">
+  <img src="web/public/icon.svg" width="80" height="80" alt="Nestory 图标" />
+</p>
 
-产品显示名称为 Nestory，使用已定稿的 Chalk 图标。仓库、Go模块、命令、Docker服务及数据卷仍沿用 `noteapp`，升级请保持原卷名。
+<h1 align="center">Nestory</h1>
+<p align="center">把任务、笔记和日程，放回项目里。</p>
 
-当前行为与历史设计变更以[现行产品说明](docs/current-product.md)为入口。
+Nestory 是面向个人的项目工作空间。用笔记记录想法，用任务推进工作，用日程安排时间；三类对象可以相互关联，工作台汇总跨项目的待办与日历。
 
-单人、本地或受信任局域网使用的项目、任务与笔记软件。第一版提供五阶段任务与一层子任务、扁平笔记列表、共享块编辑与安全附件、独立日历、三组双向关联、工作台、搜索、项目归档和按批次删除恢复。SQLite与附件在同一数据卷持久化，无登录或团队协作。
+采用 Go、React 和 SQLite，一个 Docker 容器同时提供界面与 API。适合本机或受信任局域网免登录使用，数据库与附件保存在同一个持久化数据卷中。
 
-本次审查修复见 [发布修复验收](docs/reviews/2026-10-25-release-fixes.md)。实际验收与限制见 [第一版验收](docs/acceptance-v1.md)，安装、升级、备份恢复见 [运维手册](docs/operations.md)。
+## 功能
 
-## 任务与笔记筛选
+| 功能 | 使用方式 |
+| --- | --- |
+| 项目 | 汇总任务、笔记和日程，支持置顶、重命名、归档与删除。 |
+| 任务 | 五个固定阶段、一层子任务、优先级和截止日期；列表与看板共享筛选、排序和阶段拖动。父子任务状态独立。 |
+| 笔记 | 扁平列表，支持标题、创建/更新时间和自定义属性筛选。 |
+| 日程 | 周/月日历与时间轴，支持有效起止时间、日历拖动改期。工作台可直接点击日期或选择时段创建。 |
+| 块编辑 | 输入 `/` 插入标题、列表、待办、代码、引用、表格、图片或文件；支持块拖动和 Markdown 导入/导出。 |
+| 属性与关联 | 统一属性栏，支持文本、网址、单选、多选；任务、笔记和日程之间可建立同项目双向关联。 |
+| 保存与恢复 | 自动保存、失败保稿、冲突提示；项目归档后只读，删除内容按批次恢复。 |
+| 工作台与搜索 | 跨项目日历和未完成任务列表，搜索标题及块正文。 |
 
-任务工具栏的“筛选”可添加阶段、优先级、截止日期、标题，以及当前项目任务的自定义属性条件。点击条件标签编辑，× 移除，“清除全部”恢复全部任务。多个条件同时满足（AND），列表和看板共用；筛选按项目保存在当前浏览器，换设备不会同步。存储不可用时仍可在本次会话筛选。
+对象详情在居中浮层中打开。视图、筛选、排序和折叠偏好按项目保存在当前浏览器；换设备不会同步。
 
-笔记列表同样提供筛选器，支持标题、创建时间、更新时间，以及笔记自己的文本/网址/单选/多选自定义属性。筛选与排序组合，详情关闭后保留条件；笔记和任务的筛选偏好互不影响。创建/更新时间按部署时区转换为日期后判断，时区尚未加载时不展示可能错误的匹配结果。
+## Docker 快速启动
 
-“今天/本周”按 APP_TIMEZONE 计算，周一至周日；日期区间包含两端，“早于/晚于”严格比较。筛选时匹配的子任务会保留父任务上下文，匹配数仅计实际符合条件的任务。属性/选项失效会提示重选或移除；读取失败可重试，不会当成空值。暂不支持 OR、嵌套条件或保存命名筛选。
-
-## 视图、排序与日程时间轴
-
-任务列表和看板共用排序：默认顺序、标题、优先级、截止日期、创建/更新时间，可选升降序，未填写值始终放在末尾。“显示设置”可切换阶段分组、全部展开/收起；点击阶段标题单独折叠，仍可将任务拖入收起的阶段。排序保持父子层级，筛选规则照常生效。
-
-笔记列表支持默认顺序、标题、创建/更新时间排序。日程可在日历与时间轴之间切换；时间轴按周/月显示日程跨度，支持上一/下一区间、今天和开始/结束时间、标题、时长排序，点击日程打开同一个详情弹窗。时间轴内可横向滚动；日历继续支持原有拖动改期，时间轴本身暂不支持拖动改期、依赖连线或自动排程。
-
-排序使用工具栏“排序”按钮：在弹层中选择属性和方向，点击“应用排序”后生效；条件标签可编辑或移除，移除后恢复默认顺序。任务、笔记、日程列表共用标题/新建区和视图/工具栏布局。
-
-上述视图、分组、阶段折叠、排序，以及日历周/月、时间轴跨度和查看日期均按项目保存在当前浏览器；不会改动业务对象或同步到其他设备。任务/笔记/日程详情统一为标题与菜单、可折叠属性、块正文、保存/恢复提示的顺序，保留原有自动保存与未保存保护。
-
-## 开发
-
-固定工具链：Go **1.27.3**、Node **26.9.0**、npm **11.19.1**。依赖版本见 `go.mod` / `web/package-lock.json`，许可证见 [依赖记录](docs/implementation/dependencies.md)。
-
-```sh
-cd web
-npm ci
-npm run build
-cd ..
-go run ./cmd/noteapp
-```
-
-打开 [本地应用](http://localhost:8080)。Go 编译时内嵌 `web/dist`，首次运行必须先构建前端。
-
-前端热更新：另开终端执行 `cd web && npm run dev`；后端用 `APP_DEV_ORIGIN=http://127.0.0.1:5173 go run ./cmd/noteapp`。浏览器打开 [Vite](http://127.0.0.1:5173)，`/api` 同源代理至 8080。前端不会向任意来源开放 CORS。
-
-| 环境变量 | 默认值 | 含义 |
-| --- | --- | --- |
-| APP_ADDR | 127.0.0.1:8080 | 本地 Go 监听地址；容器显式设为 :8080 |
-| APP_ALLOWED_HOSTS | localhost,127.0.0.1,::1 | 所有路由允许的精确主机名/IP，不含端口、URL或通配符 |
-| APP_DATA_DIR | ./data | SQLite 与附件存储目录 |
-| APP_TIMEZONE | Asia/Shanghai | 部署时区，启动校验 |
-| APP_UPLOAD_LIMIT | 20971520 | 单附件最大字节数，20 MiB；正整数 |
-| APP_DEV_ORIGIN | 空 | 额外允许的开发浏览器 Origin |
-| APP_BIND | 127.0.0.1 | Compose 端口绑定 |
-| APP_PORT | 8080 | Compose 主机端口 |
-| APP_IMAGE | noteapp:local | 构建/启动的镜像引用 |
-| APP_VERSION | development | 镜像中的源码版本标签，发布时设为commit |
-| APP_VOLUME_NAME | noteapp_noteapp-data | 显式真实命名卷，升级须沿用旧卷 |
-
-若安装多个 Go 版本后出现 `compile: version ... does not match go tool version ...`，检查 `go env GOROOT` 和 `go tool compile -V`；本次环境残留 goenv 的 GOROOT，使用 `env -u GOROOT go test ./...` 可恢复工具链一致性，无需修改用户全局配置。受限环境可把 `GOPATH`、`GOCACHE`、`GOMODCACHE` 和 `npm_config_cache` 指向可写目录。
-
-## Docker
+需要 Docker Engine 与 Compose v2。在仓库根目录执行：
 
 ```sh
 cp .env.example .env
@@ -66,99 +34,172 @@ APP_VERSION=$(git rev-parse HEAD) docker compose up -d --build
 scripts/smoke.sh --url http://127.0.0.1:8080
 ```
 
-单容器提供 API 和静态前端，非 root UID/GID 10001 运行；默认真实命名卷 `noteapp_noteapp-data`（APP_VOLUME_NAME） 持久化整个 `/data`。固定镜像标签与 digest 见 Dockerfile。默认仅本机可访问；受信任局域网部署须同时设置 `APP_BIND=0.0.0.0`，并在 `APP_ALLOWED_HOSTS` 中追加实际访问的主机名或 IP，例如 `localhost,127.0.0.1,::1,192.168.1.20,noteapp.home`。请求 Host 可带端口，配置项不带端口；未知 Host 对所有路由返回 403，不信任转发头。当前没有身份验证。
+打开 [http://127.0.0.1:8080](http://127.0.0.1:8080)。首次构建需要下载基础镜像与依赖。
 
-更新/重建：`docker compose up -d --build --force-recreate`。停止：`docker compose down`。不要执行 `docker compose down -v`，那会删除数据卷。
+默认数据卷为 `noteapp_noteapp-data`，保存 `/data` 下的 SQLite 和附件。产品名称为 Nestory，工程命令、服务、Go 模块和数据卷继续沿用 `noteapp`，升级时保持原卷名。
 
-## 检查
+```sh
+# 停止应用，保留数据卷
+docker compose down
+
+# 查看运行日志
+docker compose logs --tail=100 noteapp
+```
+
+`docker compose down -v` 会删除数据卷，不用于正常停止或升级。
+
+## 开始使用
+
+1. 创建项目，从项目汇总页添加任务、笔记或日程。
+2. 打开对象，直接编辑标题和块正文；停止输入约 800ms 后自动保存，留意保存状态。
+3. 展开属性栏设置任务阶段、优先级、截止日期或日程起止时间；通过关联连接同项目内容。
+4. 在任务页切换列表/看板，用筛选器和排序器整理内容；点击阶段标题折叠分组。
+5. 在工作台点击日历日期或选择时段，选择所属项目并填写标题，自动创建日程。
+
+新建自定义属性时先选择类型，再命名、填写值。同项目同类型对象自动获得该属性定义，各对象的值独立。跨类型复用会复制定义、选项与颜色，之后独立管理。属性设置管理属性，选项行的三点菜单管理选项名称、颜色和删除。
+
+保存失败或版本冲突时，先处理页面提示。未保存草稿属于当前浏览器，清理站点数据不会保留这些草稿；完整数据保护依靠数据库与附件备份。
+
+## 配置
+
+Compose 配置写入 `.env`；直接运行 Go 时通过环境变量传入。Go 进程不会自动加载 `.env`。
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `APP_BIND` | `127.0.0.1` | Compose 主机绑定地址。 |
+| `APP_PORT` | `8080` | Compose 主机端口。 |
+| `APP_IMAGE` | `noteapp:local` | 构建与启动的镜像名称。 |
+| `APP_VERSION` | `development` | 镜像源码版本标识。 |
+| `APP_VOLUME_NAME` | `noteapp_noteapp-data` | 持久化卷；修改会切换数据集。 |
+| `APP_TIMEZONE` | `Asia/Shanghai` | 日历、日期筛选及今日/本周的统一时区。 |
+| `APP_ALLOWED_HOSTS` | `localhost,127.0.0.1,::1` | 允许访问的精确主机名/IP，不含端口。 |
+| `APP_UPLOAD_LIMIT` | `20971520` | 单附件上限，默认 20 MiB。 |
+| `APP_ADDR` | `127.0.0.1:8080` | 直接运行 Go 的监听地址；容器使用 `:8080`。 |
+| `APP_DATA_DIR` | `./data` | 直接运行 Go 的数据库与附件目录；容器使用 `/data`。 |
+| `APP_DEV_ORIGIN` | 空 | 额外允许的开发浏览器来源。 |
+
+局域网访问需同时设置 `APP_BIND=0.0.0.0`，并把实际主机名/IP 加入 `APP_ALLOWED_HOSTS`。应用没有登录和团队权限，仅适用于受信任网络；Host 白名单不能替代身份验证。当前不直接信任 `X-Forwarded-*`。
+
+## 本地开发
+
+仓库锁定工具链：Go **1.27.3**、Node **26.9.0**、npm **11.19.1**。依赖由 `go.mod`、`go.sum` 和 `web/package-lock.json` 锁定。
+
+先构建前端，再启动内嵌静态文件的 Go 服务：
+
+```sh
+npm ci --prefix web
+npm run build --prefix web
+go run ./cmd/noteapp
+```
+
+热更新开发使用两个终端：
+
+```sh
+# 终端一：后端
+APP_DEV_ORIGIN=http://127.0.0.1:5173 go run ./cmd/noteapp
+```
+
+```sh
+# 终端二：前端，/api 代理至本机 8080
+npm run dev --prefix web
+```
+
+打开 [http://127.0.0.1:5173](http://127.0.0.1:5173)。
+
+## 测试
 
 ```sh
 go test ./...
 go test -race ./...
 go vet ./...
-cd web
-npm run typecheck
-npm test -- --run
-npm run build
-npx playwright install chromium
-# 或使用现有 Chromium：
-# PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/path/to/chromium" npm run e2e
-npm run e2e
-cd ..
-python3 -m unittest scripts.tests.test_archive
-# 本机已有最终Docker镜像时，另验证备份恢复与容器错误边界：
-python3 -m unittest scripts.tests.test_backup_restore scripts.tests.test_runtime
+npm run typecheck --prefix web
+npm run test --prefix web -- --run
+npm run build --prefix web
 ```
 
-Playwright 默认启动 Go 后端并使用 `/tmp/noteapp-e2e-data` 临时数据库和 18080 端口；可用 `E2E_BASE_URL=http://127.0.0.1:8080 npm run e2e` 对已运行实例验证。测试会创建带时间戳项目，建议使用测试实例。
-
-所有 HTTP JSON 接口位于 `/api/v1`：`/healthz` 检查进程、`/readyz` 检查数据库、`/config` 提供时区和阶段元数据；项目、任务、页面、日程、双向关联、工作台、搜索及回收站接口见技术设计。PATCH 与 move 必须提交 version。400 为参数错误，404 为不存在，409 为版本/归档/父级冲突，500 不暴露数据库详情。任务、笔记和日程编辑页在停止输入 800ms 后自动保存，每个对象串行发送快照；保存失败时提供重试按钮。失败和 409 会保留草稿，可复制、重试或确认后重新载入。关闭标签页和应用内路由离开会提示未保存内容。
-
-## 停机一致性备份与恢复
-
-运维脚本要求主机 Python 3.9+（含标准库sqlite3）和Docker。脚本只接受明确命名卷、容器及镜像；备份整个 `/data`，包括存在的WAL/SHM和附件，生成版本、SQL对象/关系计数、文件及附件SHA清单，最后自动尝试恢复原容器运行状态。不要运行中只复制数据库主文件。
+浏览器测试会创建、修改测试数据。推荐使用脚本启动的独立临时容器与数据卷：
 
 ```sh
-mkdir -p backups
-scripts/backup.sh --container noteapp-noteapp-1 \
-  --volume noteapp_noteapp-data --image noteapp:local \
-  --app-version "$(git rev-parse HEAD)" --output "$PWD/backups/noteapp-v1"
-
-docker volume create noteapp-restored
-scripts/restore.sh --volume noteapp-restored \
-  --image <manifest.json中的image_id> --backup "$PWD/backups/noteapp-v1"
+npm exec --prefix web -- playwright install chromium
+docker build -t noteapp:test .
+sh scripts/audit/run_browser.sh noteapp:test
+NOTEAPP_TEST_IMAGE=noteapp:test python3 -m unittest discover -s scripts/tests -p 'test_*.py'
 ```
 
-恢复只写预先创建的空卷，禁止覆盖；先使用清单里的同一image ID。脚本先核对SHA与只读SQLite完整性/外键/计数，再恢复并重新读取目标核对正文所在文件、所有关系计数和每个附件SHA。保留原卷，不要覆盖源数据。按 [运维手册](docs/operations.md) 启动恢复检查实例并验证浏览器，再切换正式卷。升级前备份；不承诺自动schema降级。
+也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有 Chromium。运维脚本要求 Python 3.9+，包含标准库 `sqlite3`。
 
-[最终验收记录](docs/acceptance-v1.md) 区分正式多阶段构建与早期开发替代验证，附实际命令、镜像版本和证据。当前前端大包约1.65MB（gzip526KB），首次加载性能仍可优化。
+## 备份、升级与恢复
 
-## 对象与固有属性
+备份脚本会暂时停止指定容器、备份整个数据卷，并尝试恢复原运行状态。清单包含镜像版本、数据库检查结果和附件 SHA；不要在运行中只复制数据库主文件。
 
-任务、笔记、日程共同实现 `internal/object.Entity`，提供统一的对象身份、类型、项目、标题、正文、版本和固有属性视图。`GET /api/v1/object-types/{tasks|pages|events}` 返回后端定义的固定属性及修改方式；`GET /api/v1/objects/{type}/{id}` 返回对象值、关联属性和归档只读状态。前端属性栏直接使用后端定义排列与标注字段。
+以下容器名适用于 Compose 项目名为 `noteapp` 的默认安装；其他安装应先用 `docker compose ps` 确认实际名称：
 
-属性仍通过各类型既有的 PATCH、move 和 relation 接口修改，继续执行版本检查、同项目约束、父级防循环和归档只读校验。原有SQLite专用表和数据保持兼容；schema9新增的自定义字段使用独立定义和值接口，不改变这些固有属性的业务约束。
+```sh
+scripts/backup.sh --container noteapp-noteapp-1 \
+  --volume noteapp_noteapp-data --image noteapp:local \
+  --app-version "$(git rev-parse HEAD)" --output "$PWD/backups/before-upgrade"
+```
 
-后端模块职责、事务边界及对象版本语义见 [后端结构](docs/architecture.md)。对象读取由 `objectquery` 编排；`taskmeta` 集中任务元数据，`apperr` 与 HTTP 状态映射分离。附件流接收在数据库事务外完成，提交时重新检查项目可写性。
+备份完成后，使用新源码或镜像，沿用原来的 `.env` 和数据卷重建：
 
-## 项目菜单与即时编辑
+```sh
+APP_VERSION=$(git rev-parse HEAD) docker compose up -d --build --force-recreate
+scripts/smoke.sh --url http://127.0.0.1:8080
+```
 
-每个侧栏项目右侧的“⋯”提供重命名、归档/取消归档、删除、置顶/取消置顶。菜单与删除确认已统一为紧凑菜单和独立模态确认框，见[样式整理记录](docs/implementation/2026-10-25-menu-style.md)。置顶持久保存并优先排列；归档项目保持只读，需取消归档后重命名、删除或修改置顶。删除使用预览确认，将项目及当前有效的任务、笔记、日程放入同一回收站批次；恢复该批次保留关联，之前单独删除的对象保持原批次。
+恢复使用预先创建的空卷和备份清单中记录的镜像 ID：
 
-三类对象详情使用应用内居中浮层和可折叠属性栏。笔记详情不展示目录、新建表单、父级和内部顺序值；这些不影响已有笔记层级数据。正文使用 BlockNote 块编辑器，直接编辑渲染内容，输入 `/` 插入标题、列表、待办、代码、引用、表格、图片或文件；悬停块左侧可拖动、复制和删除。没有固定模式工具栏。通过 `/导入` 插入 Markdown 文件、`/导出` 下载副本。正文只保存块 JSON（`body_document`），接口不再接受或返回 Markdown 正文及旧原文字段。搜索直接读取块中的文字和附件名称；Markdown 只用于导入/导出，导出不保证保留全部块属性，完整备份请使用数据库与附件备份。schema7 会移除旧 `body`/`legacy_body` 列；旧库中的非空 Markdown 需先停机备份，并使用锁定的编辑器解析器离线准备迁移，不能直接跳过。具体步骤见 [块迁移运维](docs/operations.md#块唯一正文升级schema7)及[准备工具](docs/implementation/2026-10-25-block-migration-tool.md)。不支持把旧镜像指向已升级数据库；回退必须恢复升级前备份。
+```sh
+docker volume create noteapp-restored
+scripts/restore.sh --volume noteapp-restored \
+  --image <manifest.json中的image_id> --backup "$PWD/backups/before-upgrade"
+```
 
-历史schema 5增加了项目置顶与软删除字段；当前schema7升级方式见上文。现场升级前备份保存在 `backups/2026-10-24-before-project-actions/`，该目录排除在Git和Docker上下文外。旧镜像回退应先恢复对应备份，勿仅切换镜像而混用数据库版本。
+恢复脚本拒绝覆盖非空卷。先启动恢复检查实例、核对正文和附件，再切换正式卷。旧镜像不能直接连接升级后的数据库；回退应恢复对应旧备份。
 
-### V1稳定性修复（schema8）
+schema6 及更早版本的非空 Markdown 正文需要先离线准备块迁移，详见[运维手册](docs/operations.md)。新安装无需此步骤。
 
-任务/笔记/日程的未保存编辑草稿会保存到当前浏览器，重新打开时恢复；服务器版本变化或其他窗口有草稿时会暂停覆盖，提示处理冲突。可用“恢复本机草稿”明确接续与当前服务器基线一致的恢复内容。浏览器存储不可用/配额不足会明确报错并提供复制草稿、重试保存；清理站点数据、换浏览器或换域名/端口不会携带本机草稿，完整数据保护仍依赖数据库与附件备份。
+## 技术结构
 
-上传/导入未结束时不能移动任务；归档、删除和重新载入仍受未保存状态保护。创建请求丢失响应后重试会复用同一请求ID，不重复插入对象；新的独立窗口和明确取消后的新操作使用独立身份。日历拖动遇到响应丢失会查询服务器确认；查询也失败时禁止继续拖动，提供同步操作。删除确认校验整个成员快照。正文JSON上限2MiB，超限保留当前草稿并提示拆分。
+Go 轻量模块化单体，普通构造函数组装依赖；React + TypeScript + Vite 前端，SQLite 保存业务数据，附件保存在同卷文件目录。一个非 root Docker 容器提供前端与 `/api/v1`。
 
-schema7→8只添加创建请求结果表，不改写已有对象。升级前备份，使用新镜像重建原卷即可自动迁移；schema6及更早版本仍需先按上面的块迁移步骤准备。旧页面升级后请刷新。实际故障测试、备份恢复和限制见[稳定性验收](docs/implementation/2026-10-25-v1-stability.md)。
+```text
+cmd/noteapp/          服务入口
+internal/            业务模块、事务、HTTP适配与数据库
+migrations/          SQLite迁移
+web/src/             React界面与块编辑器
+scripts/             备份、恢复、检查和性能探针
+docs/                当前说明、架构、运维与历史验收证据
+```
 
-## 使用边界
+正文唯一存储格式为版本化块 JSON。HTTP 更新使用版本检查，跨对象关系与删除恢复有事务约束；创建请求支持幂等重试。编辑器按需加载，GET JSON 支持协商 gzip。完整技术说明见[架构文档](docs/architecture.md)与[自定义属性 API](docs/custom-properties-api.md)。
 
-当前面向个人规模数据。独立审计的容量样本为单项目每类 1000 个对象、每份约 8KB 正文；这是测量场景，并非无限规模或性能保证。列表仍读取完整正文，超大项目应拆分；本轮通过编辑器按需加载、移除无关任务请求和GET JSON压缩降低加载开销，未加入摘要接口或分页。块数据按固定 BlockNote 0.56.0 schema 校验，非法写入返回400且不更改旧数据；升级不自动修复或丢弃已有正文。
+## 当前边界
 
-LAN 的普通 HTTP 使用安全随机数兼容 UUID 生成；免登录仍只适合受信任网络。Host 白名单用于限制访问主机，不能替代身份验证。反向代理若终止 HTTPS，需单独设计可信代理配置；当前不会直接相信 `X-Forwarded-*`。
+- 面向个人规模；完整列表仍读取正文，没有分页或无限规模保证。单项目每类 1000 个对象的[性能测量](docs/evidence/docs-performance-20261029/README.md)是测试样本。
+- 筛选条件按 AND 组合，暂不支持 OR、嵌套条件或命名筛选。
+- 日程时间轴支持跨度展示，暂不支持拖动改期、依赖连线或自动排程；日历支持拖动改期。
+- 笔记界面为扁平列表，旧库层级数据保留；不提供子笔记创建和目录树操作。
+- 正文上限为 2 MiB；每项目每类型最多 64 个自定义属性。Markdown 导出不保证保留所有原生块属性，完整备份请使用运维脚本。
+- 当前不提供多人协作、登录、自定义阶段、重复日程和提醒。
 
-任务页顶部可切换“列表 / 看板”，每个项目在当前浏览器记住自己的选择。看板按现有五个阶段分列，父任务和子任务各自显示；拖动卡片或使用卡片阶段选择器更改阶段，优先级筛选同时适用。每列“＋”可预选该阶段创建任务；点击卡片打开现有详情。归档看板只读，手机可横向浏览并使用阶段选择器。实现与验证见[任务视图记录](docs/implementation/2026-10-27-task-views.md)。
+## 常见问题
 
-任务列表按阶段分组时，可拖动任务左侧的手柄到目标阶段；只更改这一项任务的阶段，父子状态互不联动。点击阶段圆点也可通过原生选择器修改，适合键盘和手机。关联属性展开后，搜索筛选同项目候选，点击候选即建立关联。对象详情页的项目操作统一从侧栏“⋯”进入。实现和验证见[对象与任务交互精简](docs/implementation/2026-10-26-task-interactions.md)。
+**升级后内容不见了？** 检查 `APP_VOLUME_NAME` 和 Compose 项目配置是否仍指向原数据卷。修改卷名会打开另一份数据，不要因此删除旧卷。
 
-对象标题右侧的“⋯”收纳对象自身操作，当前提供移入回收站；点击后仍需预览确认。任务、笔记、日程采用相同入口，属性区统一展示固有属性、关联和自定义属性，默认收起。见[对象菜单调整记录](docs/implementation/2026-10-26-object-menu.md)。
+**局域网访问返回 403？** 检查访问主机名/IP 是否加入 `APP_ALLOWED_HOSTS`，并确认端口绑定允许局域网访问。
 
-### 自定义属性（schema9）
+**页面仍显示旧名称或图标？** 刷新页面；浏览器可能单独缓存 favicon。先确认服务正在使用新构建，再尝试强制刷新。
 
-属性默认收起，展开后宽屏显示两列、窄屏自动切为单列，按内容自动增加行数。先展开属性栏，再点击末尾的“添加属性”：可新建文本、单选、多选或网址，给新属性命名并填写值；也可复用同项目其他对象类型的已有属性，复制定义、选项与颜色，不复制值，后续按对象类型独立管理。定义会自动出现在同项目同类型的所有已有/新建对象上，各对象的值独立。点击属性名称可改共享名称；单选、多选在选择面板直接创建选项，在选项行的三点菜单中改名、选择九种标签颜色或删除；属性设置仅管理属性名称和删除属性，固有属性不可删除。选项ID保持不变。折叠不停止自动保存，刷新后默认收起。设置和属性值自动保存，失败保留本机输入并展开实际错误；设置草稿可在再次打开对应设置时恢复。归档后只读。
+**Go 编译提示工具版本不匹配？** 检查 `go env GOROOT` 和 `go tool compile -V`。若环境残留旧 `GOROOT`，可尝试 `env -u GOROOT go test ./...`。
 
-每项目每类型最多64个属性，名称80字符、选项100个、文本4000字符、网址2048字符；网址只接受HTTP/HTTPS。删除自定义属性会清除该类型全部对象的对应值；删除选项会清理引用值，操作前有明确确认。当前不提供字段类型转换；任务与笔记列表支持按自定义属性筛选，全局搜索仍搜索标题与正文。API、独立版本规则及清空值见[自定义属性接口](docs/custom-properties-api.md)。schema8→9只新增定义/值两表，不改写正文；升级前备份，新镜像启动会自动迁移。回滚应恢复升级前备份到空卷，再运行匹配旧镜像。
+**编辑器加载失败或保存失败？** 根据界面提示重新加载或重试；先保留、复制尚未保存的草稿。不要通过清理浏览器存储处理未确认的保存问题。
 
-对象详情以应用内居中浮层打开，顶部为项目 / 类型 / 对象名称；点击上级或关闭回到列表。任务、笔记、日程共用此布局，编辑内容自动保存，保存失败与未完成附件处理会阻止静默离开。重复的本地空间提示已精简，现有数据不受影响。
+## 文档与验证记录
 
-近期稳定性审计与复现记录见[2026-10-27 近期改动审计](docs/audits/2026-10-27-recent-changes.md)，涵盖属性删除缓存、关联面板、错误揭示和长标题导航修复。
-
-工作台日历支持点击日期或框选时段新建日程：选择所属项目并填写标题后自动保存，保存后留在工作台并刷新日历。月视图默认 09:00–10:00，周视图使用所选时段；保存失败可重试，未保存关闭会提示。
-
-加载优化：工作台和列表首屏不下载块编辑器，打开对象详情时按需加载；模块加载失败可重新加载页面。笔记/日程页不再额外请求任务列表（项目汇总背景除外）。GET JSON支持协商gzip，浏览器自动解压，完整字段不变；附件与写请求不受此压缩影响。测量和边界见[性能检查记录](docs/evidence/docs-performance-20261029/README.md)。
+- [现行产品说明](docs/current-product.md)：当前功能、规则及历史设计的优先关系。
+- [运维手册](docs/operations.md)：部署、升级、备份和恢复。
+- [架构文档](docs/architecture.md)：模块、对象、属性与事务边界。
+- [性能检查](docs/evidence/docs-performance-20261029/README.md)：测量方法、实际结果与限制。
+- [最初第一版验收](docs/acceptance-v1.md)与[近期审计](docs/audits/2026-10-27-recent-changes.md)：各自对应日期和提交范围的证据。
+- [品牌资源](design/nestory/final/README.md)与[依赖记录](docs/implementation/dependencies.md)。
