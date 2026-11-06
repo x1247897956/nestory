@@ -1,4 +1,6 @@
-# Noteapp
+# Nestory
+
+产品显示名称为 Nestory，使用已定稿的 Chalk 图标。仓库、Go模块、命令、Docker服务及数据卷仍沿用 `noteapp`，升级请保持原卷名。
 
 当前行为与历史设计变更以[现行产品说明](docs/current-product.md)为入口。
 

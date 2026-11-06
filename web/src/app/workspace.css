@@ -99,7 +99,7 @@ p { color:var(--muted); }
   .private-tag { display:none; }
 }
 /* Monochrome surfaces; deep navy is reserved for actionable emphasis. */
-.brand-mark { background:#202329; }
+.brand-mark { display:block; width:32px; height:32px; flex-shrink:0; background:transparent; }
 label,.filters label { color:#6b7079; }
 .project-link.active { box-shadow:inset 2px 0 0 #243b63; }
 .local-dot { background:#8d939c; }

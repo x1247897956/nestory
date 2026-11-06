@@ -311,9 +311,9 @@ export function App() {
     <div className="shell">
       <aside className="sidebar" aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)}>
         <Link to="/" className="brand">
-          <span className="brand-mark">n.</span>
+          <img className="brand-mark" src="/icon.svg" alt="" width="32" height="32" />
           <span>
-            Noteapp
+            Nestory
           </span>
         </Link>
         <Link className="nav-item" to="/" aria-current={path === "/" ? "page" : undefined}>
