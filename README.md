@@ -45,24 +45,17 @@ Nestory 是一个可以自行部署的个人工作空间。围绕项目整理笔
 
 资料、进度和时间各有自己的位置，也能随时找到彼此。
 
-## 开始使用
+## 自行部署
 
-准备好 Docker 和 Compose，在本仓库根目录执行：
+通过 Docker Compose 部署 Nestory，在自己的设备上保存笔记、任务和日程。
 
-```sh
-cp .env.example .env
-docker compose up -d --build
-```
+[查看部署指南 →](docs/operations.md)
 
-打开 **[localhost:8080](http://localhost:8080)**，创建第一个项目，然后添加笔记、任务或日程。首次启动需要构建镜像。
-
-数据库和附件通过 Docker 数据卷持久保存。升级前请备份，并沿用原数据卷；完整步骤见[部署与备份文档](docs/operations.md)。
-
-> Nestory 当前适合个人在本机或受信任局域网使用，暂不提供登录与多人协作。视图、筛选等偏好保存在当前浏览器。
+当前版本面向个人使用，适用于本机或受信任的局域网。
 
 ## 了解更多
 
-- [使用与维护指南](docs/user-guide.md)：配置、开发、测试、常见问题。
+- [使用指南](docs/user-guide.md)：创建项目、组织内容与日常操作。
 - [完整功能说明](docs/current-product.md)：属性、视图和当前功能边界。
 - [部署与备份](docs/operations.md)：安装、升级、备份和恢复。
 - [技术架构](docs/architecture.md)：Go、React、SQLite 与模块设计。

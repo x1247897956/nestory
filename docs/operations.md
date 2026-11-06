@@ -1,4 +1,6 @@
-# Noteapp 运维手册
+# Nestory 部署与维护
+
+[产品首页](../README.md) · [使用指南](user-guide.md) · [配置参考](configuration.md) · [开发指南](development.md)
 
 当前产品操作见[现行产品说明](current-product.md)；本手册中的旧schema升级步骤用于历史数据迁移，不代表当前编辑界面。
 
