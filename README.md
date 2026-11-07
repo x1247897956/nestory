@@ -82,3 +82,7 @@ Nestory 是一个可以自行部署的个人工作空间。围绕项目整理笔
 - [技术架构](docs/architecture.md)：Go、React、SQLite 与模块设计。
 
 Nestory 由 Go、React、TypeScript 和 SQLite 构建，块编辑器采用 [BlockNote](https://www.blocknotejs.org/)，日历采用 [FullCalendar](https://fullcalendar.io/)。依赖版本及许可证记录见[依赖说明](docs/implementation/dependencies.md)。
+
+## 许可证
+
+Nestory 自有代码采用 [MIT License](LICENSE)。第三方依赖及其代码仍遵循各自的许可证，包括 BlockNote 的 MPL-2.0。
