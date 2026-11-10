@@ -1,3 +1,5 @@
+[English](operations.en.md) | **简体中文**
+
 # 部署 Nestory
 
 使用 Docker Compose 在自己的设备上运行 Nestory。当前版本适合个人在本机或受信任局域网使用。
