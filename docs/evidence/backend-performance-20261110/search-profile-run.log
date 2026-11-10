@@ -1,0 +1,7 @@
+goos: darwin
+goarch: arm64
+pkg: noteapp/internal/workspace
+cpu: Apple M5
+BenchmarkSearch/per_type=5000/body-10    	      18	 322757250 ns/op	   29604 B/op	     335 allocs/op
+PASS
+ok  	noteapp/internal/workspace	7.374s

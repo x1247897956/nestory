@@ -26,3 +26,14 @@ python3 scripts/audit/custom_properties_rehearsal.py --image noteapp:custom-prop
 ```
 
 要求源清单是schema8且源镜像与清单一致。脚本升级副本到9、比较全部原有行和附件，写入独立演练项目的四种属性，再备份恢复到另一个干净卷核对；会在backups/留下验证备份，临时容器/卷自动清理。随机宿主端口在停启后重新发现，避免复用旧地址。已有schema6准备迁移脚本当前目标也为schema9。
+
+## 单人后端性能检查
+
+```sh
+python3 scripts/audit/backend_performance.py --image noteapp:architecture-20261110 --output /tmp/nestory-capacity.json
+env -u GOROOT go test -run '^$' -bench BenchmarkSearch -benchmem -count=6 ./internal/workspace
+```
+
+新容量脚本依次创建每类100、1000、5000个约8KiB正文对象的隔离容器/卷；三轮各20次暖请求，输出全部样本及nearest-rank p95。默认协商gzip，计时截至HTTP响应读取完成，JSON解压/解析不计入接口延迟，也不代表前端渲染耗时。内存为Docker采样值，不能称作峰值；8路搜索同时保存用于多标签页压力诊断，不模拟多人用户。清理仅针对本次新建资源，不能传入正式URL/卷。
+
+Go基准使用真实临时SQLite，单独定位搜索服务，不等同于Docker端到端延迟；不要同时运行两类测量、构建或其他基准。

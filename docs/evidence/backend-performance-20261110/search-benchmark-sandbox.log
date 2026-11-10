@@ -1,0 +1,4 @@
+# ./internal/workspace
+open /Users/seyr1n/Library/Caches/go-build/69/69f0fdd1f662d1593b4204859727a2049072a9824acb6e154742a63b7c6edd42-d: operation not permitted
+FAIL	./internal/workspace [setup failed]
+FAIL

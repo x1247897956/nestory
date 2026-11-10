@@ -1,0 +1,30 @@
+goos: darwin
+goarch: arm64
+pkg: noteapp/internal/workspace
+cpu: Apple M5
+BenchmarkSearch/per_type=1000/miss-10    	      24	  49083085 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=1000/miss-10    	      24	  48743517 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=1000/miss-10    	      24	  50527099 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=1000/miss-10    	      24	  49014399 ns/op	   10719 B/op	      47 allocs/op
+BenchmarkSearch/per_type=1000/miss-10    	      24	  49053071 ns/op	   10719 B/op	      47 allocs/op
+BenchmarkSearch/per_type=1000/miss-10    	      24	  48641780 ns/op	   10722 B/op	      47 allocs/op
+BenchmarkSearch/per_type=1000/body-10    	      19	  61515772 ns/op	   29517 B/op	     335 allocs/op
+BenchmarkSearch/per_type=1000/body-10    	      19	  61895689 ns/op	   29515 B/op	     335 allocs/op
+BenchmarkSearch/per_type=1000/body-10    	      19	  61512741 ns/op	   29512 B/op	     335 allocs/op
+BenchmarkSearch/per_type=1000/body-10    	      19	  61756914 ns/op	   29515 B/op	     335 allocs/op
+BenchmarkSearch/per_type=1000/body-10    	      19	  61746489 ns/op	   29512 B/op	     335 allocs/op
+BenchmarkSearch/per_type=1000/body-10    	      19	  62254101 ns/op	   29513 B/op	     335 allocs/op
+BenchmarkSearch/per_type=5000/miss-10    	       4	 252081812 ns/op	   10716 B/op	      47 allocs/op
+BenchmarkSearch/per_type=5000/miss-10    	       5	 251180325 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=5000/miss-10    	       5	 249133083 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=5000/miss-10    	       4	 251371542 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=5000/miss-10    	       5	 249584725 ns/op	   10720 B/op	      47 allocs/op
+BenchmarkSearch/per_type=5000/miss-10    	       5	 249481017 ns/op	   10716 B/op	      47 allocs/op
+BenchmarkSearch/per_type=5000/body-10    	       4	 314958208 ns/op	   29532 B/op	     335 allocs/op
+BenchmarkSearch/per_type=5000/body-10    	       4	 316911990 ns/op	   29532 B/op	     335 allocs/op
+BenchmarkSearch/per_type=5000/body-10    	       4	 313966302 ns/op	   29532 B/op	     335 allocs/op
+BenchmarkSearch/per_type=5000/body-10    	       4	 312664052 ns/op	   29532 B/op	     335 allocs/op
+BenchmarkSearch/per_type=5000/body-10    	       4	 316045240 ns/op	   29532 B/op	     335 allocs/op
+BenchmarkSearch/per_type=5000/body-10    	       4	 319883010 ns/op	   29528 B/op	     335 allocs/op
+PASS
+ok  	noteapp/internal/workspace	30.453s
