@@ -82,4 +82,4 @@ Nestory 是一个可以自行部署的个人工作空间。围绕项目整理笔
 
 ## 许可证
 
-Nestory 自有代码采用 [MIT License](LICENSE)。第三方依赖及其代码仍遵循各自的许可证，包括 BlockNote 的 MPL-2.0。
+本项目采用 [MIT License](LICENSE)。
