@@ -7,7 +7,6 @@
 <p align="center">个人项目管理 · 块笔记 · 任务看板 · 日历</p>
 <p align="center">
   <a href="#产品预览">产品预览</a> ·
-  <a href="docs/user-guide.md">使用指南</a> ·
   <a href="docs/operations.md">部署文档</a>
 </p>
 
@@ -76,8 +75,6 @@ Nestory 是一个可以自行部署的个人工作空间。围绕项目整理笔
 
 ## 了解更多
 
-- [使用指南](docs/user-guide.md)：创建项目、组织内容与日常操作。
-- [完整功能说明](docs/current-product.md)：属性、视图和当前功能边界。
 - [部署与备份](docs/operations.md)：安装、升级、备份和恢复。
 - [技术架构](docs/architecture.md)：Go、React、SQLite 与模块设计。
 
