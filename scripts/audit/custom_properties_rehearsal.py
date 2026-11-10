@@ -31,7 +31,7 @@ def main():
   run(str(ROOT/'scripts/restore.sh'),'--volume',first,'--image',old,'--backup',str(source))
   base=start(first);backup(first,upgraded);base=address(first)
   ma,mb=validate_bundle(source),validate_bundle(upgraded)
-  assert ma['schema_versions']==list(range(1,9));assert ma['assets']==mb['assets'];assert mb['schema_versions']==list(range(1,10))
+  assert ma['schema_versions']==list(range(1,9));assert ma['assets']==mb['assets'];assert mb['schema_versions']==list(range(1,11))
   with tempfile.TemporaryDirectory(prefix='noteapp-custom-upgrade-compare-') as tmp:
    roots=[]
    for i,bundle in enumerate([source,upgraded]):
@@ -42,7 +42,7 @@ def main():
      q='SELECT * FROM "'+table.replace('"','""')+'"'
      if table=='schema_migrations':q+=' WHERE version<=8'
      assert Counter(a.execute(q).fetchall())==Counter(b.execute(q).fetchall()),table
-  print('PASS actual schema8 backup upgraded to9:',len(tables),'original tables unchanged except added migration9; attachments unchanged',flush=True)
+  print('PASS actual schema8 backup upgraded to10:',len(tables),'original tables unchanged except added migrations9/10; attachments unchanged',flush=True)
   p=request(base,'/projects',{'title':'Isolated custom property restore test'})
   n=request(base,'/projects/'+p['id']+'/pages',{'title':'Restored properties'})
   for kind,value in [('text','实际恢复演练中文'),('url','https://example.com/restore'),('single_select','x1'),('multi_select',['x1','x2'])]:

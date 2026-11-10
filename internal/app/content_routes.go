@@ -11,7 +11,11 @@ import (
 
 func registerTasks(mux *http.ServeMux, t *task.Service) {
 	mux.HandleFunc("GET /api/v1/projects/{id}/tasks", func(w http.ResponseWriter, r *http.Request) {
-		v, err := t.List(r.Context(), r.PathValue("id"))
+		list := t.List
+		if r.URL.Query().Get("include_body") == "false" {
+			list = t.ListProperties
+		}
+		v, err := list(r.Context(), r.PathValue("id"))
 		respond(w, 200, v, err)
 	})
 	mux.HandleFunc("POST /api/v1/projects/{id}/tasks", func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +53,11 @@ func registerTasks(mux *http.ServeMux, t *task.Service) {
 
 func registerPages(mux *http.ServeMux, pg *page.Service) {
 	mux.HandleFunc("GET /api/v1/projects/{id}/pages", func(w http.ResponseWriter, r *http.Request) {
-		v, err := pg.List(r.Context(), r.PathValue("id"))
+		list := pg.List
+		if r.URL.Query().Get("include_body") == "false" {
+			list = pg.ListProperties
+		}
+		v, err := list(r.Context(), r.PathValue("id"))
 		respond(w, 200, v, err)
 	})
 	mux.HandleFunc("POST /api/v1/projects/{id}/pages", func(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +95,11 @@ func registerPages(mux *http.ServeMux, pg *page.Service) {
 
 func registerEvents(mux *http.ServeMux, events *event.Service) {
 	mux.HandleFunc("GET /api/v1/projects/{id}/events", func(w http.ResponseWriter, r *http.Request) {
-		v, e := events.List(r.Context(), r.PathValue("id"), r.URL.Query().Get("from"), r.URL.Query().Get("to"))
+		list := events.List
+		if r.URL.Query().Get("include_body") == "false" {
+			list = events.ListProperties
+		}
+		v, e := list(r.Context(), r.PathValue("id"), r.URL.Query().Get("from"), r.URL.Query().Get("to"))
 		respond(w, 200, v, e)
 	})
 	mux.HandleFunc("POST /api/v1/projects/{id}/events", func(w http.ResponseWriter, r *http.Request) {

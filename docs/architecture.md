@@ -56,7 +56,9 @@ apperr包含invalid、not_found、conflict和too_large类别。HTTP适配层统�
 
 schema7校验/迁移全部对象（包含归档和回收站）后删除旧Markdown列。已有块数据原样保留；非空旧正文须先使用锁定BlockNote解析器准备，Go迁移检查源SHA256和块结构，在同一事务中复制、删列、删准备表及记录版本，失败回滚。数据库为块字段提供非null空文档默认值和JSON基础CHECK。完整应用级结构仍由document.Validate把关。
 
-搜索使用SQLite json_tree从块的text与附件name读取文本，不保存第二份正文或Markdown投影；不会把块ID、类型名、附件URL或样式值当正文搜索。属性、移动、归档、关联和批次恢复沿用现有事务边界。当前JSON搜索适合个人规模，未引入全文索引。
+schema10使用SQLite内建FTS5 trigram索引。search_documents仅保存从标题及块text/附件name派生的搜索文本；search_fts为其外部内容索引。它们不提供正文写入接口，可以从源对象重建，块JSON仍是唯一编辑与导出来源。SQLite触发器在源写入同一事务内更新索引，软删移除、批次恢复重建；归档过滤实时读取项目状态。不会把块ID、类型名、附件URL或样式值当正文搜索。
+
+搜索保留LIKE子串语义，而非改成按词MATCH。一般查询通过trigram加速；少于三个字符及需ESCAPE的字面符号查询在派生文本上匹配，避免查询时解析完整JSON。匹配ID只物化一次，再求总数、排序分页；独立正文仍不改变。索引增加磁盘占用及正文更新成本，不能声称任意规模/查询都为常数时间。
 
 ## 稳定性边界（schema8）
 
@@ -92,3 +94,10 @@ app负责应用级路由、项目上下文和任务交互编排；features按项
 .ts和.tsx同属TypeScript，.tsx允许React界面语法。旧MarkdownPreview及其仅有的react-markdown/remark-gfm/rehype-highlight依赖已移除；LazyBlockEditor明确指向BlockNote，Markdown仍作为原生编辑器的导入/导出格式，不存在第二套正文编辑或服务端存储。
 
 本轮保留业务服务直接使用SQLite的局部耦合，不以空泛接口包装全部SQL。App.tsx仍承载应用级状态，后续只有新增职责或测量证明需要时才进一步拆分；本次未声称达到完全与存储无关的领域层。
+
+
+## 集合按属性读取
+
+任务/笔记/日程集合支持include_body=false，在SQL投影中不读取body_document，响应省略该字段；未指定参数继续返回完整对象以保持兼容。正式前端集合只请求属性，详情GET、创建、更新返回完整块正文。TypeScript使用Omit<完整对象,"body_document">区分集合类型，不能直接传给编辑器；属性缓存和完整详情缓存分别维护，拖动后也不会把完整正文写回集合缓存。
+
+实测规模、搜索/集合修复结果与限制见[性能验证记录](evidence/search-collections-20261110/README.md)。

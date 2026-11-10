@@ -21,7 +21,7 @@ type Task struct {
 	ProjectID    string          `json:"project_id"`
 	ParentID     *string         `json:"parent_id"`
 	Title        string          `json:"title"`
-	BodyDocument json.RawMessage `json:"body_document"`
+	BodyDocument json.RawMessage `json:"body_document,omitempty"`
 	Stage        string          `json:"stage"`
 	Priority     string          `json:"priority"`
 	DueDate      *string         `json:"due_date"`
@@ -73,10 +73,22 @@ func read(ctx context.Context, q querier, tid string) (Task, error) {
 }
 func (s *Service) Get(ctx context.Context, tid string) (Task, error) { return read(ctx, s.db, tid) }
 func (s *Service) List(ctx context.Context, pid string) ([]Task, error) {
+	return s.list(ctx, pid, true)
+}
+
+// ListProperties reads collection attributes without fetching block documents.
+func (s *Service) ListProperties(ctx context.Context, pid string) ([]Task, error) {
+	return s.list(ctx, pid, false)
+}
+func (s *Service) list(ctx context.Context, pid string, includeBody bool) ([]Task, error) {
 	if _, err := project.Read(ctx, s.db, pid); err != nil {
 		return nil, err
 	}
-	rows, err := s.db.QueryContext(ctx, "SELECT "+columns+" FROM tasks WHERE project_id=? AND deleted_at IS NULL ORDER BY position,id", pid)
+	selectedColumns := columns
+	if !includeBody {
+		selectedColumns = strings.Replace(columns, "body_document", "NULL AS body_document", 1)
+	}
+	rows, err := s.db.QueryContext(ctx, "SELECT "+selectedColumns+" FROM tasks WHERE project_id=? AND deleted_at IS NULL ORDER BY position,id", pid)
 	if err != nil {
 		return nil, err
 	}

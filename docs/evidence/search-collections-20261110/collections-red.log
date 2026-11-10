@@ -1,0 +1,5 @@
+--- FAIL: TestCollectionPropertiesOmitBodyButDetailsStayComplete (0.02s)
+    collection_properties_test.go:46: tasks full=false body=true
+FAIL
+FAIL	noteapp/internal/app	0.610s
+FAIL

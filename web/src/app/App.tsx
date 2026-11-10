@@ -23,7 +23,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, abandonCreateIntent, stages, priorities, type Project, type Task } from "./api";
+import { api, abandonCreateIntent, stages, priorities, propertiesOf, type Project, type Task as FullTask, type TaskProperties as Task } from "./api";
 import { ProjectForm } from "../features/project/ProjectForm";
 import { ProjectOverview } from "../features/project/ProjectOverview";
 import { TaskSummary } from "../features/task/TaskSummary";
@@ -101,12 +101,12 @@ export function App() {
   const overviewBackground=useOverviewBackground(projectId);
   const tasks = useQuery({
     queryKey: ["tasks", projectId],
-    queryFn: () => api<Task[]>("/projects/" + projectId + "/tasks"),
+    queryFn: () => api<Task[]>("/projects/" + projectId + "/tasks?include_body=false"),
     enabled: !!projectId && (!/\/(pages|events)(?:\/|$)/.test(path) || overviewBackground),
   });
   const detail = useQuery({
     queryKey: ["task", taskId],
-    queryFn: () => api<Task>("/tasks/" + taskId),
+    queryFn: () => api<FullTask>("/tasks/" + taskId),
     enabled: !!taskId,
   });
   useEffect(() => {
@@ -175,7 +175,7 @@ export function App() {
     ]);
   };
   const saveTask = async (draft: TaskDraft, version: number) => {
-    const next = await api<Task>("/tasks/" + taskId, "PATCH", {
+    const next = await api<FullTask>("/tasks/" + taskId, "PATCH", {
       ...draft,
       version,
     });
@@ -197,8 +197,8 @@ export function App() {
     setStageBusy(true);
     setError("");
     const replaceTask = (next: Task) => {
-      qc.setQueryData<Task[]>(key, items => items?.map(item => item.id === id ? next : item));
-      qc.setQueryData(["task", id], next);
+      qc.setQueryData<Task[]>(key, items => items?.map(item => item.id === id ? propertiesOf(next) : item));
+      if ("body_document" in next) qc.setQueryData(["task", id], next);
     };
     const refreshStageDependents = () => { void Promise.all([
       qc.invalidateQueries({queryKey:["relations"]}),
@@ -209,14 +209,14 @@ export function App() {
       await qc.cancelQueries({queryKey:key, exact:true});
       // Keep the server version until PATCH acknowledges the optimistic move.
       qc.setQueryData<Task[]>(key, items => items?.map(item => item.id === id ? {...item, stage} : item));
-      const next = await api<Task>(`/tasks/${id}`, "PATCH", { version: task.version, stage });
+      const next = await api<FullTask>(`/tasks/${id}`, "PATCH", { version: task.version, stage });
       replaceTask(next);
       refreshStageDependents();
     } catch (e) {
       // A lost response may still mean the write succeeded. Read the authoritative
       // version before allowing another move; never guess a new CAS version.
       try {
-        const actual = await api<Task>(`/tasks/${id}`);
+        const actual = await api<FullTask>(`/tasks/${id}`);
         replaceTask(actual);
         refreshStageDependents();
         if (actual.stage !== stage) setError("阶段更新失败，请重试：" + (e as Error).message);
@@ -515,7 +515,7 @@ export function App() {
                           parentOptions={all.filter(t => !t.parent_id && t.id !== taskId)}
                           hasChildren={all.some(t => t.parent_id === taskId)}
                           onParentChange={async (parentId, version) => {
-                            const next = await api<Task>("/tasks/" + taskId + "/move", "POST", {parent_id: parentId || null, position: all.filter(t => (t.parent_id ?? "") === parentId && t.id !== taskId).length, version});
+                            const next = await api<FullTask>("/tasks/" + taskId + "/move", "POST", {parent_id: parentId || null, position: all.filter(t => (t.parent_id ?? "") === parentId && t.id !== taskId).length, version});
                             qc.setQueryData(["task", taskId], next);
                             await invalidate();
                             setEditorEpoch(n => n + 1);
@@ -551,7 +551,7 @@ export function App() {
                         try {
                           const input = { title: newTitle, parent_id: newParent || null, ...(newStage!=="todo"?{stage:newStage}:{}) };
                           createAttempts.current.push(input);
-                          const t = await api<Task>(
+                          const t = await api<FullTask>(
                             "/projects/" + projectId + "/tasks",
                             "POST",
                             input,

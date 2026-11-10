@@ -10,7 +10,7 @@ vi.mock("@fullcalendar/react", () => ({
     return <div data-testid="calendar" />;
   },
 }));
-vi.mock("../../app/api", () => ({ api: vi.fn(), abandonCreateIntent: vi.fn() }));
+vi.mock("../../app/api", async (original) => ({ ...await original<typeof import("../../app/api")>(), api: vi.fn(), abandonCreateIntent: vi.fn() }));
 beforeEach(() => {
   vi.mocked(api).mockReset();
   vi.mocked(api).mockImplementation(async (_path, method) =>

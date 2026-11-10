@@ -1,5 +1,5 @@
 import { useRef, useMemo, type DragEvent } from 'react';
-import { type Task, stages, priorities } from '../../app/api';
+import { type TaskProperties as Task, stages, priorities } from '../../app/api';
 import './task-board.css';
 
 type TaskBoardProps = {

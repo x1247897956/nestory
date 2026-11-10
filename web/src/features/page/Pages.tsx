@@ -27,6 +27,7 @@ export type Page = {
   created_at?: number;
   updated_at?: number;
 };
+export type PageProperties = Omit<Page, "body_document">;
 export function Pages({
   projectId,
   projectTitle = "项目",
@@ -60,7 +61,7 @@ export function Pages({
   const [epoch, setEpoch] = useState(0);
   const list = useQuery({
     queryKey: ["pages", projectId],
-    queryFn: () => api<Page[]>("/projects/" + projectId + "/pages"),
+    queryFn: () => api<PageProperties[]>("/projects/" + projectId + "/pages?include_body=false"),
   });
   const detail = useQuery({
     queryKey: ["page", pageId],

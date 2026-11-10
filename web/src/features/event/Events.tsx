@@ -22,7 +22,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import luxonPlugin from "@fullcalendar/luxon3";
 import zhCN from "@fullcalendar/core/locales/zh-cn";
 import { DateTime } from "luxon";
-import { api, abandonCreateIntent } from "../../app/api";
+import { api, propertiesOf, abandonCreateIntent } from "../../app/api";
 import { toInput, fromInput } from "./time";
 export type CalendarEvent = {
   id: string;
@@ -33,6 +33,7 @@ export type CalendarEvent = {
   end_at: string;
   version: number;
 };
+export type EventProperties = Omit<CalendarEvent, "body_document">;
 function validTimes(start: string, end: string, zone: string) {
   const a = DateTime.fromISO(start, { zone });
   const b = DateTime.fromISO(end, { zone });
@@ -128,8 +129,8 @@ export function Events({
   const events = useQuery({
     queryKey: ["events", projectId, queryRange],
     queryFn: () =>
-      api<CalendarEvent[]>(
-        "/projects/" + projectId + "/events?" + new URLSearchParams(queryRange!),
+      api<EventProperties[]>(
+        "/projects/" + projectId + "/events?" + new URLSearchParams({...queryRange!,include_body:"false"}),
       ),
     enabled: !!zone && !!queryRange,
   });
@@ -209,8 +210,8 @@ export function Events({
   const reconcile = async (id: string, owner: string) => {
     const next = await api<CalendarEvent>("/events/" + id);
     qc.setQueryData(["event", id], next);
-    qc.setQueriesData<CalendarEvent[]>({ queryKey: ["events", owner] },
-      (old) => old?.map((item) => item.id === id ? next : item));
+    qc.setQueriesData<EventProperties[]>({ queryKey: ["events", owner] },
+      (old) => old?.map((item) => item.id === id ? propertiesOf(next) : item));
     setUnresolvedByProject((old) => { const next = { ...old }; delete next[owner]; return next; });
   };
   const changeEvent = async (info: EventChangeArg) => {
@@ -238,7 +239,7 @@ export function Events({
         version: original.version,
       });
       qc.setQueryData(["event", original.id], next);
-      qc.setQueriesData<CalendarEvent[]>({ queryKey: ["events", owner] }, (old) => old?.map((item) => item.id === next.id ? next : item));
+      qc.setQueriesData<EventProperties[]>({ queryKey: ["events", owner] }, (old) => old?.map((item) => item.id === next.id ? propertiesOf(next) : item));
       if (currentProject.current === owner) await refresh();
     } catch (e) {
       try {

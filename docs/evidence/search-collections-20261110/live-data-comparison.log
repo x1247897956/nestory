@@ -1,0 +1,2 @@
+PASS schema9→10: 14 original tables/rows unchanged, source block JSON unchanged, attachments unchanged; 0 derived search entries verified
+Database bytes before/after: [258048, 290816]

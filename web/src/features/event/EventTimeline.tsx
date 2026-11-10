@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon';
 import type { CSSProperties } from 'react';
-import type { CalendarEvent } from './Events';
+import type { EventProperties } from './Events';
 import { barGeometry, dayPosition, timelineRange, type TimelineSpan } from './timeline';
 import './timeline.css';
-export function EventTimeline({events,date,span,zone,onDateChange,onSpanChange,onOpen,loading,error,onRetry}:{events:CalendarEvent[];date:string;span:TimelineSpan;zone:string;onDateChange:(date:string)=>void;onSpanChange:(span:TimelineSpan)=>void;onOpen:(id:string)=>void;loading:boolean;error:boolean;onRetry:()=>void}) {
+export function EventTimeline({events,date,span,zone,onDateChange,onSpanChange,onOpen,loading,error,onRetry}:{events:EventProperties[];date:string;span:TimelineSpan;zone:string;onDateChange:(date:string)=>void;onSpanChange:(span:TimelineSpan)=>void;onOpen:(id:string)=>void;loading:boolean;error:boolean;onRetry:()=>void}) {
  const range=timelineRange(date,span,zone);
  const now=DateTime.now().setZone(zone);
  const today=dayPosition(now.startOf('day'),range.start);

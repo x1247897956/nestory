@@ -54,7 +54,7 @@ def main():
    out['asset_sha256']=hashlib.sha256(get('/assets/a')).hexdigest();assert out['asset_sha256']==hashlib.sha256(b'audit').hexdigest()
    run('docker','stop',name);copied=pathlib.Path(work)/'upgraded.db';run('docker','cp',name+':/data/noteapp.db',str(copied))
    with sqlite3.connect(copied) as db:
-    out['schema']=db.execute('SELECT max(version) FROM schema_migrations').fetchone()[0];assert out['schema']==9
+    out['schema']=db.execute('SELECT max(version) FROM schema_migrations').fetchone()[0];assert out['schema']==10
     out['integrity']=db.execute('PRAGMA integrity_check').fetchone()[0];assert out['integrity']=='ok';assert not db.execute('PRAGMA foreign_key_check').fetchall()
    print(json.dumps(out,ensure_ascii=False,indent=2))
   finally:run('docker','rm','-f',name);run('docker','volume','rm',name)

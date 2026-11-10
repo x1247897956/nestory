@@ -25,3 +25,6 @@ var CreationRequests string
 
 //go:embed 009_custom_properties.sql
 var CustomProperties string
+
+//go:embed 010_search_index.sql
+var SearchIndex string

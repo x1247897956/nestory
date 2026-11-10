@@ -25,6 +25,13 @@ export type Task = {
   created_at: number;
   updated_at: number;
 };
+// Collections intentionally cannot be passed to an editor as complete documents.
+export type TaskProperties = Omit<Task, "body_document">;
+export function propertiesOf<T extends object>(value: T): Omit<T, "body_document"> {
+  const properties = {...value};
+  delete (properties as {body_document?: unknown}).body_document;
+  return properties;
+}
 export const stages = [
   ["todo", "Todo"],
   ["in_plan", "InPlan"],

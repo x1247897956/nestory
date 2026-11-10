@@ -19,7 +19,7 @@ type Event struct {
 	ID           string          `json:"id"`
 	ProjectID    string          `json:"project_id"`
 	Title        string          `json:"title"`
-	BodyDocument json.RawMessage `json:"body_document"`
+	BodyDocument json.RawMessage `json:"body_document,omitempty"`
 	StartAt      string          `json:"start_at"`
 	EndAt        string          `json:"end_at"`
 	CreatedAt    int64           `json:"created_at"`
@@ -79,6 +79,14 @@ func interval(a, b string) (int64, int64, error) {
 	return x.UnixMilli(), y.UnixMilli(), nil
 }
 func (s *Service) List(ctx context.Context, pid, from, to string) ([]Event, error) {
+	return s.list(ctx, pid, from, to, true)
+}
+
+// ListProperties reads collection attributes without fetching block documents.
+func (s *Service) ListProperties(ctx context.Context, pid, from, to string) ([]Event, error) {
+	return s.list(ctx, pid, from, to, false)
+}
+func (s *Service) list(ctx context.Context, pid, from, to string, includeBody bool) ([]Event, error) {
 	a, b, e := interval(from, to)
 	if e != nil {
 		return nil, e
@@ -89,7 +97,11 @@ func (s *Service) List(ctx context.Context, pid, from, to string) ([]Event, erro
 	if _, e = project.Read(ctx, s.db, pid); e != nil {
 		return nil, e
 	}
-	rows, e := s.db.QueryContext(ctx, "SELECT "+columns+" FROM events WHERE project_id=? AND deleted_at IS NULL AND start_at<? AND end_at>? ORDER BY start_at,id", pid, b, a)
+	selectedColumns := columns
+	if !includeBody {
+		selectedColumns = strings.Replace(columns, "body_document", "NULL AS body_document", 1)
+	}
+	rows, e := s.db.QueryContext(ctx, "SELECT "+selectedColumns+" FROM events WHERE project_id=? AND deleted_at IS NULL AND start_at<? AND end_at>? ORDER BY start_at,id", pid, b, a)
 	if e != nil {
 		return nil, e
 	}

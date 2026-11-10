@@ -137,5 +137,16 @@ func migrate(ctx context.Context, db *sql.DB) error {
 			return err
 		}
 	}
+	if err = tx.QueryRowContext(ctx, "SELECT count(*) FROM schema_migrations WHERE version=10").Scan(&n); err != nil {
+		return err
+	}
+	if n == 0 {
+		if _, err = tx.ExecContext(ctx, migrations.SearchIndex); err != nil {
+			return err
+		}
+		if _, err = tx.ExecContext(ctx, "INSERT INTO schema_migrations VALUES(10,?)", time.Now().UnixMilli()); err != nil {
+			return err
+		}
+	}
 	return tx.Commit()
 }

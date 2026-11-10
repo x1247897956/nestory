@@ -36,7 +36,7 @@ test('note custom snapshot failure and deleted definitions do not match empty; a
 test('absolute note timestamp filters wait for timezone and use local date rather than UTC',async({page,request})=>{
  const p=await(await request.post('/api/v1/projects',{data:{title:'Note date zone'}})).json();
  await page.addInitScript(pid=>localStorage.setItem(`noteapp:page-filters:v1:${pid}`,JSON.stringify([{id:'date-rule',field:'created_at',op:'before',value:'2026-10-28'}])),p.id);
- await page.route(`**/api/v1/projects/${p.id}/pages`,route=>route.fulfill({json:[{id:'before',project_id:p.id,title:'Local October 27',position:0,version:1,created_at:Date.parse('2026-10-27T15:30:00Z')},{id:'after',project_id:p.id,title:'Local October 28',position:1,version:1,created_at:Date.parse('2026-10-27T16:30:00Z')}]}));
+ await page.route(url=>url.pathname===`/api/v1/projects/${p.id}/pages`,route=>route.fulfill({json:[{id:'before',project_id:p.id,title:'Local October 27',position:0,version:1,created_at:Date.parse('2026-10-27T15:30:00Z')},{id:'after',project_id:p.id,title:'Local October 28',position:1,version:1,created_at:Date.parse('2026-10-27T16:30:00Z')}]}));
  let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;});await page.route('**/api/v1/config',async route=>{await gate;await route.continue();});
  try{await page.goto(`/projects/${p.id}/pages`);await expect(page.getByText('正在加载筛选数据…',{exact:true})).toBeVisible();await expect(page.locator('.page-list-row a')).toHaveCount(0);}finally{release();}
  await expect(page.locator('.page-list-row a')).toHaveText(['Local October 27']);

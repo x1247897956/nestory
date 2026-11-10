@@ -8,6 +8,8 @@ import math
 import pathlib
 import platform
 import statistics
+import sqlite3
+import tempfile
 import subprocess
 import time
 import urllib.request
@@ -87,6 +89,11 @@ def measure(args, count):
                  'events': '/projects/' + pid + '/events?from=2026-11-01T00:00:00Z&to=2026-12-01T00:00:00Z',
                  'search_miss': '/search?q=no-match-perf-token', 'search_body': '/search?q=searchable',
                  'workspace': '/workspace?from=2026-11-01T00:00:00Z&to=2026-12-01T00:00:00Z'}
+        if args.properties:
+            paths.update({key + '_properties': path + ('&' if '?' in path else '?') + 'include_body=false'
+                          for key, path in list(paths.items()) if key in ('tasks', 'pages', 'events')})
+            paths['search_short'] = '/search?q=%E4%B8%AD%E6%96%87'
+            paths['search_literal'] = '/search?q=%25'
         for path in paths.values():
             for _ in range(3):
                 request(path)
@@ -126,6 +133,15 @@ def measure(args, count):
                   'concurrent': {'search_ms': search_times, 'save_ms': elapsed},
                   'memory_sample': run('docker', 'stats', '--no-stream', '--format', '{{json .}}', name)})
             print(f'count={count} round={round_number + 1} finished', flush=True)
+        result['storage_files_kib'] = run('docker', 'exec', name, 'sh', '-c', 'du -k /data/noteapp.db*')
+        # Snapshot only this synthetic database after measurements and a clean stop.
+        # dbstat accounts for the derived index's disk cost; it is not timed API work.
+        run('docker', 'stop', name)
+        with tempfile.TemporaryDirectory(prefix='nestory-perf-storage-') as work:
+            path = pathlib.Path(work) / 'noteapp.db'
+            run('docker', 'cp', name + ':/data/noteapp.db', str(path))
+            with sqlite3.connect(path.as_uri() + '?mode=ro', uri=True) as db:
+                result['storage_pages_bytes'] = dict(db.execute('SELECT name,sum(pgsize) FROM dbstat GROUP BY name'))
         result['success'] = True
         return result
     except Exception as error:
@@ -148,6 +164,7 @@ def main():
     parser.add_argument('--counts', type=int, nargs='+', default=[100, 1000, 5000])
     parser.add_argument('--rounds', type=int, default=3)
     parser.add_argument('--samples', type=int, default=20)
+    parser.add_argument('--properties', action='store_true', help='Also measure the attribute-only collection paths used by the UI')
     parser.add_argument('--output', type=pathlib.Path, required=True)
     args = parser.parse_args()
     if min(args.counts + [args.rounds, args.samples]) < 1:

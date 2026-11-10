@@ -104,48 +104,6 @@ type SearchResult struct {
 
 const union = `SELECT 'projects' type,p.id,p.title,p.description body,p.id project_id,p.title project_title,p.archived_at,p.updated_at FROM projects p WHERE p.deleted_at IS NULL UNION ALL SELECT 'tasks',o.id,o.title,(SELECT coalesce(group_concat(j.value,char(10)),'') FROM json_tree(o.body_document) j WHERE j.key IN ('text','name') AND j.type='text'),p.id,p.title,p.archived_at,o.updated_at FROM tasks o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL UNION ALL SELECT 'pages',o.id,o.title,(SELECT coalesce(group_concat(j.value,char(10)),'') FROM json_tree(o.body_document) j WHERE j.key IN ('text','name') AND j.type='text'),p.id,p.title,p.archived_at,o.updated_at FROM pages o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL UNION ALL SELECT 'events',o.id,o.title,(SELECT coalesce(group_concat(j.value,char(10)),'') FROM json_tree(o.body_document) j WHERE j.key IN ('text','name') AND j.type='text'),p.id,p.title,p.archived_at,o.updated_at FROM events o JOIN projects p ON p.id=o.project_id WHERE o.deleted_at IS NULL`
 
-func (s *Service) Search(ctx context.Context, q string, archived bool, limit, offset int) (SearchResult, error) {
-	if limit < 1 || limit > 100 || offset < 0 {
-		return SearchResult{}, apperr.Invalid("分页范围无效")
-	}
-	v := SearchResult{Items: []Item{}, Limit: limit, Offset: offset}
-	q = strings.TrimSpace(q)
-	if q == "" {
-		return v, nil
-	}
-	q = "%" + strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(q) + "%"
-	where := ` WHERE (? OR archived_at IS NULL) AND (title LIKE ? ESCAPE '\' OR body LIKE ? ESCAPE '\')`
-	e := s.db.QueryRowContext(ctx, "SELECT count(*) FROM ("+union+")"+where, archived, q, q).Scan(&v.Total)
-	if e != nil {
-		return v, e
-	}
-	rows, e := s.db.QueryContext(ctx, "SELECT type,id,title,project_id,project_title,archived_at IS NOT NULL,updated_at FROM ("+union+")"+where+" ORDER BY updated_at DESC,id,type LIMIT ? OFFSET ?", archived, q, q, limit, offset)
-	if e != nil {
-		return v, e
-	}
-	for rows.Next() {
-		var it Item
-		if e = rows.Scan(&it.Type, &it.ID, &it.Title, &it.ProjectID, &it.ProjectTitle, &it.Archived, &it.UpdatedAt); e != nil {
-			rows.Close()
-			return v, e
-		}
-		v.Items = append(v.Items, it)
-	}
-	e = rows.Err()
-	rows.Close()
-	if e != nil {
-		return v, e
-	}
-	for i := range v.Items {
-		if v.Items[i].Type == "pages" {
-			v.Items[i].Path, e = s.path(ctx, v.Items[i].ID)
-			if e != nil {
-				return v, e
-			}
-		}
-	}
-	return v, nil
-}
 func (s *Service) path(ctx context.Context, key string) (string, error) {
 	var parts []string
 	seen := map[string]bool{}

@@ -1,0 +1,29 @@
+go: downloading golang.org/x/perf v0.0.0-20261009192801-be2c69fb417e
+go: downloading github.com/aclements/go-moremath v0.0.0-20210112150236-f10218a38794
+goos: darwin
+goarch: arm64
+pkg: noteapp/internal/workspace
+cpu: Apple M5
+                             │ docs/evidence/backend-performance-20261110/search-benchmark.log │ /tmp/nestory-search-optimized-bench.log │
+                             │                             sec/op                              │      sec/op       vs base               │
+Search/per_type=1000/miss-10                                                     49033.7µ ± 3%       703.6µ ±  5%  -98.57% (p=0.002 n=6)
+Search/per_type=1000/body-10                                                       61.75m ± 1%       17.32m ± 24%  -71.96% (p=0.002 n=6)
+Search/per_type=5000/miss-10                                                    250382.5µ ± 1%       667.6µ ±  0%  -99.73% (p=0.002 n=6)
+Search/per_type=5000/body-10                                                      315.50m ± 1%       99.40m ± 92%  -68.50% (p=0.002 n=6)
+geomean                                                                            124.4m            5.332m        -95.71%
+
+                             │ docs/evidence/backend-performance-20261110/search-benchmark.log │ /tmp/nestory-search-optimized-bench.log │
+                             │                              B/op                               │       B/op        vs base               │
+Search/per_type=1000/miss-10                                                     10.469Ki ± 0%       2.266Ki ± 0%  -78.36% (p=0.002 n=6)
+Search/per_type=1000/body-10                                                      28.82Ki ± 0%       19.86Ki ± 0%  -31.10% (p=0.002 n=6)
+Search/per_type=5000/miss-10                                                     10.469Ki ± 0%       2.266Ki ± 0%  -78.36% (p=0.002 n=6)
+Search/per_type=5000/body-10                                                      28.84Ki ± 0%       19.74Ki ± 3%  -31.56% (p=0.002 n=6)
+geomean                                                                           17.37Ki            6.697Ki       -61.45%
+
+                             │ docs/evidence/backend-performance-20261110/search-benchmark.log │ /tmp/nestory-search-optimized-bench.log │
+                             │                            allocs/op                            │    allocs/op      vs base               │
+Search/per_type=1000/miss-10                                                        47.00 ± 0%         32.00 ± 0%  -31.91% (p=0.002 n=6)
+Search/per_type=1000/body-10                                                        335.0 ± 0%         491.0 ± 0%  +46.57% (p=0.002 n=6)
+Search/per_type=5000/miss-10                                                        47.00 ± 0%         32.00 ± 0%  -31.91% (p=0.002 n=6)
+Search/per_type=5000/body-10                                                        335.0 ± 0%         491.0 ± 0%  +46.57% (p=0.002 n=6)
+geomean                                                                             125.5              125.3        -0.10%

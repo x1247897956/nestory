@@ -5,7 +5,7 @@ import {ObjectEditorHeader, ObjectEditorBody, ObjectEditorFooter} from "../../co
 import { useState } from "react";
 import { LazyBlockEditor } from "../../components/editor/LazyBlockEditor";
 import { useAutosave } from "../../components/editor/useAutosave";
-import type { Task } from "../../app/api";
+import type { Task, TaskProperties } from "../../app/api";
 import { stages, priorities } from "../../app/api";
 export type TaskDraft = {
   title: string;
@@ -32,8 +32,8 @@ export function TaskEditor({
   onReload,
 }: {
   task: Task;
-  parent?: Task;
-  parentOptions?: Task[];
+  parent?: TaskProperties;
+  parentOptions?: TaskProperties[];
   hasChildren?: boolean;
   onParentChange?: (parentId: string, version: number) => Promise<void>;
   archived: boolean;

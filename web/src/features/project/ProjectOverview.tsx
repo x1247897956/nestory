@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { api, stages, type Task } from "../../app/api";
+import { api, stages, type TaskProperties as Task } from "../../app/api";
 import { displayTime } from "../event/time";
 
 type Item = { id: string; type: string; title: string; path?: string; start_at?: string; end_at?: string };

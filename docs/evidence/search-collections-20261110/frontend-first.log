@@ -1,0 +1,237 @@
+
+> noteapp-web@0.1.0 test
+> vitest --run
+
+
+ RUN  v4.1.12 /Users/seyr1n/01-Project/noteapp/web
+
+ ❯ src/features/event/Events.test.tsx (7 tests | 2 failed) 5774ms
+   × saves drag changes with only original version and times, and reconciles a failed response 1022ms
+   × blocks dragging when reconciliation fails and resumes only after explicit synchronization 1044ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/event/Events.test.tsx > saves drag changes with only original version and times, and reconciles a failed response
+AssertionError: expected '2026-10-24T01:00:00Z' to be '2026-10-24T03:00:00Z' // Object.is equality
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <div
+        class="calendar-workspace collection-workspace"
+        data-dirty="false"
+      >
+        <section
+          aria-label="项目日历"
+        >
+          <div
+            class="collection-heading"
+          >
+            <header
+              class="collection-header"
+            >
+              <div
+                class="collection-title"
+              >
+                <h2>
+                  日程
+                </h2>
+                <span
+                  class="collection-count"
+                >
+                  1
+                </span>
+                <span
+                  aria-live="polite"
+                  class="collection-status"
+                />
+              </div>
+              <div
+                class="collection-actions"
+              >
+                <button
+                  class="calendar-new"
+                >
+                  新建日程
+                </button>
+              </div>
+            </header>
+            <div
+              class="collection-toolbar"
+            >
+              <div
+                class="collection-views"
+              >
+                <div
+                  aria-label="日程视图"
+                  class="collection-view-switch"
+                  role="group"
+                >
+                  <button
+                    aria-pressed="true"
+                  >
+                    日历
+                  </button>
+                  <button
+                    aria-pressed="false"
+                  >
+                    时间轴
+                  </button>
+                </div>
+              </div>
+              <div
+                class="collection-tools"
+              />
+            </div>
+          </div>
+          <div
+            data-testid="calendar"
+          />
+          <p
+            role="alert"
+          >
+            保存结果尚未确认，请同步日程后继续拖动。
+          </p>
+          <button>
+            同步日程
+          </button>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
+
+Expected: "2026-10-24T03:00:00Z"
+Received: "2026-10-24T01:00:00Z"
+
+ ❯ src/features/event/Events.test.tsx:128:62
+    126|     }),
+    127|   );
+    128|   await waitFor(() => expect(calendar.props.events[0].start).toBe("202…
+       |                                                              ^
+    129|   expect(revert).not.toHaveBeenCalled();
+    130|   expect(api).toHaveBeenCalledWith("/events/e", "PATCH", {
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/event/Events.test.tsx > blocks dragging when reconciliation fails and resumes only after explicit synchronization
+AssertionError: expected false to be true // Object.is equality
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <div
+        class="calendar-workspace collection-workspace"
+        data-dirty="false"
+      >
+        <section
+          aria-label="项目日历"
+        >
+          <div
+            class="collection-heading"
+          >
+            <header
+              class="collection-header"
+            >
+              <div
+                class="collection-title"
+              >
+                <h2>
+                  日程
+                </h2>
+                <span
+                  class="collection-count"
+                >
+                  1
+                </span>
+                <span
+                  aria-live="polite"
+                  class="collection-status"
+                />
+              </div>
+              <div
+                class="collection-actions"
+              >
+                <button
+                  class="calendar-new"
+                >
+                  新建日程
+                </button>
+              </div>
+            </header>
+            <div
+              class="collection-toolbar"
+            >
+              <div
+                class="collection-views"
+              >
+                <div
+                  aria-label="日程视图"
+                  class="collection-view-switch"
+                  role="group"
+                >
+                  <button
+                    aria-pressed="true"
+                  >
+                    日历
+                  </button>
+                  <button
+                    aria-pressed="false"
+                  >
+                    时间轴
+                  </button>
+                </div>
+              </div>
+              <div
+                class="collection-tools"
+              />
+            </div>
+          </div>
+          <div
+            data-testid="calendar"
+          />
+          <p
+            role="alert"
+          >
+            同步失败，保存结果仍未确认，请重试同步。
+          </p>
+          <button>
+            同步日程
+          </button>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/features/event/Events.test.tsx:179:55
+    177|   online = true;
+    178|   fireEvent.click(screen.getByRole("button", { name: "同步日程" }));
+    179|   await waitFor(() => expect(calendar.props.editable).toBe(true));
+       |                                                       ^
+    180|   act(() => calendar.props.eventChange({ event: { id: "e", start: new …
+    181|   await waitFor(() => expect(api).toHaveBeenCalledWith("/events/e", "P…
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 21 passed (22)
+      Tests  2 failed | 96 passed (98)
+   Start at  14:52:03
+   Duration  8.61s (transform 1.19s, setup 1.47s, import 2.04s, tests 23.14s, environment 5.35s)
