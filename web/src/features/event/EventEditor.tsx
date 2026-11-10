@@ -3,8 +3,8 @@ import {DateTime} from "luxon";
 import type {BodyDocument} from "../../app/document";
 import type {CalendarEvent} from "./Events";
 import {ObjectEditorHeader, ObjectEditorBody, ObjectEditorFooter} from "../../components/object/ObjectEditor";
-import {MarkdownEditor} from "../../components/markdown/MarkdownEditor";
-import {useAutosave} from "../../components/markdown/useAutosave";
+import {LazyBlockEditor} from "../../components/editor/LazyBlockEditor";
+import {useAutosave} from "../../components/editor/useAutosave";
 import {ObjectProperties} from "../../components/object/ObjectProperties";
 import {ObjectMenu} from "../../components/object/ObjectMenu";
 import {toInput,fromInput} from "./time";
@@ -90,7 +90,7 @@ export function EventEditor({
           />
       </ObjectEditorHeader>
       <ObjectEditorBody>
-      <MarkdownEditor
+      <LazyBlockEditor
         projectId={event.project_id}
         onPendingChange={setBodyPending}
         body_document={a.draft.body_document}

@@ -8,7 +8,7 @@ import { EventEditor } from "./EventEditor";
 export { EventEditor } from "./EventEditor";
 import { ObjectDialog, useOverviewBackground } from "../../components/object/ObjectDialog";
 import "./events.css";
-import { SaveIndicator } from "../../components/markdown/SaveIndicator";
+import { SaveIndicator } from "../../components/editor/SaveIndicator";
 import type { EventChangeArg } from "@fullcalendar/core";
 import type { BodyDocument } from "../../app/document";
 import { useEffect, useRef, useState } from "react";

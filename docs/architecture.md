@@ -1,4 +1,4 @@
-# Noteapp 后端结构
+# Nestory 架构
 
 本文说明当前模块职责、对象模型与事务边界。
 
@@ -7,7 +7,8 @@
 ## 职责和依赖
 
 ```text
-app / asset/http.go        HTTP解析、响应和状态码映射
+app.New                    构造服务、注册HTTP适配器
+app/*_routes.go / asset/http.go   HTTP解析、响应和状态码映射
          ↓
 objectquery               组合对象、项目只读状态、关联的应用查询
          ↓
@@ -20,7 +21,7 @@ apperr                    不含HTTP状态码的应用错误
 platform/database         SQLite连接、迁移
 ```
 
-app仍是依赖组装入口。objectquery通过构造函数接收读取函数，HTTP handler不再负责跨模块查询编排。无需通用Repository或DI框架。
+app.New只负责依赖组装；项目、内容、跨对象和工作台路由分别注册，server.go管理静态资源与Host/Origin/异常保护。objectquery通过构造函数接收读取函数，HTTP handler不再负责跨模块查询编排。无需通用Repository或DI框架。
 
 业务服务继续直接使用database/sql。这里明确保留了业务校验和SQL的局部耦合，尚未引入完整的独立领域层、存储适配层。
 
@@ -68,3 +69,24 @@ schema7校验/迁移全部对象（包含归档和回收站）后删除旧Markdo
 正文编辑器通过React.lazy/Suspense按需加载，集合页不初始化BlockNote；加载失败由局部边界显示重新加载入口。页面按需启用任务查询，笔记/日程页面不额外请求完整任务集合，但汇总来源浮层保留原背景所需数据。
 
 HTTP Host/Origin校验后由httpx.CompressJSON处理GET JSON协商压缩，使用标准库gzip.BestSpeed、Vary: Accept-Encoding。不缓冲完整响应，不改变对象字段；写请求、静态文件、附件、Range、无正文响应和已有编码保持原行为。压缩不替代分页或限制解码内存，数据库和事务边界不变。
+
+## 语言与运行边界
+
+| 位置 | 语言 | 是否属于正式运行服务 |
+| --- | --- | --- |
+| cmd / internal | Go | 是：单一服务提供API与内嵌静态文件 |
+| web/src | TypeScript（.ts/.tsx）、CSS，入口为HTML | 浏览器代码；构建为JavaScript/CSS后由Go提供 |
+| scripts/operations.py | Python标准库 | 否：主机按需执行备份、恢复、健康检查 |
+| scripts/audit / tests | Python、Node、Shell | 否：开发/发布验证 |
+| scripts/prepare-block-migration.mjs | JavaScript ES模块 | 否：只为旧库离线迁移调用BlockNote解析器 |
+| scripts/media | JavaScript与Shell | 否：README素材工具 |
+
+Docker只有构建阶段运行Node和Go工具链；最终运行层只包含Go二进制、系统证书、时区数据及基础系统组件，不包含Python/Node服务。生产启动无需安装Python，也不执行迁移准备脚本；需要备份/恢复脚本时在主机准备Python。
+
+## 前端边界
+
+app负责应用级路由、项目上下文和任务交互编排；features按项目、任务、笔记、日程、工作台等划分。components/editor负责共享原生块编辑、按需加载和串行自动保存；components/object负责详情、固有/自定义属性与关联。view模块共享筛选、排序和偏好规则。
+
+.ts和.tsx同属TypeScript，.tsx允许React界面语法。旧MarkdownPreview及其仅有的react-markdown/remark-gfm/rehype-highlight依赖已移除；LazyBlockEditor明确指向BlockNote，Markdown仍作为原生编辑器的导入/导出格式，不存在第二套正文编辑或服务端存储。
+
+本轮保留业务服务直接使用SQLite的局部耦合，不以空泛接口包装全部SQL。App.tsx仍承载应用级状态，后续只有新增职责或测量证明需要时才进一步拆分；本次未声称达到完全与存储无关的领域层。

@@ -1,0 +1,7 @@
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'noteapp-web@0.1.0',
+npm warn EBADENGINE   required: { node: '26.9.0', npm: '11.19.1' },
+npm warn EBADENGINE   current: { node: 'v26.12.1', npm: '11.20.0' }
+npm warn EBADENGINE }
+
+removed 101 packages in 388ms

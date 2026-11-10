@@ -19,7 +19,7 @@ import {
   getDefaultReactSlashMenuItems,
 } from "@blocknote/react";
 import "@blocknote/ariakit/style.css";
-import "./markdown.css";
+import "./editor.css";
 
 import type { BodyDocument, DocumentFields } from "../../app/document";
 

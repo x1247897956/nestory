@@ -4,7 +4,7 @@ import { renderObjectEditor } from "../test/renderObjectEditor";
 import { PageEditor } from "../features/page/Pages";
 import { EventEditor } from "../features/event/Events";
 import { TaskEditor } from "../features/task/TaskEditor";
-vi.mock("../components/markdown/MarkdownEditor", () => ({ MarkdownEditor: ({ onPendingChange }: { onPendingChange?: (pending: boolean) => void }) => <><button onClick={() => onPendingChange?.(true)}>Start upload</button><button onClick={() => onPendingChange?.(true)}>Start import</button><button onClick={() => onPendingChange?.(false)}>Finish file</button></> }));
+vi.mock("../components/editor/LazyBlockEditor", () => ({ LazyBlockEditor: ({ onPendingChange }: { onPendingChange?: (pending: boolean) => void }) => <><button onClick={() => onPendingChange?.(true)}>Start upload</button><button onClick={() => onPendingChange?.(true)}>Start import</button><button onClick={() => onPendingChange?.(false)}>Finish file</button></> }));
 vi.mock("../components/object/ObjectProperties", () => ({ ObjectProperties: () => null }));
 beforeEach(() => {
   const data = new Map<string, string>();

@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {useQuery,useQueryClient} from '@tanstack/react-query';
 import {DateTime} from 'luxon';
 import {api,ApiError,abandonCreateIntent,type Project} from '../../app/api';
-import {SaveIndicator} from '../../components/markdown/SaveIndicator';
+import {SaveIndicator} from '../../components/editor/SaveIndicator';
 import {fromInput,toInput} from '../event/time';
 import type {CalendarEvent} from '../event/Events';
 import '../event/events.css';

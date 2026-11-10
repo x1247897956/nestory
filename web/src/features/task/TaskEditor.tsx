@@ -3,8 +3,8 @@ import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
 import {ObjectEditorHeader, ObjectEditorBody, ObjectEditorFooter} from "../../components/object/ObjectEditor";
 import { useState } from "react";
-import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
-import { useAutosave } from "../../components/markdown/useAutosave";
+import { LazyBlockEditor } from "../../components/editor/LazyBlockEditor";
+import { useAutosave } from "../../components/editor/useAutosave";
 import type { Task } from "../../app/api";
 import { stages, priorities } from "../../app/api";
 export type TaskDraft = {
@@ -172,7 +172,7 @@ export function TaskEditor({
           />
       </ObjectEditorHeader>
       <ObjectEditorBody>
-        <MarkdownEditor
+        <LazyBlockEditor
           body_document={draft.body_document}
           onChange={(body_document) =>
             setDraft((d) => ({ ...d, body_document }))

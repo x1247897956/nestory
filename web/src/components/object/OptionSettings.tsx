@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from "react";
 import {api,ApiError} from "../../app/api";
-import {useAutosave} from "../markdown/useAutosave";
+import {useAutosave} from "../editor/useAutosave";
 import {PropertyDraftStatus} from "./PropertyDraftStatus";
 import {optionColor,propertyColors,type PropertyDefinition,type PropertyOption} from "./propertyTypes";
 

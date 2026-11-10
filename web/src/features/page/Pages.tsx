@@ -14,8 +14,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, abandonCreateIntent } from "../../app/api";
-import { MarkdownEditor } from "../../components/markdown/MarkdownEditor";
-import { useAutosave } from "../../components/markdown/useAutosave";
+import { LazyBlockEditor } from "../../components/editor/LazyBlockEditor";
+import { useAutosave } from "../../components/editor/useAutosave";
 export type Page = {
   id: string;
   project_id: string;
@@ -282,7 +282,7 @@ export function PageEditor({
       </ObjectEditorHeader>
 
       <ObjectEditorBody>
-      <MarkdownEditor
+      <LazyBlockEditor
         projectId={page.project_id}
         onPendingChange={setBodyPending}
         body_document={a.draft.body_document}

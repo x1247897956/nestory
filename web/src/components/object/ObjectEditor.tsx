@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import {SaveIndicator} from '../markdown/SaveIndicator';
+import {SaveIndicator} from '../editor/SaveIndicator';
 import './object-editor.css';
 
 export function ObjectEditorHeader({title, menu, properties, children}: {title:string; menu:ReactNode; properties:ReactNode; children:ReactNode}) {

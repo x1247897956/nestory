@@ -79,8 +79,8 @@ it("keeps a conflict draft when explicit reload fails", async () => {
   expect(screen.getByLabelText("Markdown 正文")).toHaveValue("keep me");
 });
 
-vi.mock("../components/markdown/MarkdownEditor", () => ({
-  MarkdownEditor: ({
+vi.mock("../components/editor/LazyBlockEditor", () => ({
+  LazyBlockEditor: ({
     body_document,
     onChange,
     disabled,

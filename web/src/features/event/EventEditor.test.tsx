@@ -45,8 +45,8 @@ it("edits in deployment time and preserves Markdown on conflict", async () => {
   expect(save.mock.calls[0][0].start_at).toBe("2026-10-24T01:00:30Z");
 });
 
-vi.mock("../../components/markdown/MarkdownEditor", () => ({
-  MarkdownEditor: ({
+vi.mock("../../components/editor/LazyBlockEditor", () => ({
+  LazyBlockEditor: ({
     body_document,
     onChange,
     disabled,

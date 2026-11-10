@@ -12,6 +12,6 @@ class EditorLoadBoundary extends Component<{children: ReactNode}, {failed: boole
   return this.props.children;
  }
 }
-export function MarkdownEditor(props: Props) {
+export function LazyBlockEditor(props: Props) {
  return <EditorLoadBoundary><Suspense fallback={<p role="status">正在加载编辑器…</p>}><NativeEditor {...props}/></Suspense></EditorLoadBoundary>;
 }

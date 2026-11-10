@@ -84,8 +84,8 @@ it("keeps the mounted editor when background project and task refresh fail", asy
   expect(screen.getByText("有未保存更改")).toBeVisible();
 });
 
-vi.mock("../components/markdown/MarkdownEditor", () => ({
-  MarkdownEditor: ({
+vi.mock("../components/editor/LazyBlockEditor", () => ({
+  LazyBlockEditor: ({
     body_document,
     onChange,
     disabled,

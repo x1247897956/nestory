@@ -34,13 +34,13 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await page.getByRole("link", { name: "笔记", exact: true }).click();
     await page.getByRole("button", { name: "新建笔记", exact: true }).click();
     await page.getByLabel("笔记标题", {exact:true}).fill("完整笔记");
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await expect(page.getByLabel("笔记标题", { exact: true })).toHaveValue(
       "完整笔记",
     );
     const pgid = page.url().split("/").pop()!;
     await importMarkdown(page,'# 真实验收\n\n- [ ] 阅读\n\n```go\nfmt.Println("hello")\n```');
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await page
       .getByLabel("上传附件")
       .setInputFiles({
@@ -49,7 +49,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
         buffer: png,
       });
     await expect(page.locator(".bn-editor img")).toBeVisible();
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await page
       .getByLabel("上传附件")
       .setInputFiles({
@@ -63,7 +63,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
         return assetIDs(value).length;
       })
       .toBe(2);
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await expect(page.locator(".block-editor img")).toBeVisible();
     await expect(page.locator(".block-editor pre code")).toContainText(
       "fmt.Println",
@@ -79,7 +79,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     const parent = page.url().split("/").pop()!;
     await expandProperties(page);
     await page.getByLabel("阶段", { exact: true }).selectOption("done");
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await page.getByRole('link',{name:'任务',exact:true}).click();
   await page.getByRole("button", { name: "添加任务", exact: true }).click();
     await page.getByLabel("新任务标题").fill("读摘要");
@@ -93,7 +93,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     await expandProperties(page);
     await page.getByLabel("截止日期", { exact: true }).fill(today);
     await importMarkdown(page, "- [ ] 独立检查项");
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await expandProperties(page);
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     await page.getByRole("button", {name:"关联 完整笔记",exact:true}).click();
@@ -118,7 +118,7 @@ if (!process.env.NOTEAPP_VERIFY_RESTORED) {
     );
     const eid = page.url().split("/").pop()!;
     await page.getByLabel("Markdown 正文").fill("日程正文可恢复");
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
     await expandProperties(page);
     if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
     for (const label of ["完整笔记", "读摘要 · Todo"]) {

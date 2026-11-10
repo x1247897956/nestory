@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, useLayoutEffect } from "react";
 import { api, ApiError } from "../../app/api";
-import { useAutosave } from "../markdown/useAutosave";
+import { useAutosave } from "../editor/useAutosave";
 import { PropertyDraftStatus } from "./PropertyDraftStatus";
 import { PropertyChoice } from "./PropertyChoice";
 import { PropertySettings } from "./PropertySettings";

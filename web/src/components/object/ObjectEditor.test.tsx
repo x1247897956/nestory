@@ -18,7 +18,7 @@ import {PageEditor} from '../../features/page/Pages';
 import {EventEditor} from '../../features/event/EventEditor';
 vi.mock('./ObjectProperties',()=>({ObjectProperties:({children}:{children?:import('react').ReactNode})=><div data-testid="properties">{children}</div>}));
 vi.mock('./ObjectMenu',()=>({ObjectMenu:()=> <button aria-label="对象菜单"/>}));
-vi.mock('../markdown/MarkdownEditor',()=>({MarkdownEditor:()=> <textarea aria-label="Markdown 正文"/>}));
+vi.mock('../editor/LazyBlockEditor',()=>({LazyBlockEditor:()=> <textarea aria-label="Markdown 正文"/>}));
 const base={id:'e',project_id:'p',title:'Title',body_document:{version:1 as const,blocks:[]},version:1,created_at:0,updated_at:0};
 it.each(['task','page','event'] as const)('%s uses the same structure and keeps archived fields disabled',kind=>{
  const props={archived:true,onSave:async()=>{},onReload:async()=>{}};
