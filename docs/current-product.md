@@ -22,7 +22,7 @@
 
 - [README](../README.md)：运行、配置、当前功能。
 - [架构](architecture.md)：模块、对象、事务、正文与属性。
-- [运维](operations.md)：备份恢复和旧数据迁移；schema7移除旧正文列，schema9加入自定义属性。禁止将旧镜像直接指向升级后数据库。
+- [运维](operations.md)：安装、更新、备份和恢复。
 - [自定义属性API](custom-properties-api.md)：共享范围、版本和删除规则。
 - [最初第一版验收](acceptance-v1.md)：2026-10-24的历史基线，并非当前版本所有新增功能的测试报告。
 - [近期变更审计](audits/2026-10-27-recent-changes.md)：对应提交范围的历史审计。
