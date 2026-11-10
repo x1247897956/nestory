@@ -1,0 +1,20 @@
+# Keep GitHub language statistics focused on application source.
+# These attributes do not remove files or hide code review diffs.
+
+# Host maintenance, migration, audit, and media tooling.
+scripts/** linguist-detectable=false
+
+# Automated tests and test-only helpers.
+**/*_test.go linguist-detectable=false
+**/*.test.ts linguist-detectable=false
+**/*.test.tsx linguist-detectable=false
+web/e2e/** linguist-detectable=false
+web/src/test/** linguist-detectable=false
+web/playwright.config.ts linguist-detectable=false
+
+# Documentation and design assets, including recorded audit evidence.
+docs/** linguist-documentation=true
+design/** linguist-documentation=true
+
+# Frontend build output (normally ignored by Git).
+web/dist/** linguist-generated=true
