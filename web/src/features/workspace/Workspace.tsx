@@ -12,6 +12,7 @@ import zhCN from "@fullcalendar/core/locales/zh-cn";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../app/api";
+import { useSettings, calendarTimeFormat } from "../settings/preferences";
 export type Item = {
   id: string;
   type: string;
@@ -33,6 +34,7 @@ export function ItemList({
   items: Item[];
   timezone?: string;
 }) {
+  const settings=useSettings();
   return (
     <ul>
       {items.map((x) => (
@@ -64,11 +66,13 @@ export function ItemList({
             {x.start_at &&
               new Date(x.start_at).toLocaleString("zh-CN", {
                 timeZone: timezone,
+                hour12:settings.hourCycle==='12',
               })}{" "}
             {x.end_at &&
               " — " +
                 new Date(x.end_at).toLocaleString("zh-CN", {
                   timeZone: timezone,
+                  hour12:settings.hourCycle==='12',
                 })}
           </small>
         </li>
@@ -80,6 +84,7 @@ type Dashboard = { date: string; timezone: string; tasks: Item[]; events: Item[]
 const itemUrl = (item: Item) => `/projects/${item.project_id}${item.type === "projects" ? "" : `/${item.type}/${item.id}`}`;
 
 export function Workspace() {
+  const settings = useSettings();
   const [range, setRange] = useState<{ from: string; to: string }>();
   const [selection,setSelection]=useState<{start:string;end:string}>();
   const [created,setCreated]=useState<CalendarEvent>();
@@ -101,13 +106,14 @@ export function Workspace() {
       <header className="desk-section-heading"><h2>日程</h2><span>所有未归档项目</span></header>
       {config.isError ? <p role="alert" className="desk-error">日历配置加载失败 <button onClick={() => void config.refetch()}>重试</button></p> : !zone ? <p role="status" className="desk-empty">正在加载日历…</p> : <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, luxonPlugin,interactionPlugin]}
-        locale={zhCN} timeZone={zone} initialView="dayGridMonth" firstDay={1}
+        locale={zhCN} timeZone={zone} initialView={settings.calendarView} firstDay={settings.firstDay}
+        eventTimeFormat={calendarTimeFormat(settings.hourCycle)} slotLabelFormat={calendarTimeFormat(settings.hourCycle)}
         headerToolbar={{ left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek" }}
         buttonText={{ today: "今天", month: "月", week: "周" }}
         height="auto" dayMaxEvents={3} eventDisplay="block"
         selectable selectMirror
-        dateClick={info=>{if(!info.allDay)return;const parsed=DateTime.fromISO(info.dateStr,{zone});const start=info.allDay?parsed.set({hour:9}):parsed;setSelection({start:start.toISO()!,end:start.plus({hours:1}).toISO()!});setCreated(undefined);}}
-        select={info=>{const parsed=DateTime.fromISO(info.startStr,{zone});const start=info.allDay?parsed.set({hour:9}):parsed;setSelection({start:start.toISO()!,end:(info.allDay?start.plus({hours:1}):DateTime.fromISO(info.endStr,{zone})).toISO()!});setCreated(undefined);}}
+        dateClick={info=>{if(!info.allDay)return;const parsed=DateTime.fromISO(info.dateStr,{zone});const start=info.allDay?parsed.set({hour:9}):parsed;setSelection({start:start.toISO()!,end:start.plus({minutes:settings.eventDuration}).toISO()!});setCreated(undefined);}}
+        select={info=>{const parsed=DateTime.fromISO(info.startStr,{zone});const start=info.allDay?parsed.set({hour:9}):parsed;setSelection({start:start.toISO()!,end:(info.allDay?start.plus({minutes:settings.eventDuration}):DateTime.fromISO(info.endStr,{zone})).toISO()!});setCreated(undefined);}}
         datesSet={info => setRange(old => old?.from === info.startStr && old.to === info.endStr ? old : { from: info.startStr, to: info.endStr })}
         events={(data?.events ?? []).map(item => ({ id: item.id, title: item.title, start: item.start_at, end: item.end_at, url: itemUrl(item), extendedProps: { project: item.project_title } }))}
         eventContent={info => <><span className="workbench-event-time">{info.timeText}</span><span className="workbench-event-title" title={`${info.event.title} · ${info.event.extendedProps.project}`}>{info.event.title}<small>{info.event.extendedProps.project}</small></span></>}

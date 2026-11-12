@@ -3,8 +3,11 @@ import type { CSSProperties } from 'react';
 import type { EventProperties } from './Events';
 import { barGeometry, dayPosition, timelineRange, type TimelineSpan } from './timeline';
 import './timeline.css';
+import {useSettings} from '../settings/preferences';
 export function EventTimeline({events,date,span,zone,onDateChange,onSpanChange,onOpen,loading,error,onRetry}:{events:EventProperties[];date:string;span:TimelineSpan;zone:string;onDateChange:(date:string)=>void;onSpanChange:(span:TimelineSpan)=>void;onOpen:(id:string)=>void;loading:boolean;error:boolean;onRetry:()=>void}) {
- const range=timelineRange(date,span,zone);
+ const settings=useSettings();
+ const range=timelineRange(date,span,zone,settings.firstDay);
+ const timeFormat=settings.hourCycle==='12'?'M月d日 a hh:mm':'M月d日 HH:mm';
  const now=DateTime.now().setZone(zone);
  const today=dayPosition(now.startOf('day'),range.start);
  const visible=events.map(event=>({event,geometry:barGeometry(event.start_at,event.end_at,range)})).filter(item=>item.geometry);
@@ -21,7 +24,7 @@ export function EventTimeline({events,date,span,zone,onDateChange,onSpanChange,o
      <div className="timeline-row timeline-header"><div className="timeline-label">日程</div><div className="timeline-track timeline-days">{range.days.map(day=><div key={day.toISODate()} className={day.hasSame(now,'day')?'is-today':''}><span>{day.toFormat('M/d')}</span><small>{day.setLocale('zh-CN').toFormat('ccc')}</small></div>)}</div></div>
      {visible.map(({event,geometry})=><div className="timeline-row" key={event.id}><button className="timeline-label timeline-event-label" onClick={()=>onOpen(event.id)} title={event.title}>{event.title}</button><div className="timeline-track">
       {today>=0 && today<range.days.length && <div className="timeline-today" aria-hidden="true" style={{left:`${(today+.5)/range.days.length*100}%`}}/>}
-      <button className="timeline-bar" onClick={()=>onOpen(event.id)} style={{left:`${geometry!.left}%`,width:`${geometry!.width}%`}} aria-label={`${event.title}，${DateTime.fromISO(event.start_at).setZone(zone).toFormat('M月d日 HH:mm')} 至 ${DateTime.fromISO(event.end_at).setZone(zone).toFormat('M月d日 HH:mm')}`} title={event.title}><span>{event.title}</span></button>
+      <button className="timeline-bar" onClick={()=>onOpen(event.id)} style={{left:`${geometry!.left}%`,width:`${geometry!.width}%`}} aria-label={`${event.title}，${DateTime.fromISO(event.start_at).setZone(zone).setLocale('zh-CN').toFormat(timeFormat)} 至 ${DateTime.fromISO(event.end_at).setZone(zone).setLocale('zh-CN').toFormat(timeFormat)}`} title={event.title}><span>{event.title}</span></button>
      </div></div>)}
     </div>
    </div>

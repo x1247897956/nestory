@@ -64,6 +64,9 @@ type jsonGzipWriter struct {
 	wroteHeader bool
 }
 
+// Allow ResponseController to reach the server's deadlines for large backups.
+func (w *jsonGzipWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
+
 func (w *jsonGzipWriter) WriteHeader(status int) {
 	if w.wroteHeader {
 		return

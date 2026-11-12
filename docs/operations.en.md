@@ -2,14 +2,17 @@
 
 # Deploy Nestory
 
+For the existing local instance on `127.0.0.1:18084`, see the [local deployment and data management guide (Chinese)](local-deployment.md). Preserve its existing Compose project, port, and volume rather than using fresh-install defaults.
+
 Run Nestory on your own device with Docker Compose. Nestory is designed for personal use on a local device or trusted local network.
 
 ## Install
 
-Install Docker and Compose v2, then run these commands from the project root:
+Install Docker, Compose v2, and Python 3.9+ (for reading the host timezone), then run these commands from the project root:
 
 ```sh
-cp .env.example .env
+[ -f .env ] || cp .env.example .env
+python3 scripts/local_deploy.py configure
 docker compose up -d --build
 docker compose ps
 ```
@@ -36,27 +39,31 @@ Do not add `-v`: it deletes the data volume. The service and volume retain the e
 
 ## Update
 
-Back up your data first, as described below. After obtaining the new source version, keep your existing `.env` and data volume, then run:
+Daily recovery uses the recycle bin. There are no scheduled backups, background snapshots, or automatic restore rehearsals. For moving to another device, manually export a workspace ZIP from Settings and import it into an empty instance. The offline commands below are optional operator tools.
+
+After obtaining the new source version, keep your existing `.env` and data volume, then explicitly run:
 
 ```sh
+python3 scripts/local_deploy.py configure
 docker compose up -d --build --force-recreate
 docker compose ps
 ```
 
 Once the service is healthy, refresh your browser and check that your projects and attachments open correctly.
 
-## Back up
+## Optional offline migration
 
 The backup script requires Python 3.9+ on the host. It briefly stops the application, backs up the database and attachments, and attempts to restore the container's previous running state.
 
-Run the following from the deployment directory. If you changed the volume name, replace `--volume` with its actual name. Use a new output directory for each backup.
+Run the following only when you choose to perform an offline export. It reads the actual data volume from the container; use a new output directory each time.
 
 ```sh
 mkdir -p backups
 nestory_container=$(docker compose ps -q noteapp)
+nestory_volume=$(docker inspect --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}{{end}}{{end}}' "$nestory_container")
 scripts/backup.sh \
   --container "$nestory_container" \
-  --volume noteapp_noteapp-data \
+  --volume "$nestory_volume" \
   --image "$(docker inspect --format '{{.Image}}' "$nestory_container")" \
   --app-version "$(git rev-parse HEAD)" \
   --output "$PWD/backups/before-update"
@@ -86,6 +93,7 @@ APP_IMAGE=IMAGE_ID
 Replace `IMAGE_ID` with the image ID from the backup manifest, then start the application and check the restored content:
 
 ```sh
+python3 scripts/local_deploy.py configure
 docker compose up -d --no-build --force-recreate
 ```
 

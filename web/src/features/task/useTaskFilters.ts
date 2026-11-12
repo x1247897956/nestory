@@ -6,9 +6,11 @@ import {filterFields,matchesFilters,readFilters,validFilters,type TaskFilter,typ
 const storageKey=(id:string,type:'tasks'|'pages')=>`noteapp:${type==='tasks'?'task':'page'}-filters:v1:${id}`;
 export function useTaskFilters(projectId:string|undefined,tasks:FilterObject[],enabled:boolean,type:'tasks'|'pages'='tasks'){
  const [choices,setChoices]=useState<Record<string,TaskFilter[]>>({});
+ const [preferenceEpoch,setPreferenceEpoch]=useState(0);
+ useEffect(()=>{const reset=()=>{setChoices({});setPreferenceEpoch(value=>value+1);};window.addEventListener('noteapp:preferences-reset',reset);return()=>window.removeEventListener('noteapp:preferences-reset',reset);},[]);
  const id=projectId??'';
  const key=`${type}:${id}`;
- const saved=useMemo(()=>{try{return readFilters(localStorage.getItem(storageKey(id,type)));}catch{return [];}},[key]);
+ const saved=useMemo(()=>{try{return readFilters(localStorage.getItem(storageKey(id,type)));}catch{return [];}},[key,preferenceEpoch]);
  const filters=choices[key]??saved;
  const setFilters=(next:TaskFilter[])=>{setChoices(old=>({...old,[key]:next}));try{if(id)localStorage.setItem(storageKey(id,type),JSON.stringify(next));}catch{/* Session-only preferences remain usable. */}};
  const properties=useQuery({queryKey:['object',type==='tasks'?'task-filter-properties':'page-filter-properties',projectId],queryFn:()=>api<PropertySnapshot>(`/projects/${projectId}/property-snapshot/${type}`),enabled:!!projectId&&enabled});

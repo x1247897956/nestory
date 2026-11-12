@@ -1,16 +1,16 @@
-.view-sort-control{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;max-width:100%;font-size:13px;color:#3b4350}
+.view-sort-control{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;max-width:100%;font-size:calc(13px * var(--interface-scale, 1));color:var(--ink-3b4350, #3b4350)}
 .view-sort-control button{font:inherit}
-.view-sort-trigger{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid #dfe2e8;background:#fff;border-radius:6px;padding:6px 10px;color:#505967;min-height:32px}
-.view-sort-trigger:hover,.view-sort-trigger.active{background:#f1f4f9;color:#233b62}
-.view-sort-chip{display:inline-flex;align-items:center;max-width:100%;min-width:0;background:#f1f4f9;border-radius:6px;color:#233b62}
+.view-sort-trigger{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-dfe2e8, #dfe2e8);background:var(--surface-ffffff, #fff);border-radius:6px;padding:6px 10px;color:var(--ink-505967, #505967);min-height:32px}
+.view-sort-trigger:hover,.view-sort-trigger.active{background:var(--surface-f1f4f9, #f1f4f9);color:var(--ink-233b62, #233b62)}
+.view-sort-chip{display:inline-flex;align-items:center;max-width:100%;min-width:0;background:var(--surface-f1f4f9, #f1f4f9);border-radius:6px;color:var(--ink-233b62, #233b62)}
 .view-sort-chip button{border:0;background:transparent;padding:6px 8px;color:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .view-sort-chip .view-sort-remove{flex:none;padding-inline:7px}
-.view-sort-popover{position:fixed;inset:auto;margin:0;width:min(340px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid #dfe2e8;border-radius:10px;padding:16px;background:#fff;color:#303845;font-family:inherit;font-size:13px;line-height:1.5;box-sizing:border-box;box-shadow:0 12px 32px #19243718}
+.view-sort-popover{position:fixed;inset:auto;margin:0;width:min(340px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid var(--line-dfe2e8, #dfe2e8);border-radius:10px;padding:16px;background:var(--surface-ffffff, #fff);color:var(--ink-303845, #303845);font-family:inherit;font-size:calc(13px * var(--interface-scale, 1));line-height:1.5;box-sizing:border-box;box-shadow:0 12px 32px var(--shadow-19243718, #19243718)}
 .view-sort-popover header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.view-sort-popover header button{border:0;background:transparent;color:#586274;font-size:20px;padding:0 4px}
-.view-sort-popover label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#576171;margin-bottom:12px}
-.view-sort-popover select{box-sizing:border-box;width:100%;min-width:0;min-height:36px;padding:6px 9px;border:1px solid #dfe2e8;border-radius:6px;background:#fff;color:#27313e;font:inherit;font-size:13px}
-.view-sort-popover footer{display:flex;justify-content:flex-end;align-items:center;gap:8px;border-top:1px solid #e6e8ec;padding-top:12px;margin-top:4px}
+.view-sort-popover header button{border:0;background:transparent;color:var(--ink-586274, #586274);font-size:calc(20px * var(--interface-scale, 1));padding:0 4px}
+.view-sort-popover label{display:flex;flex-direction:column;gap:5px;font-size:calc(12px * var(--interface-scale, 1));color:var(--ink-576171, #576171);margin-bottom:12px}
+.view-sort-popover select{box-sizing:border-box;width:100%;min-width:0;min-height:36px;padding:6px 9px;border:1px solid var(--line-dfe2e8, #dfe2e8);border-radius:6px;background:var(--surface-ffffff, #fff);color:var(--ink-27313e, #27313e);font:inherit;font-size:calc(13px * var(--interface-scale, 1))}
+.view-sort-popover footer{display:flex;justify-content:flex-end;align-items:center;gap:8px;border-top:1px solid var(--line-e6e8ec, #e6e8ec);padding-top:12px;margin-top:4px}
 .view-sort-popover footer button{padding:7px 12px}
-.view-sort-control :is(button,select):focus-visible{outline:2px solid #34527e;outline-offset:2px}
+.view-sort-control :is(button,select):focus-visible{outline:2px solid var(--line-34527e, #34527e);outline-offset:2px}
 .view-sort-control button:disabled{opacity:.5;cursor:not-allowed}

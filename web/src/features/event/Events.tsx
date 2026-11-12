@@ -24,6 +24,7 @@ import zhCN from "@fullcalendar/core/locales/zh-cn";
 import { DateTime } from "luxon";
 import { api, propertiesOf, abandonCreateIntent } from "../../app/api";
 import { toInput, fromInput } from "./time";
+import { calendarTimeFormat, readSettings, useSettings } from '../settings/preferences';
 export type CalendarEvent = {
   id: string;
   project_id: string;
@@ -43,7 +44,7 @@ type EventPreferences = { view: 'calendar' | 'timeline'; calendarView: 'dayGridM
 const defaultPreferences: EventPreferences = {view:'calendar',calendarView:'dayGridMonth',span:'week',date:'',sort:{field:'start_at',direction:'asc'}};
 function normalizePreferences(raw: unknown): EventPreferences {
  const v = raw && typeof raw === 'object' ? raw as Partial<EventPreferences> : {};
- return {view:v.view === 'timeline'?'timeline':'calendar',calendarView:v.calendarView === 'timeGridWeek'?'timeGridWeek':'dayGridMonth',span:v.span === 'month'?'month':'week',date:typeof v.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v.date) && DateTime.fromISO(v.date).isValid?v.date:'',sort:normalizeSort(v.sort,eventSortFields,defaultPreferences.sort)};
+ return {view:v.view === 'timeline'?'timeline':'calendar',calendarView:v.calendarView === 'timeGridWeek'||v.calendarView === 'dayGridMonth'?v.calendarView:readSettings().calendarView,span:v.span === 'month'?'month':'week',date:typeof v.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v.date) && DateTime.fromISO(v.date).isValid?v.date:'',sort:normalizeSort(v.sort,eventSortFields,defaultPreferences.sort)};
 }
 export function Events({
   projectId,
@@ -57,7 +58,8 @@ export function Events({
   archived: boolean;
 }) {
   const nav = useNavigate();
-  const [preferences,setPreferences] = useProjectPreferences(projectId,"events",defaultPreferences,normalizePreferences);
+  const settings = useSettings();
+  const [preferences,setPreferences] = useProjectPreferences(projectId,"events",{...defaultPreferences,calendarView:settings.calendarView},normalizePreferences);
   const overviewBackground=useOverviewBackground(projectId);
   const [params] = useSearchParams();
   const qc = useQueryClient();
@@ -119,12 +121,12 @@ export function Events({
         .plus({ hours: 1 });
       setSelection({
         start: toInput(start.toISO()!, zone),
-        end: toInput(start.plus({ hours: 1 }).toISO()!, zone),
+        end: toInput(start.plus({ minutes: settings.eventDuration }).toISO()!, zone),
       });
     }
-  }, [zone, params, archived, eventId, projectId]);
+  }, [zone, params, archived, eventId, projectId, settings.eventDuration]);
   const selectedDate = preferences.date || (zone ? DateTime.now().setZone(zone).toISODate()! : '');
-  const visibleTimelineRange = zone && selectedDate ? timelineRange(selectedDate,preferences.span,zone) : undefined;
+  const visibleTimelineRange = zone && selectedDate ? timelineRange(selectedDate,preferences.span,zone,settings.firstDay) : undefined;
   const queryRange = preferences.view === 'timeline' && visibleTimelineRange ? {from:visibleTimelineRange.start.toISO()!,to:visibleTimelineRange.end.toISO()!} : range;
   const events = useQuery({
     queryKey: ["events", projectId, queryRange],
@@ -279,7 +281,7 @@ export function Events({
       {!overviewBackground && (
         <section aria-label="项目日历" aria-hidden={eventId?true:undefined} inert={!!eventId}>
           <CollectionHeader title="日程" count={events.isPending?"…":events.data?.length??0}
-            actions={!archived&&<button className="calendar-new" disabled={busy} onClick={()=>{const start=DateTime.now().setZone(zone).startOf("day").set({hour:9});choose(start.toISO()!,start.plus({hours:1}).toISO()!);}}>新建日程</button>}
+            actions={!archived&&<button className="calendar-new" disabled={busy} onClick={()=>{const start=DateTime.now().setZone(zone).startOf("day").set({hour:9});choose(start.toISO()!,start.plus({minutes:settings.eventDuration}).toISO()!);}}>新建日程</button>}
             views={<div className="collection-view-switch" role="group" aria-label="日程视图">
               <button aria-pressed={preferences.view==='calendar'} onClick={()=>setPreferences(old=>({...old,view:'calendar'}))}>日历</button>
               <button aria-pressed={preferences.view==='timeline'} onClick={()=>setPreferences(old=>({...old,view:'timeline'}))}>时间轴</button>
@@ -297,6 +299,8 @@ export function Events({
             locale={zhCN}
             timeZone={zone}
             initialView={preferences.calendarView}
+            firstDay={settings.firstDay}
+            slotLabelFormat={calendarTimeFormat(settings.hourCycle)}
             initialDate={selectedDate}
             headerToolbar={{
               left: "prev,next today",
@@ -334,7 +338,7 @@ export function Events({
               choose(
                 chosen.toISO()!,
                 (a.allDay
-                  ? chosen.plus({ hours: 1 })
+                  ? chosen.plus({ minutes: settings.eventDuration })
                   : DateTime.fromISO(a.endStr, { zone })
                 ).toISO()!,
               );
@@ -342,16 +346,12 @@ export function Events({
             dateClick={(a) => {
               const parsed = DateTime.fromISO(a.dateStr, { zone });
               const d = a.allDay ? parsed.set({ hour: 9 }) : parsed;
-              choose(d.toISO()!, d.plus({ hours: 1 }).toISO()!);
+              choose(d.toISO()!, d.plus({ minutes: settings.eventDuration }).toISO()!);
             }}
             eventClick={(a) =>
               nav("/projects/" + projectId + "/events/" + a.event.id)
             }
-            eventTimeFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }}
+            eventTimeFormat={calendarTimeFormat(settings.hourCycle)}
             displayEventEnd
           />}
           {preferences.view==='calendar' && events.isError && (

@@ -2,8 +2,8 @@
 .task-views-workspace > .task-list { min-width:0; }
 .task-views-workspace .list-toolbar { flex-wrap:wrap; align-items:center; }
 .task-views-workspace .task-toolbar-actions { flex-wrap:wrap; gap:8px; }
-.task-view-switcher { display:flex; align-items:center; gap:2px; padding:3px; background:#f2f4f7; border-radius:6px; }
-.list-toolbar .task-view-switcher button { display:flex; align-items:center; justify-content:center; gap:6px; min-height:30px; padding:5px 9px; border:0; font-size:12px; line-height:20px; color:#626874; background:transparent; border-radius:4px; }
-.list-toolbar .task-view-switcher button[aria-pressed="true"] { color:#243b63; background:#fff; box-shadow:0 1px 3px #17203312; }
-.list-toolbar .task-view-switcher button:hover { color:#243b63; }
+.task-view-switcher { display:flex; align-items:center; gap:2px; padding:3px; background:var(--surface-f2f4f7, #f2f4f7); border-radius:6px; }
+.list-toolbar .task-view-switcher button { display:flex; align-items:center; justify-content:center; gap:6px; min-height:30px; padding:5px 9px; border:0; font-size:calc(12px * var(--interface-scale, 1)); line-height:20px; color:var(--ink-626874, #626874); background:transparent; border-radius:4px; }
+.list-toolbar .task-view-switcher button[aria-pressed="true"] { color:var(--ink-243b63, #243b63); background:var(--surface-ffffff, #fff); box-shadow:0 1px 3px var(--shadow-17203312, #17203312); }
+.list-toolbar .task-view-switcher button:hover { color:var(--ink-243b63, #243b63); }
 @media(max-width:650px) { .list-toolbar .task-view-switcher button { min-height:36px; } }

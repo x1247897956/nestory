@@ -1,6 +1,21 @@
 import io,pathlib,sqlite3,tarfile,tempfile,unittest
+from contextlib import closing
+from unittest.mock import patch
+from scripts import operations
 from scripts.operations import archive_snapshot
 class Archive(unittest.TestCase):
+ def test_snapshot_closes_database_before_returning(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=pathlib.Path(tmp)
+   with closing(sqlite3.connect(root/'noteapp.db')) as db,db:db.executescript('CREATE TABLE schema_migrations(version INTEGER); INSERT INTO schema_migrations VALUES(1); CREATE TABLE assets(id TEXT,storage_key TEXT,size INTEGER);')
+   connections=[];connect=sqlite3.connect
+   def tracked(*args,**kwargs):
+    connection=connect(*args,**kwargs);connections.append(connection);return connection
+   try:
+    with patch.object(operations.sqlite3,'connect',tracked):operations.snapshot(root)
+    with self.assertRaises(sqlite3.ProgrammingError):connections[0].execute('SELECT 1')
+   finally:
+    for connection in connections:connection.close()
  def test_complete_uncheckpointed_wal_snapshot(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=pathlib.Path(tmp);data=root/'data';data.mkdir();db=sqlite3.connect(data/'noteapp.db');db.execute('PRAGMA journal_mode=WAL');db.executescript('CREATE TABLE schema_migrations(version INTEGER); INSERT INTO schema_migrations VALUES(1); CREATE TABLE assets(id TEXT,storage_key TEXT,size INTEGER); CREATE TABLE proof(value TEXT); INSERT INTO proof VALUES("uncheckpointed");');db.commit()

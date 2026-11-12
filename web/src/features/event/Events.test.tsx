@@ -3,6 +3,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { renderObjectEditor as render } from "../../test/renderObjectEditor";
 import { Events } from "./Events";
 import { api } from "../../app/api";
+import { defaultSettings, saveSettings } from '../settings/preferences';
 const calendar = vi.hoisted(() => ({ props: {} as Record<string, any> }));
 vi.mock("@fullcalendar/react", () => ({
   default: (props: Record<string, any>) => {
@@ -57,6 +58,16 @@ it("defaults to month, opens a compact timed draft at 09:00 and creates automati
   expect(
     window.dispatchEvent(new Event("beforeunload", { cancelable: true })),
   ).toBe(true);
+});
+it('uses calendar defaults and duration without replacing a saved project view', () => {
+  saveSettings({...defaultSettings,firstDay:0,hourCycle:'12',calendarView:'timeGridWeek',eventDuration:30});
+  localStorage.setItem('noteapp:view:p:events',JSON.stringify({calendarView:'dayGridMonth'}));
+  render(<Events projectId="p" archived={false}/>);
+  expect(calendar.props.initialView).toBe('dayGridMonth');
+  expect(calendar.props.firstDay).toBe(0);
+  expect(calendar.props.eventTimeFormat.hour12).toBe(true);
+  fireEvent.click(screen.getByRole('button',{name:'新建日程'}));
+  expect((screen.getByLabelText('新日程结束') as HTMLInputElement).value).toMatch(/T09:30$/);
 });
 it("does not create invalid intervals and freezes a valid draft during its request", async () => {
   let resolve: (value: any) => void = () => {};

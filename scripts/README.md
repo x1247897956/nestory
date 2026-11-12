@@ -1,11 +1,12 @@
 # 主机维护与开发工具
 
-这些脚本不进入生产运行镜像，也不是第二套后端。日常应用由Go程序提供API与静态前端。
+这些脚本不进入生产运行镜像，也不是第二套后端。日常应用由Go程序提供API与静态前端，误删由回收站恢复。所有脚本只在操作者显式调用时运行，没有计划备份或后台调度。
 
 | 工具 | 用途 | 需要的环境 |
 | --- | --- | --- |
 | backup.sh / restore.sh | 调用operations.py备份或恢复完整数据卷，检查数据库和附件一致性 | 主机Python3.9+、Docker |
 | smoke.sh | 调用operations.py检查已运行实例的健康和基本接口 | 主机Python3.9+ |
+| local_deploy.py | 显式配置宿主机时区、启动已验证镜像和只读查看状态，无调度／备份入口 | 主机Python3.9+、Docker；详见[本机部署](../docs/local-deployment.md) |
 | audit/ | 使用独立临时容器/卷进行容量、故障、迁移和恢复检查 | 按脚本需要Python、Docker，浏览器测量另需Node/Chromium |
 | tests/ | 验证归档安全、备份恢复、运行边界及迁移准备工具 | Python unittest或Node test |
 | prepare-block-migration.mjs | 只为旧Markdown数据库离线准备块正文，使用和前端相同的BlockNote解析器 | Node、前端锁定依赖；新安装不用运行 |

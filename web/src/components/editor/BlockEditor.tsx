@@ -1,4 +1,5 @@
 import { useObjectPortal } from "../object/ObjectDialog";
+import { useSettings, useResolvedTheme } from '../../features/settings/preferences';
 import { useCallback, useEffect, useRef, useState, useId, memo } from "react";
 import {
   BlockNoteEditor,
@@ -147,12 +148,13 @@ const EditorCanvas = memo(function EditorCanvas({
   importInput: React.RefObject<HTMLInputElement | null>;
 }) {
   const portal = useObjectPortal();
+  const theme = useResolvedTheme();
   return (
     <BlockNoteView
       editor={editor}
       portalElements={portal ? { default: portal } : undefined}
       editable={!disabled}
-      theme="light"
+      theme={theme}
       onChange={emit}
       slashMenu={false}
       sideMenu={false}
@@ -215,6 +217,7 @@ export function BlockEditor({
   projectId,
   onPendingChange,
 }: Props) {
+  const settings = useSettings();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(0);
   useEffect(() => { onPendingChange?.(pending > 0); }, [pending, onPendingChange]);
@@ -282,6 +285,7 @@ export function BlockEditor({
     }
   });
   const editor = loaded.editor;
+  useEffect(() => { editor?.domElement?.setAttribute('spellcheck',String(settings.spellCheck)); },[editor,settings.spellCheck]);
   useEffect(() => {
     if (!editor) return;
     if (body_document && acknowledgedDocuments.current.has(body_document)) return;

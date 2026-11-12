@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import './task-views.css';
 export type TaskView='list'|'board';
 function storedView(projectId:string):TaskView {
@@ -6,6 +6,7 @@ function storedView(projectId:string):TaskView {
 }
 export function useProjectTaskView(projectId?:string):[TaskView,(view:TaskView)=>void] {
  const [choices,setChoices]=useState<Record<string,TaskView>>({});
+ useEffect(()=>{const reset=()=>setChoices({});window.addEventListener('noteapp:preferences-reset',reset);return()=>window.removeEventListener('noteapp:preferences-reset',reset);},[]);
  const key=projectId??'';
  const view=choices[key]??storedView(key);
  return [view,next=>{

@@ -36,6 +36,8 @@ import "./project-surfaces.css";
 import "./menus.css";
 import { Events } from "../features/event/Events";
 import { Pages } from "../features/page/Pages";
+import { SettingsPage } from '../features/settings/Settings';
+import { rememberLocation } from '../features/settings/preferences';
 export function App() {
   const { projectId, taskId, pageId, eventId } = useParams();
   const nav = useNavigate();
@@ -98,6 +100,7 @@ export function App() {
     enabled: !!projectId,
   });
   const path = useLocation().pathname;
+  useEffect(() => { rememberLocation(path); },[path]);
   const overviewBackground=useOverviewBackground(projectId);
   const tasks = useQuery({
     queryKey: ["tasks", projectId],
@@ -355,6 +358,10 @@ export function App() {
           ＋ 新建项目
         </button>
 
+        <Link className={'nav-item settings-entry' + (path === '/settings' ? ' active' : '')} to="/settings" aria-current={path === '/settings' ? 'page' : undefined}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m9.5 3-.7 2.4-2.2 1.3-2.5-.6-2.5 4.3 1.8 1.8v2.5l-1.8 1.8 2.5 4.3 2.5-.6 2.2 1.3.7 2.4h5l.7-2.4 2.2-1.3 2.5.6 2.5-4.3-1.8-1.8v-2.5l1.8-1.8-2.5-4.3-2.5.6-2.2-1.3L14.5 3Z" transform="translate(1 -1) scale(.92)"/><circle cx="12" cy="12" r="3"/></svg>
+          设置
+        </Link>
       </aside>
       <main>
         <div aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)} className={"topbar" + (projectId && (overview || overviewBackground) ? " project-overview-topbar" : "")}>
@@ -364,7 +371,7 @@ export function App() {
               {(overview || overviewBackground) ? <h1 aria-label={p?.title ?? "项目"}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current="page">{p?.title ?? "项目"}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总">{p?.title ?? "项目"}</Link>}
               {!overview && !overviewBackground && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
 
-            </> : <span aria-current="page">{path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
+            </> : <span aria-current="page">{path === '/settings' ? '设置' : path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
           </nav>
           {projectId && (overview || overviewBackground) && p?.description && <p className="overview-description">{p.description}</p>}
           </div>
@@ -372,7 +379,7 @@ export function App() {
         </div>
         {!projectId ? (
           <>
-            {path === "/search" ? (
+            {path === '/settings' ? <SettingsPage/> : path === "/search" ? (
               <Search />
             ) : path === "/trash" ? (
               <Trash />

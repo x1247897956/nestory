@@ -4,12 +4,15 @@
 
 使用 Docker Compose 在自己的设备上运行 Nestory。当前版本适合个人在本机或受信任局域网使用。
 
+已有本机 `127.0.0.1:18084` 实例的固定配置、回收站、手动迁移与显式部署见[本机部署维护](local-deployment.md)。已有实例应先确认实际项目名、端口和数据卷，避免按新安装默认值启动另一套空实例。
+
 ## 安装
 
-安装 Docker 和 Compose v2，然后在项目根目录执行：
+安装 Docker、Compose v2 和 Python 3.9+（用于读取宿主机时区），然后在项目根目录执行：
 
 ```sh
-cp .env.example .env
+[ -f .env ] || cp .env.example .env
+python3 scripts/local_deploy.py configure
 docker compose up -d --build
 docker compose ps
 ```
@@ -36,27 +39,35 @@ docker compose down
 
 ## 更新
 
-更新前先完成下面的备份。取得新版本源码后，保留原 `.env` 和数据卷，执行：
+取得新版本源码后，保留原 `.env` 和数据卷，显式更新镜像与容器。应用没有周期备份任务，日常误删通过回收站恢复。执行：
 
 ```sh
+python3 scripts/local_deploy.py configure
 docker compose up -d --build --force-recreate
 docker compose ps
 ```
 
 服务恢复后，刷新浏览器并确认原有项目和附件可以打开。
 
-## 备份
+## 手动迁移
+
+换电脑或迁移实例时，优先使用设置页的「导出工作空间」和空实例中的「恢复工作空间」，见[设置与迁移说明](settings.md)。
+
+以下离线脚本是可选的人工运维工具，不会由应用、启动命令或计划任务自动调用。
+
+## 离线导出（可选）
 
 备份脚本需要主机安装 Python 3.9+。它会短暂停止应用，备份数据库和附件，完成后尝试恢复原运行状态。
 
-在部署目录执行以下命令；如果修改过数据卷名称，将 `--volume` 换成实际卷名。备份输出目录每次应使用一个新名称。
+在部署目录执行以下命令；命令从实际容器读取 `/data` 卷名。备份输出目录每次应使用一个新名称。
 
 ```sh
 mkdir -p backups
 nestory_container=$(docker compose ps -q noteapp)
+nestory_volume=$(docker inspect --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}{{end}}{{end}}' "$nestory_container")
 scripts/backup.sh \
   --container "$nestory_container" \
-  --volume noteapp_noteapp-data \
+  --volume "$nestory_volume" \
   --image "$(docker inspect --format '{{.Image}}' "$nestory_container")" \
   --app-version "$(git rev-parse HEAD)" \
   --output "$PWD/backups/before-update"
@@ -86,6 +97,7 @@ APP_IMAGE=IMAGE_ID
 这里的 `IMAGE_ID` 同样替换为备份清单中的镜像ID。启动并检查恢复后的内容：
 
 ```sh
+python3 scripts/local_deploy.py configure
 docker compose up -d --no-build --force-recreate
 ```
 

@@ -6,6 +6,9 @@
 /web/playwright-report/
 *.tsbuildinfo
 .env
+.env.*
+!.env.example
+.local-deploy.lock
 __pycache__/
 *.py[cod]
 

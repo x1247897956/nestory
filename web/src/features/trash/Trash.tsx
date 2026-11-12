@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../app/api";
+import {useSettings} from "../settings/preferences";
 type Batch = {
   id: string;
   type: string;
@@ -17,6 +18,7 @@ const names: Record<string, string> = {
   events: "日程",
 };
 export function Trash() {
+  const settings=useSettings();
   const qc = useQueryClient();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
@@ -83,7 +85,7 @@ export function Trash() {
                     day: "2-digit",
                     hour: "2-digit",
                     minute: "2-digit",
-                    hour12: false,
+                    hour12: settings.hourCycle==='12',
                   })}
                 </time>
                 <button

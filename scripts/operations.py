@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline named-volume backup/restore. Requires Python 3.9+ and Docker; no pip packages."""
 import argparse
+from contextlib import closing
 import datetime
 import hashlib
 import json
@@ -83,7 +84,7 @@ def snapshot(root):
     dbpath = root / 'noteapp.db'
     if not dbpath.is_file():
         raise ValueError('Backup has no noteapp.db')
-    with sqlite3.connect(dbpath.as_uri() + '?mode=ro', uri=True) as db:
+    with closing(sqlite3.connect(dbpath.as_uri() + '?mode=ro', uri=True)) as db:
         integrity = [row[0] for row in db.execute('PRAGMA integrity_check')]
         foreign = db.execute('PRAGMA foreign_key_check').fetchall()
         if integrity != ['ok'] or foreign:

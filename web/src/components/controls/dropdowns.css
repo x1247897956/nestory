@@ -1,0 +1,151 @@
+/* One visual language for native value pickers. Browser-owned selection,
+   focus, form submission and top-layer placement remain intact. */
+:root {
+  --dropdown-surface:var(--surface-ffffff, #fff);
+  --dropdown-text:var(--ink-303845, #303845);
+  --dropdown-muted:var(--ink-626874, #626874);
+  --dropdown-border:var(--border, #e8e9ed);
+  --dropdown-hover:var(--surface-f1f3f6, #f1f3f6);
+  --dropdown-selected:var(--surface-edf1f8, #edf1f8);
+  --dropdown-selected-text:var(--ink-243b63, #243b63);
+  --dropdown-shadow:0 8px 24px var(--shadow-1822351c, #1822351c);
+  --dropdown-font:"Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* Unsupported browsers retain the fully functional platform picker. Keeping
+   the enhancement together avoids styling just the trigger but not its popup. */
+@supports (appearance:base-select) and selector(select::picker(select)) {
+  :root select:not([multiple]):not([size]),
+  :root select:not([multiple]):not([size])::picker(select) {
+    appearance:base-select;
+  }
+
+  :root select:not([multiple]):not([size]) {
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    padding-inline-end:10px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+
+  :root select:not([multiple]):not([size]):focus {
+    box-shadow:none;
+  }
+
+  :root select:not([multiple]):not([size]):focus-visible {
+    outline:2px solid var(--dropdown-selected-text);
+    outline-offset:2px;
+  }
+
+  :root select:not([multiple]):not([size]):disabled {
+    cursor:default;
+  }
+
+  /* Property cells previously removed the native arrow with a local appearance
+     override. Opt those cells in too and remove their old background arrow. */
+  :root section.object-property-section .object-property-cell .task-property select {
+    appearance:base-select;
+    background-image:none;
+    padding-inline-end:10px !important;
+  }
+
+  :root select:not([multiple]):not([size])::picker-icon {
+    content:"";
+    flex:none;
+    width:14px;
+    height:14px;
+    margin-inline-start:auto;
+    color:var(--dropdown-muted);
+    background:currentColor;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition:transform .12s ease-out;
+  }
+
+  :root select:not([multiple]):not([size]):open::picker-icon {
+    transform:rotate(180deg);
+  }
+
+  :root select:not([multiple]):not([size])::picker(select) {
+    box-sizing:border-box;
+    inline-size:max-content;
+    min-inline-size:min(anchor-size(width), calc(100vw - 24px));
+    max-inline-size:min(420px, calc(100vw - 24px));
+    max-block-size:min(320px, calc(100dvh - 32px));
+    overflow:auto;
+    overscroll-behavior:contain;
+    margin-block:6px;
+    padding:6px;
+    border:1px solid var(--dropdown-border);
+    border-radius:8px;
+    background:var(--dropdown-surface);
+    color:var(--dropdown-text);
+    box-shadow:var(--dropdown-shadow);
+    font-family:var(--dropdown-font);
+    font-size:calc(13px * var(--interface-scale, 1));
+    font-weight:400;
+    line-height:1.5;
+    text-align:start;
+    scrollbar-width:thin;
+    scrollbar-color:var(--dropdown-border) transparent;
+  }
+
+  :root select:not([multiple]):not([size]) option {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-block-size:32px;
+    padding:6px 8px;
+    border:0;
+    border-radius:4px;
+    background:transparent;
+    color:var(--dropdown-text);
+    font:inherit;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    cursor:pointer;
+  }
+
+  :root select:not([multiple]):not([size]) option:hover {
+    background:var(--dropdown-hover);
+  }
+
+  :root select:not([multiple]):not([size]) option:checked {
+    background:var(--dropdown-selected);
+    color:var(--dropdown-selected-text);
+  }
+
+  :root select:not([multiple]):not([size]) option:focus-visible {
+    outline:2px solid var(--dropdown-selected-text);
+    outline-offset:-2px;
+  }
+
+  :root select:not([multiple]):not([size]) option:disabled {
+    color:var(--dropdown-muted);
+    opacity:.55;
+    cursor:default;
+  }
+
+  :root select:not([multiple]):not([size]) option::checkmark {
+    content:"";
+    order:1;
+    flex:none;
+    margin-inline-start:auto;
+    width:14px;
+    height:14px;
+    background:currentColor;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8 3 3 7-7' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  @media (pointer:coarse) {
+    :root select:not([multiple]):not([size]) option {
+      min-block-size:44px;
+      padding-block:10px;
+    }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    :root select:not([multiple]):not([size])::picker-icon { transition:none; }
+  }
+}

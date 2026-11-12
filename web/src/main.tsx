@@ -4,6 +4,13 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { App } from "./app/App";
+import { applySettings, startupPath, SettingsEffects } from './features/settings/preferences';
+import './features/settings/appearance.css';
+import './features/settings/theme-colors.css';
+import './components/controls/dropdowns.css';
+applySettings();
+const initialPath = startupPath(window.location.pathname);
+if (window.location.pathname === '/' && !window.location.search && !window.location.hash && initialPath !== '/') window.history.replaceState(null,'',initialPath);
 const client = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 });
@@ -11,6 +18,7 @@ const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/search", element: <App /> },
   { path: "/trash", element: <App /> },
+  { path: "/settings", element: <App /> },
   { path: "/projects/:projectId", element: <App /> },
   { path: "/projects/:projectId/tasks", element: <App /> },
   { path: "/projects/:projectId/tasks/:taskId", element: <App /> },
@@ -24,6 +32,7 @@ void initializeTabIdentity().catch(() => undefined).then(() => {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={client}>
+      <SettingsEffects/>
       <RouterProvider router={router} />
     </QueryClientProvider>
   </React.StrictMode>,

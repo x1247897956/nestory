@@ -1,0 +1,26 @@
+:root {
+ --settings-text:#303845; --settings-muted:#626874; --settings-soft:#f3f4f7; --settings-surface:#fff;
+ --settings-rule:#eceef2; --settings-switch:#bdc5d0; --settings-error-bg:#fceeee; --settings-error:#983c3c;
+ --interface-scale:1; --editor-font-size:15px;
+}
+:root[data-theme="dark"] {
+ --settings-text:#e1e6ef; --settings-muted:#a6b1c3; --settings-soft:#222832; --settings-surface:#1b2028;
+ --settings-rule:#303845; --settings-switch:#526078; --settings-error-bg:#392423; --settings-error:#f0a2a2;
+ --green:#476c9d; --border:#343e4d; --muted:#a6b1c3;
+}
+html { scroll-behavior:smooth; }
+::selection { background:#476c9d40; }
+:root { scrollbar-color:#a6b0c2 transparent; scrollbar-width:thin; }
+:root[data-theme="dark"] { scrollbar-color:#4e5c72 transparent; }
+.block-editor .bn-editor { font-size:var(--editor-font-size) !important; }
+.object-editor-body { max-width:780px; margin-inline:auto; }
+:root[data-editor-width="wide"] .object-editor-body { max-width:none; }
+:root[data-density="compact"] .nav-item { padding-block:7px; }
+:root[data-density="compact"] .project-link { padding-block:6px; }
+:root[data-density="compact"] .task-row { min-height:38px; padding-block:6px; }
+:root[data-density="compact"] .collection-row { padding-block:8px; }
+:root[data-density="compact"] .page-list-row { min-height:40px; }
+:root[data-density="compact"] .page-tree .page-list-row a { padding-block:9px; }
+:root[data-density="compact"] .task-board .task-board-open { padding:10px; gap:6px; }
+:root[data-density="compact"] .task-board-card { padding:10px 12px; }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }

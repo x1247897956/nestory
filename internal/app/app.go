@@ -34,6 +34,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 	mux.HandleFunc("POST /api/v1/projects/{id}/assets", assets.UploadHTTP)
 	mux.HandleFunc("GET /api/v1/assets/{id}", assets.Download)
 	registerStatus(mux, db, c)
+	registerTransfer(mux, db, c)
 	registerProjects(mux, p)
 	registerTasks(mux, t)
 	registerPages(mux, pg)

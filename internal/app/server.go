@@ -10,6 +10,7 @@ import (
 	"noteapp/internal/platform/config"
 	"noteapp/internal/platform/httpx"
 	"noteapp/internal/taskmeta"
+	"noteapp/internal/transfer"
 	"noteapp/web"
 )
 
@@ -23,7 +24,7 @@ func registerStatus(mux *http.ServeMux, db *sql.DB, c config.Config) {
 		httpx.JSON(w, 200, map[string]string{"status": "ready"})
 	})
 	mux.HandleFunc("GET /api/v1/config", func(w http.ResponseWriter, r *http.Request) {
-		httpx.JSON(w, 200, map[string]any{"timezone": c.Timezone, "stages": taskmeta.Stages(), "priorities": taskmeta.Priorities()})
+		httpx.JSON(w, 200, map[string]any{"timezone": c.Timezone, "stages": taskmeta.Stages(), "priorities": taskmeta.Priorities(), "version": "0.1.0", "transfer_limit": transfer.MaxArchiveBytes})
 	})
 }
 

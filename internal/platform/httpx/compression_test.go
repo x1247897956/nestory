@@ -8,7 +8,32 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
+
+type deadlineResponse struct {
+	*httptest.ResponseRecorder
+	deadline time.Time
+}
+
+func (w *deadlineResponse) SetWriteDeadline(value time.Time) error { w.deadline = value; return nil }
+func TestCompressionPreservesTransferDeadlineControl(t *testing.T) {
+	deadline := time.Now().Add(5 * time.Minute)
+	handler := CompressJSON(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := http.NewResponseController(w).SetWriteDeadline(deadline); err != nil {
+			t.Errorf("cannot extend backup deadline: %v", err)
+		}
+		w.Header().Set("Content-Type", "application/zip")
+		w.Write([]byte("zip"))
+	}))
+	request := httptest.NewRequest("GET", "/api/v1/transfer/export", nil)
+	request.Header.Set("Accept-Encoding", "gzip")
+	response := &deadlineResponse{ResponseRecorder: httptest.NewRecorder()}
+	handler.ServeHTTP(response, request)
+	if !response.deadline.Equal(deadline) {
+		t.Fatal("backup deadline was discarded")
+	}
+}
 
 func TestCompressJSON(t *testing.T) {
 	for _, tc := range []struct {

@@ -195,6 +195,7 @@ test('an unopened shared settings draft in another tab never blocks this note va
 
 
 test('choice popovers create tags inline and URL values are direct editable links',async({page,request})=>{
+ const referenceUrl=new URL('/search',test.info().project.use.baseURL).href;
  const p=await post(request,'/projects',{title:'属性交互'});
  const n=await post(request,`/projects/${p.id}/pages`,{title:'紧凑属性'});
  await page.goto(`/projects/${p.id}/pages/${n.id}`);await expandProperties(page);
@@ -212,18 +213,18 @@ test('choice popovers create tags inline and URL values are direct editable link
  const url=await add(page,'网址','参考');
  await url.getByRole('button',{name:'未填写',exact:true}).click();
  await expandProperties(page);
- await url.getByLabel('属性值 参考',{exact:true}).fill('http://127.0.0.1:18187/search');
+ await url.getByLabel('属性值 参考',{exact:true}).fill(referenceUrl);
  await expandProperties(page);
  await url.getByLabel('属性值 参考',{exact:true}).press('Enter');
  const link=url.getByRole('link',{name:'打开网址 参考',exact:true});
- await expect(link).toHaveAttribute('href','http://127.0.0.1:18187/search');
+ await expect(link).toHaveAttribute('href',referenceUrl);
  const opened=page.waitForEvent('popup');await link.click();const tab=await opened;await expect(tab).toHaveURL(/\/search$/);await tab.close();
  await url.getByRole('button',{name:'编辑网址 参考',exact:true}).click();
  await expandProperties(page);
- await expect(url.getByLabel('属性值 参考',{exact:true})).toHaveValue('http://127.0.0.1:18187/search');
+ await expect(url.getByLabel('属性值 参考',{exact:true})).toHaveValue(referenceUrl);
  await expandProperties(page);
  await url.getByLabel('属性值 参考',{exact:true}).press('Enter');
- await expect.poll(async()=>(await fields(request,'pages',n.id)).find((f:any)=>f.definition.name==='参考').value).toBe('http://127.0.0.1:18187/search');
+ await expect.poll(async()=>(await fields(request,'pages',n.id)).find((f:any)=>f.definition.name==='参考').value).toBe(referenceUrl);
  await page.setViewportSize({width:773,height:827});
  await page.screenshot({fullPage:true,path:'/tmp/noteapp-property-redesign-773.png'});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(773);

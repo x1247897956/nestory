@@ -50,6 +50,14 @@ NOTEAPP_TEST_IMAGE=noteapp:test python3 -m unittest discover -s scripts/tests -p
 
 也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有 Chromium。运维脚本要求 Python 3.9+，包含标准库 `sqlite3`。
 
+## 源码提交与镜像打包
+
+测试代码保留在 Git 仓库中，便于开发者和 CI 复现验证。`.env`、`.env.local`、`.env.production` 等真实配置由 `.gitignore` 排除，`.env.example` 等示例模板保留。
+
+Docker 构建使用 `.dockerignore` 允许列表，只传入编译需要的 Go 源码、迁移 SQL、前端源码、公共静态资源和构建配置。Python 运维脚本、Go/前端测试、测试夹具、文档、设计稿、本机配置、`node_modules` 和旧 `dist` 不进入构建上下文。Dockerfile 同时显式复制这些必要路径，避免整仓库复制。新增生产源码目录或构建配置文件时，需要相应更新允许列表和 COPY 路径。
+
+最终镜像包含编译后的 Go 程序（内嵌前端）与运行依赖，不包含 Python、Node、项目源码或测试脚本。上传源码与发布镜像使用不同范围；本机环境配置不参与镜像构建。
+
 ## 技术结构
 
 Go 轻量模块化单体，普通构造函数组装依赖；React + TypeScript + Vite 前端，SQLite 保存业务数据，附件保存在同卷文件目录。一个非 root Docker 容器提供前端与 `/api/v1`。

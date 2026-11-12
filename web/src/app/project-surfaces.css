@@ -1,21 +1,21 @@
 /* Project forms use the same neutral surface as object and deletion dialogs. */
-.modal-backdrop.project-form-backdrop { background:#17203355; }
-.modal.project-form { background:#fff; color:#303845; padding:28px; border-radius:12px; box-shadow:0 20px 64px #11182726; max-height:calc(100dvh - 40px); overflow:auto; }
-.modal.project-form h2 { margin:0 0 24px; font-family:inherit; font-size:20px; line-height:28px; font-weight:600; }
-.modal.project-form label { color:#626874; font-size:12px; line-height:20px; margin-bottom:18px; }
-.modal.project-form input,.modal.project-form textarea { display:block; margin-top:7px; border:1px solid #e0e4eb; color:#303845; background:#fff; font-size:13px; line-height:20px; padding:9px 11px; }
-.modal.project-form input:focus,.modal.project-form textarea:focus { border-color:#445d82; box-shadow:0 0 0 3px #243b630b; }
+.modal-backdrop.project-form-backdrop { background:var(--surface-17203355, #17203355); }
+.modal.project-form { background:var(--surface-ffffff, #fff); color:var(--ink-303845, #303845); padding:28px; border-radius:12px; box-shadow:0 20px 64px var(--shadow-11182726, #11182726); max-height:calc(100dvh - 40px); overflow:auto; }
+.modal.project-form h2 { margin:0 0 24px; font-family:inherit; font-size:calc(20px * var(--interface-scale, 1)); line-height:28px; font-weight:600; }
+.modal.project-form label { color:var(--ink-626874, #626874); font-size:calc(12px * var(--interface-scale, 1)); line-height:20px; margin-bottom:18px; }
+.modal.project-form input,.modal.project-form textarea { display:block; margin-top:7px; border:1px solid var(--line-e0e4eb, #e0e4eb); color:var(--ink-303845, #303845); background:var(--surface-ffffff, #fff); font-size:calc(13px * var(--interface-scale, 1)); line-height:20px; padding:9px 11px; }
+.modal.project-form input:focus,.modal.project-form textarea:focus { border-color:var(--line-445d82, #445d82); box-shadow:0 0 0 3px var(--shadow-243b630b, #243b630b); }
 .modal.project-form textarea { min-height:104px; }
 .modal.project-form footer { margin-top:24px; gap:8px; }
-.modal.project-form footer button { min-height:36px; padding:7px 14px; font-size:13px; line-height:20px; }
-.modal.project-form footer .primary { background:#243b63; border-color:#243b63; color:#fff; }
-.modal.project-form footer .primary:hover:not(:disabled) { background:#192e51; }
-.modal.project-form .error { color:#ac362d; }
+.modal.project-form footer button { min-height:36px; padding:7px 14px; font-size:calc(13px * var(--interface-scale, 1)); line-height:20px; }
+.modal.project-form footer .primary { background:var(--surface-243b63, #243b63); border-color:var(--line-243b63, #243b63); color:var(--ink-ffffff, #fff); }
+.modal.project-form footer .primary:hover:not(:disabled) { background:var(--surface-192e51, #192e51); }
+.modal.project-form .error { color:var(--ink-ac362d, #ac362d); }
 /* An empty section occupies exactly one normal object row, including its border. */
-.project-overview .overview-card ul { border:1px solid #e8e9ed; margin:0; border-radius:5px; }
-.project-overview .overview-card li { border-top:1px solid #e8e9ed; }
+.project-overview .overview-card ul { border:1px solid var(--line-e8e9ed, #e8e9ed); margin:0; border-radius:5px; }
+.project-overview .overview-card li { border-top:1px solid var(--line-e8e9ed, #e8e9ed); }
 .project-overview .overview-card li:first-child { border-top:0; }
 .project-overview .overview-card li a { min-height:62px; padding:12px 16px; line-height:20px; }
 .project-overview .overview-card small { line-height:16px; margin-top:2px; }
-.project-overview .overview-empty { display:flex; align-items:center; min-height:64px; margin:0; padding:12px 16px; border:1px solid #e8e9ed; border-radius:5px; background:#fff; color:#626874; font-size:12px; line-height:20px; }
+.project-overview .overview-empty { display:flex; align-items:center; min-height:64px; margin:0; padding:12px 16px; border:1px solid var(--line-e8e9ed, #e8e9ed); border-radius:5px; background:var(--surface-ffffff, #fff); color:var(--ink-626874, #626874); font-size:calc(12px * var(--interface-scale, 1)); line-height:20px; }
 @media(max-width:480px) { .modal.project-form { padding:24px; } }

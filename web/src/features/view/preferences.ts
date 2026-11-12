@@ -1,10 +1,15 @@
-import { useCallback, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 
 /** Browser-local preferences; a blocked or corrupt store must never block the view. */
 export function useProjectPreferences<T>(projectId: string, scope: string, fallback: T, normalize: (raw: unknown) => T): [T, Dispatch<SetStateAction<T>>] {
  const key = `noteapp:view:${encodeURIComponent(projectId)}:${encodeURIComponent(scope)}`;
  const cache = useRef(new Map<string, T>());
  const [, refresh] = useState(0);
+ useEffect(() => {
+  const reset = () => { cache.current.clear(); refresh(version => version + 1); };
+  window.addEventListener('noteapp:preferences-reset',reset);
+  return () => window.removeEventListener('noteapp:preferences-reset',reset);
+ },[]);
  if (!cache.current.has(key)) {
   let value = fallback;
   try {

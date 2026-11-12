@@ -1,5 +1,9 @@
 import { expect, it } from 'vitest';
 import { timelineRange, barGeometry } from './timeline';
+it('starts Sunday weeks on the preceding Sunday, including Sunday itself',()=>{
+ expect(timelineRange('2026-11-10','week','Asia/Shanghai',0).start.toISODate()).toBe('2026-11-08');
+ expect(timelineRange('2026-11-08','week','Asia/Shanghai',0).start.toISODate()).toBe('2026-11-08');
+});
 it('uses Monday weeks and half-open month ranges in the application timezone', () => {
  const week = timelineRange('2026-10-28', 'week', 'Asia/Shanghai');
  expect(week.start.toISODate()).toBe('2026-10-26');
