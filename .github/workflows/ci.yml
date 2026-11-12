@@ -119,6 +119,7 @@ jobs:
         run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
 
       - name: Install Chromium
+        timeout-minutes: 5
         run: npm exec --prefix web -- playwright install --with-deps chromium
 
       - name: Run isolated Chromium regression

@@ -9,6 +9,8 @@
 
 工作流仅使用 Chromium，不进行跨浏览器矩阵验证。CI 的 `TZ=Asia/Shanghai` 用于固定测试日期，与用户部署电脑的时区配置无关。镜像在临时 runner 中使用，不推送镜像仓库、不连接本机应用、不更新现有数据，也没有定时任务或自动部署步骤。
 
+Playwright 固定使用 1.60.0，包含 Node 26 下浏览器 ZIP 解压挂起的[上游修复](https://github.com/microsoft/playwright/pull/40747)。浏览器安装步骤限时 5 分钟，避免依赖安装异常时耗尽整项任务的时间。
+
 GitHub Actions 使用只读仓库权限，第三方 Action 固定到完整提交 SHA。依赖缓存用于缩短后续运行时间。Chromium 失败时保留 HTML 报告、失败截图和追踪文件，保存 7 天，可从对应运行页面的 Artifacts 下载。
 
 ## 在本地复现
