@@ -6,7 +6,7 @@ import { readSettings, resetPreferences } from './preferences';
 
 function show() {
  const client = new QueryClient({defaultOptions:{queries:{retry:false,staleTime:Infinity}}});
- client.setQueryData(['config'],{timezone:'Asia/Shanghai',version:'0.1.0'});
+ client.setQueryData(['config'],{timezone:'Asia/Shanghai',version:'v0.1.1+9f5e899'});
  render(<QueryClientProvider client={client}><SettingsPage/></QueryClientProvider>);
 }
 beforeEach(() => {vi.restoreAllMocks();resetPreferences();});
@@ -19,7 +19,7 @@ it('presents all settings groups and persists a choice immediately', () => {
  fireEvent.change(screen.getByLabelText('正文字号'),{target:{value:'19'}});
  expect(document.documentElement.style.getPropertyValue('--editor-font-size')).toBe('19px');
  expect(screen.getByText('Asia/Shanghai',{selector:'span'})).toBeVisible();
- expect(screen.getByText('0.1.0')).toBeVisible();
+ expect(screen.getByText('v0.1.1+9f5e899')).toBeVisible();
 });
 it('only resets preferences after confirmation and preserves drafts', () => {
  show();localStorage.setItem('noteapp:draft:1','my words');

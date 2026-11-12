@@ -12,6 +12,19 @@ class Runtime(unittest.TestCase):
    if not state['Running']:return state
    time.sleep(.1)
   self.fail('Startup failure did not exit')
+ def test_runtime_version_matches_build_revision(self):
+  self.start('-e','APP_VERSION=runtime-override-ignored')
+  container=json.loads(run('docker','inspect',self.name).stdout)[0]
+  port=container['NetworkSettings']['Ports']['8080/tcp'][0]['HostPort'];base='http://127.0.0.1:'+port+'/api/v1'
+  for _ in range(100):
+   try:
+    with urllib.request.urlopen(base+'/readyz',timeout=2):break
+   except OSError:time.sleep(.1)
+  image=json.loads(run('docker','image','inspect',IMAGE).stdout)[0]
+  expected=image['Config']['Labels']['org.opencontainers.image.revision']
+  self.assertTrue(expected)
+  with urllib.request.urlopen(base+'/config',timeout=5) as response:config=json.load(response)
+  self.assertEqual(config['version'],expected)
  def test_migration_failure_exits_without_listening(self):
   with tempfile.TemporaryDirectory() as tmp:
    file=pathlib.Path(tmp)/'bad.db'

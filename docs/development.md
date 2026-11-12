@@ -58,6 +58,19 @@ Docker 构建使用 `.dockerignore` 允许列表，只传入编译需要的 Go �
 
 最终镜像包含编译后的 Go 程序（内嵌前端）与运行依赖，不包含 Python、Node、项目源码或测试脚本。上传源码与发布镜像使用不同范围；本机环境配置不参与镜像构建。
 
+## 构建版本信息
+
+应用版本由构建参数 `APP_VERSION` 写入 Go 程序，镜像标签、`/api/v1/config` 和设置页使用同一个发布标识。普通 `go run` / `go build` 或未指定版本的镜像构建显示 `development`。
+
+发布命令可以在宿主机自动读取 Git 标签或提交号，不需要将 `.git` 目录发送到 Docker：
+
+```sh
+build_version=$(git describe --tags --always --dirty)
+docker build --build-arg APP_VERSION="$build_version" -t noteapp:local .
+```
+
+也可显式传入 `APP_VERSION=v0.1.1`。标签／版本编号由发布时确定，应用不自动递增版本号。已跟踪文件存在未提交修改时，以上 Git 命令会追加 `-dirty`。修改 `.env` 中的 `APP_VERSION` 后，需要重新构建镜像才能生效；`docker compose up -d --no-build noteapp` 只启动已有镜像，其报告的版本保持为该镜像构建时的标识。
+
 ## 技术结构
 
 Go 轻量模块化单体，普通构造函数组装依赖；React + TypeScript + Vite 前端，SQLite 保存业务数据，附件保存在同卷文件目录。一个非 root Docker 容器提供前端与 `/api/v1`。

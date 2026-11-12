@@ -101,9 +101,11 @@ func TestBlockOnlyMigrationPreservesAllObjects(t *testing.T) {
 	if _, err = db.Exec("UPDATE tasks SET body_document=NULL WHERE id='empty'"); err == nil {
 		t.Fatal("nullable native document")
 	}
- for _, invalid := range []string{`{}`,`{"blocks":[]}`,`{"version":1}`,`null`} {
-  if _, err = db.Exec("UPDATE tasks SET body_document=? WHERE id='empty'", invalid); err == nil { t.Fatalf("invalid SQL document accepted: %s",invalid) }
- }
+	for _, invalid := range []string{`{}`, `{"blocks":[]}`, `{"version":1}`, `null`} {
+		if _, err = db.Exec("UPDATE tasks SET body_document=? WHERE id='empty'", invalid); err == nil {
+			t.Fatalf("invalid SQL document accepted: %s", invalid)
+		}
+	}
 	rows, err := db.Query("PRAGMA foreign_key_check")
 	if err != nil {
 		t.Fatal(err)
