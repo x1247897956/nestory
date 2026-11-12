@@ -25,9 +25,10 @@ test("project names are plain and parent selection is automatic without losing b
           .parent_id,
     )
     .toBe(a.id);
+  await expect(page.getByLabel("Markdown 正文")).toBeEditable();
   await page.getByLabel("Markdown 正文").fill("移动后继续写作");
   await expect(parent).toBeDisabled();
-  await expect(page.getByRole("status")).toHaveText("已保存");
+  await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
   await parent.selectOption(b.id);
   await expect
     .poll(
@@ -101,7 +102,7 @@ test("calendar opens a compact default draft and creates automatically after val
     page.getByRole("button", { name: "保存日程", exact: true }),
   ).toHaveCount(0);
   await page.getByLabel("日程标题", { exact: true }).fill("改名也自动保存");
-  await expect(page.getByRole("status")).toHaveText("已保存");
+  await expect(page.locator(".autosave-indicator").getByRole("status")).toHaveText("已保存");
   await page.reload();await expandProperties(page);
   await expect(page.getByLabel("日程标题", { exact: true })).toHaveValue(
     "改名也自动保存",

@@ -12,7 +12,7 @@ web/e2e/** linguist-detectable=false
 web/src/test/** linguist-detectable=false
 web/playwright.config.ts linguist-detectable=false
 
-# Documentation and design assets, including recorded audit evidence.
+# Current documentation, product media, and approved brand assets.
 docs/** linguist-documentation=true
 design/** linguist-documentation=true
 

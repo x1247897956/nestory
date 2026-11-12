@@ -5,7 +5,7 @@ const require=createRequire(new URL('../../web/package.json',import.meta.url));
 const {chromium}=require('@playwright/test');
 const [name,base,pid,note]=process.argv.slice(2);
 if(!name?.startsWith('noteapp-audit-probe-'))throw Error('Disposable audit container required');
-const info=JSON.parse(execFileSync('docker',['inspect',name],{encoding:'utf8'}))[0];
+const info=JSON.parse(execFileSync('docker',['inspect',name+'-frontend'],{encoding:'utf8'}))[0];
 const port=info.NetworkSettings.Ports['8080/tcp'][0].HostPort;
 if(base!==`http://127.0.0.1:${port}`)throw Error('Container port mismatch');
 const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});

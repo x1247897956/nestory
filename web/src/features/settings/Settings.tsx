@@ -102,8 +102,8 @@ export function SettingsPage() {
      <Row title="时间格式"><Choice name="时间格式" setting="hourCycle" options={[[ '24','24 小时制'],['12','12 小时制']]}/></Row>
      <Row title="默认日历视图" description="用于工作台和尚未设置视图的项目，保留各项目已选的视图。"><Choice name="默认日历视图" setting="calendarView" options={[[ 'dayGridMonth','月视图'],['timeGridWeek','周视图']]}/></Row>
      <Row title="新日程默认时长" description="点击日期或新建日程时使用；拖选时保留你选择的时间范围。"><Choice name="新日程默认时长" setting="eventDuration" options={[[15,'15 分钟'],[30,'30 分钟'],[60,'1 小时'],[90,'1.5 小时'],[120,'2 小时']]}/></Row>
-     <Row title="工作空间时区" description="使用部署电脑的系统时区，统一用于日历、日程和日期筛选。"><span className="settings-value">{config.data?.timezone ?? '正在读取…'}</span></Row>
-     <details className="settings-help"><summary>如何同步时区</summary><p>应用在启动或部署时读取部署电脑的系统时区。修改系统时区后，在部署目录手动运行 <code>python3 scripts/local_deploy.py up</code>，再刷新应用使其生效。</p></details>
+     <Row title="工作空间时区" description="使用部署时指定的时区，统一用于日历、日程和日期筛选。"><span className="settings-value">{config.data?.timezone ?? '正在读取…'}</span></Row>
+     <details className="settings-help"><summary>如何修改时区</summary><p>在部署目录的 <code>.env</code> 中设置 <code>APP_TIMEZONE</code>（例如 Asia/Shanghai 或 UTC），运行 <code>docker compose up -d --no-build noteapp</code> 后刷新应用。时区不会随设备系统设置自动改变。</p></details>
     </section>
     <section id="settings-editor" className="settings-section" aria-labelledby="editor-title"><h2 id="editor-title">编辑器</h2>
      <Row title="正文字号" description="用于笔记、任务和日程的正文。"><Choice name="正文字号" setting="editorFontSize" options={[[14,'14 px'],[15,'15 px · 标准'],[17,'17 px'],[19,'19 px']]}/></Row>
@@ -137,7 +137,8 @@ export function SettingsPage() {
     </section>
     <section id="settings-about" className="settings-section" aria-labelledby="about-title"><h2 id="about-title">关于</h2>
      <div className="settings-about"><img src="/icon.svg" width="42" height="42" alt=""/><div><strong>Nestory</strong><p>让想法、行动和时间，在同一个项目里相遇。</p></div></div>
-     <Row title="应用版本"><span className="settings-value">{config.data?.version ?? '正在读取…'}</span></Row>
+     <Row title="前端版本"><span className="settings-value">{import.meta.env.VITE_APP_VERSION || 'development'}</span></Row>
+     <Row title="后端版本"><span className="settings-value">{config.data?.version ?? '正在读取…'}</span></Row>
      <Row title="开源许可"><span className="settings-value">MIT License</span></Row>
      <div className="settings-links"><a href={repository+'/blob/main/README.zh-CN.md'} target="_blank" rel="noreferrer">使用说明 ↗</a><a href={repository} target="_blank" rel="noreferrer">开源地址 ↗</a></div>
     </section>

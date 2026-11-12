@@ -8,12 +8,17 @@ def run(*args):
     return subprocess.check_output(args, text=True).strip()
 
 def main():
-    parser=argparse.ArgumentParser(); parser.add_argument('--image',required=True); parser.add_argument('--count',type=int,default=1000); parser.add_argument('--browser',action='store_true'); args=parser.parse_args()
+    parser=argparse.ArgumentParser(); parser.add_argument('--image',required=True); parser.add_argument('--count',type=int,default=1000); parser.add_argument('--browser',action='store_true'); parser.add_argument('--frontend-image'); args=parser.parse_args()
+    if args.browser and not args.frontend_image:
+        parser.error('--browser requires --frontend-image')
     name='noteapp-audit-probe-'+uuid.uuid4().hex[:10]
     run('docker','volume','create',name)
     result={'image':run('docker','image','inspect',args.image,'--format','{{.Id}}'),'container':name,'count_per_type':args.count}
     try:
-        run('docker','run','-d','--name',name,'-p','127.0.0.1::8080','-v',name+':/data',args.image)
+        if args.browser:
+            run('docker','network','create',name)
+        network = ['--network', name, '--network-alias', 'noteapp'] if args.browser else []
+        run('docker','run','-d','--name',name,*network,'-p','127.0.0.1::8080','-v',name+':/data',args.image)
         port=json.loads(run('docker','inspect',name))[0]['NetworkSettings']['Ports']['8080/tcp'][0]['HostPort']
         base='http://127.0.0.1:'+port+'/api/v1'
         def req(path,body=None,method=None,headers=None):
@@ -89,8 +94,16 @@ def main():
             assert responses[0][1]==responses[1][1],key+' compression changed JSON'
             result['transport'][key]={'identity_bytes':len(responses[0][0]),'negotiated_bytes':len(responses[1][0]),'encoding':responses[1][2],'decoded_equal':True}
         if args.browser:
+            front = name + '-frontend'
+            run('docker','run','-d','--name',front,'--network',name,'-p','127.0.0.1::8080',args.frontend_image)
+            front_port = json.loads(run('docker','inspect',front))[0]['NetworkSettings']['Ports']['8080/tcp'][0]['HostPort']
+            front_base = 'http://127.0.0.1:' + front_port
+            for _ in range(100):
+                try:
+                    with urllib.request.urlopen(front_base + '/api/v1/readyz', timeout=2): break
+                except OSError: time.sleep(.1)
             browser_script=pathlib.Path(__file__).with_name('capacity_browser.mjs')
-            result['browser']=json.loads(run('node',str(browser_script),name,base.removesuffix('/api/v1'),pid,firstnote))
+            result['browser']=json.loads(run('node',str(browser_script),name,front_base,pid,firstnote))
         result['memory']=run('docker','stats','--no-stream','--format','{{.MemUsage}}',name)
         # Kill only this temporary process; committed rows must survive crash/restart.
         before=req('/projects/'+pid+'/tasks')[1]
@@ -111,6 +124,10 @@ def main():
         print(json.dumps(result,ensure_ascii=False,indent=2))
         raise
     finally:
+        if args.browser:
+            subprocess.run(['docker','rm','-f',name+'-frontend'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         subprocess.run(['docker','rm','-f',name],stdout=subprocess.DEVNULL)
         subprocess.run(['docker','volume','rm',name],stdout=subprocess.DEVNULL)
+        if args.browser:
+            subprocess.run(['docker','network','rm',name],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 if __name__=='__main__':main()

@@ -2,17 +2,14 @@ package app
 
 import (
 	"database/sql"
-	"io/fs"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"noteapp/internal/platform/buildinfo"
 	"noteapp/internal/platform/config"
 	"noteapp/internal/platform/httpx"
 	"noteapp/internal/taskmeta"
 	"noteapp/internal/transfer"
-	"noteapp/web"
 )
 
 func registerStatus(mux *http.ServeMux, db *sql.DB, c config.Config) {
@@ -29,20 +26,10 @@ func registerStatus(mux *http.ServeMux, db *sql.DB, c config.Config) {
 	})
 }
 
-func registerFrontend(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/", func(w http.ResponseWriter, r *http.Request) { httpx.Fail(w, httpx.NotFound) })
-	files, _ := fs.Sub(web.Files, "dist")
-	static := http.FileServer(http.FS(files))
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		if _, err := fs.Stat(files, strings.TrimPrefix(r.URL.Path, "/")); err != nil {
-			if strings.HasPrefix(r.URL.Path, "/assets/") {
-				http.NotFound(w, r)
-				return
-			}
-			r.URL.Path = "/"
-		}
-		static.ServeHTTP(w, r)
-	})
+func registerAPIFallback(mux *http.ServeMux) {
+	missing := func(w http.ResponseWriter, r *http.Request) { httpx.Fail(w, httpx.NotFound) }
+	mux.HandleFunc("/api", missing)
+	mux.HandleFunc("/api/", missing)
 }
 
 func protectRequests(next http.Handler, c config.Config) http.Handler {

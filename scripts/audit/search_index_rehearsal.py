@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import sqlite3
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
@@ -74,13 +75,13 @@ def main():
                     raise
                 time.sleep(.1)
     def backup(name, target):
-        run(str(ROOT / 'scripts/backup.sh'), '--container', name, '--volume', name, '--image', args.image,
+        run(sys.executable, str(ROOT / 'scripts/operations.py'), 'backup', '--container', name, '--volume', name, '--image', args.image,
             '--app-version', 'search-index-rehearsal', '--output', str(target))
     try:
         for name in names:
             run('docker', 'volume', 'create', name)
             made.append(name)
-        run(str(ROOT / 'scripts/restore.sh'), '--volume', names[0], '--image', args.source_image, '--backup', str(source))
+        run(sys.executable, str(ROOT / 'scripts/operations.py'), 'restore', '--volume', names[0], '--image', args.source_image, '--backup', str(source))
         base = start(names[0])
         with tempfile.TemporaryDirectory(prefix='nestory-search-rehearsal-') as work:
             upgraded, valued, restored = [Path(work) / key for key in ('upgraded', 'valued', 'restored')]
@@ -109,7 +110,7 @@ def main():
             assert request('/search?q=search-rehearsal-marker')['total'] == 3
             for typ, obj in objects:
                 assert request('/' + typ + '/' + obj['id'])['body_document'] == obj['body_document']
-            run(str(ROOT / 'scripts/restore.sh'), '--volume', names[1], '--image', args.image, '--backup', str(valued))
+            run(sys.executable, str(ROOT / 'scripts/operations.py'), 'restore', '--volume', names[1], '--image', args.image, '--backup', str(valued))
             base = start(names[1])
             assert request('/search?q=search-rehearsal-marker')['total'] == 3
             for typ, obj in objects:

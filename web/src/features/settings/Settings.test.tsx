@@ -20,6 +20,9 @@ it('presents all settings groups and persists a choice immediately', () => {
  expect(document.documentElement.style.getPropertyValue('--editor-font-size')).toBe('19px');
  expect(screen.getByText('Asia/Shanghai',{selector:'span'})).toBeVisible();
  expect(screen.getByText('v0.1.1+9f5e899')).toBeVisible();
+ expect(screen.getByText('前端版本')).toBeVisible();
+ expect(screen.getByText('后端版本')).toBeVisible();
+ expect(screen.getByText('development')).toBeVisible();
 });
 it('only resets preferences after confirmation and preserves drafts', () => {
  show();localStorage.setItem('noteapp:draft:1','my words');

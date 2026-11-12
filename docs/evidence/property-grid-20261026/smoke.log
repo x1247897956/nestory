@@ -1,7 +1,0 @@
-PASS /api/v1/healthz
-PASS /api/v1/readyz
-PASS /api/v1/config
-PASS /api/v1/projects
-PASS /api/v1/workspace/today
-PASS /api/v1/trash
-PASS static frontend

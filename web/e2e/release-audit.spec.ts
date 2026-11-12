@@ -1,14 +1,9 @@
+import { assertReleaseFixture } from './release-fixture';
 // Independent release audit probes. Use only the disposable audit container.
 import { test, expect } from '@playwright/test';
-import {execFileSync} from 'node:child_process';
 test.skip(process.env.NOTEAPP_RELEASE_AUDIT !== '1','Opt-in release regressions; use scripts/audit/run_browser.sh');
 test.beforeEach(async ({baseURL}) => {
- expect(new URL(baseURL!).port).toBe('18187');
- const name=process.env.NOTEAPP_AUDIT_CONTAINER;
- expect(name?.startsWith('noteapp-release-audit-')).toBe(true);
- const info=JSON.parse(execFileSync('docker',['inspect',name!],{encoding:'utf8'}))[0];
- expect(info.NetworkSettings.Ports['8080/tcp'][0].HostPort).toBe('18187');
- expect(info.Mounts.some((mount:any)=>mount.Name===name && mount.Destination==='/data')).toBe(true);
+ assertReleaseFixture(baseURL);
 });
 for (const [name,block] of Object.entries({
   emptyRow:{id:'bad-emptyRow',type:'table',content:{type:'tableContent',rows:[{cells:[{type:'tableCell',props:{rowspan:2},content:[]}]},{cells:[]}]}},
@@ -41,7 +36,7 @@ test('unknown Host is rejected across routes even with matching Origin',async({r
  expect((await request.post('/api/v1/projects',{headers:{Host:'audit.invalid:18187',Origin:'http://audit.invalid:18187'},data:{title:'blocked'}})).status()).toBe(403);
 });
 test('configured LAN HTTP opens and autosaves all object types without secure context',async({playwright,request})=>{
- const browser=await playwright.chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,args:['--host-resolver-rules=MAP lan.noteapp.test 127.0.0.1','--no-proxy-server']});
+ const browser=await playwright.chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,args:['--host-resolver-rules=MAP lan.noteapp.test 127.0.0.1','--proxy-server=direct://']});
  try {
   const p=await(await request.post('/api/v1/projects',{data:{title:'LAN HTTP'}})).json();
   const page=await browser.newPage();const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));

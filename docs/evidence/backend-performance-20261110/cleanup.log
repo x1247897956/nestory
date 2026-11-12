@@ -1,1 +1,0 @@
-After completed runs, docker ps -a --filter name=nestory-perf- and docker volume ls --filter name=nestory-perf- both returned no resources.

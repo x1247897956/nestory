@@ -13,8 +13,8 @@
 复现需要本机Docker、已构建镜像、web依赖、Chromium和ffmpeg：
 
 ```sh
-PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH='/path/to/chromium' node scripts/media/capture-product.cjs noteapp:nestory-20261106
+node scripts/media/capture-product.cjs noteapp:test noteapp-web:test
 sh scripts/media/encode-product.sh
 ```
 
-脚本只创建与清理自身 `noteapp-media-*` 容器/卷，不连接18084日常实例。当前示例日期为2026年11月；以后重拍时需更新示例日期或切换至对应月份。
+脚本只创建与清理自身 `noteapp-media-*` 容器/卷，不连接日常实例。默认使用 Playwright 安装的 Chromium，也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定浏览器路径。当前示例日期为2026年11月；以后重拍时需更新示例日期或切换至对应月份。

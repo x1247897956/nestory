@@ -1,5 +1,5 @@
 """Real Docker acceptance for fail-safe offline backups. Uses only its own temporary names."""
-import json, os, pathlib, subprocess, tempfile, time, unittest, urllib.request, uuid
+import json, os, pathlib, subprocess, sys, tempfile, time, unittest, urllib.request, uuid
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 IMAGE = os.environ.get('NOTEAPP_TEST_IMAGE', 'noteapp:local')
 def run(*args, check=True):
@@ -23,8 +23,8 @@ class BackupRestore(unittest.TestCase):
   for c in [self.name,self.target]:run('docker','rm','-f',c,check=False)
   for v in [self.name,self.target]:run('docker','volume','rm',v,check=False)
   self.tmp.cleanup()
- def backup(self,**kwargs):return run(str(ROOT/'scripts/backup.sh'),'--container',self.name,'--volume',self.name,'--image',IMAGE,'--app-version','test-version','--output',str(self.out),**kwargs)
- def restore(self,**kwargs):return run(str(ROOT/'scripts/restore.sh'),'--volume',self.target,'--image',IMAGE,'--backup',str(self.out),**kwargs)
+ def backup(self,**kwargs):return run(sys.executable,str(ROOT/'scripts/operations.py'),'backup','--container',self.name,'--volume',self.name,'--image',IMAGE,'--app-version','test-version','--output',str(self.out),**kwargs)
+ def restore(self,**kwargs):return run(sys.executable,str(ROOT/'scripts/operations.py'),'restore','--volume',self.target,'--image',IMAGE,'--backup',str(self.out),**kwargs)
  def running(self):return json.loads(run('docker','inspect',self.name).stdout)[0]['State']['Running']
  def test_round_trip_and_reject_nonempty_target(self):
   self.backup();self.assertTrue(self.running());manifest=json.loads((self.out/'manifest.json').read_text());self.assertEqual(manifest['counts']['tasks'],1);self.assertEqual(manifest['counts']['creation_requests'],2);self.restore()
@@ -57,5 +57,5 @@ class BackupRestore(unittest.TestCase):
  def test_originally_stopped_stays_stopped_and_tampering_rejected(self):
   run('docker','stop',self.name);self.backup();self.assertFalse(self.running());archive=self.out/'data.tar.gz';archive.write_bytes(archive.read_bytes()+b'tamper');self.assertNotEqual(self.restore(check=False).returncode,0)
  def test_wrong_volume_rejected_without_stopping(self):
-  result=run(str(ROOT/'scripts/backup.sh'),'--container',self.name,'--volume',self.target,'--image',IMAGE,'--app-version','test','--output',str(self.out),check=False);self.assertNotEqual(result.returncode,0);self.assertTrue(self.running())
+  result=run(sys.executable,str(ROOT/'scripts/operations.py'),'backup','--container',self.name,'--volume',self.target,'--image',IMAGE,'--app-version','test','--output',str(self.out),check=False);self.assertNotEqual(result.returncode,0);self.assertTrue(self.running())
 if __name__=='__main__':unittest.main(verbosity=2)

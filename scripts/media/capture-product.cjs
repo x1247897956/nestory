@@ -2,7 +2,8 @@
 const {chromium}=require('../../web/node_modules/@playwright/test');
 const {execFileSync}=require('node:child_process');
 const fs=require('node:fs');const path=require('node:path');
-const image=process.argv[2]||'noteapp:nestory-20261106';
+const image=process.argv[2]||'noteapp:test';
+const frontendImage=process.argv[3]||'noteapp-web:test';
 const name='noteapp-media-'+Date.now();const output=path.resolve('docs/assets');
 const docker=(...args)=>execFileSync('docker',args,{encoding:'utf8'}).trim();
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -12,8 +13,10 @@ const block=(id,type,value,props={})=>({id,type,props,content:text(value),childr
  let browser,context;
  try{
   docker('volume','create',name);
-  docker('run','-d','--name',name,'-p','127.0.0.1::8080','-v',name+':/data',image);
-  const inspect=JSON.parse(docker('inspect',name))[0];const port=inspect.NetworkSettings.Ports['8080/tcp'][0].HostPort;const base='http://127.0.0.1:'+port;
+  docker('network','create',name);
+  docker('run','-d','--name',name,'--network',name,'--network-alias','noteapp','-v',name+':/data',image);
+  docker('run','-d','--name',name+'-frontend','--network',name,'-p','127.0.0.1::8080',frontendImage);
+  const inspect=JSON.parse(docker('inspect',name+'-frontend'))[0];const port=inspect.NetworkSettings.Ports['8080/tcp'][0].HostPort;const base='http://127.0.0.1:'+port;
   for(let i=0;i<100;i++){try{if((await fetch(base+'/api/v1/readyz')).ok)break;}catch{}await pause(100);}
   const api=async(url,data,method='POST')=>{const r=await fetch(base+'/api/v1'+url,{method,headers:{'Content-Type':'application/json'},...(data?{body:JSON.stringify(data)}:{})});if(!r.ok)throw Error(url+': '+r.status+' '+await r.text());return r.status===204?null:r.json()};
   const project=await api('/projects',{title:'设计一次更好的分享',description:'从灵感到讲稿，让准备有条不紊。'});
@@ -50,7 +53,7 @@ const block=(id,type,value,props={})=>({id,type,props,content:text(value),childr
   const d=await api(`/projects/${pid}/property-definitions/pages`,{kind:'single_select',name:'内容类型'});
   const definition=await api(`/property-definitions/${d.id}`,{version:d.version,options:[{id:'outline',name:'分享大纲',color:'blue'},{id:'reference',name:'参考资料',color:'green'}]},'PATCH');
   await api(`/objects/pages/${note.id}/custom-properties/${d.id}`,{version:0,definition_version:definition.version,value:'outline'},'PUT');
-  browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||'/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'});
+  browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
   fs.mkdirSync(output,{recursive:true});
   const options={viewport:{width:1680,height:1120},deviceScaleFactor:1,locale:'zh-CN',timezoneId:'Asia/Shanghai',reducedMotion:'reduce'};
   context=await browser.newContext(options);const page=await context.newPage();
@@ -73,5 +76,5 @@ const block=(id,type,value,props={})=>({id,type,props,content:text(value),childr
   recording=false;await capture;await context.close();context=null;
   execFileSync('ffmpeg',['-y','-framerate','5','-i',path.join(frames,'%05d.png'),'-vf','scale=1440:-2','-c:v','libx264','-preset','slow','-crf','20','-pix_fmt','yuv420p','-movflags','+faststart','-an',path.join(output,'product-tour.mp4')],{stdio:'ignore'});fs.rmSync(frames,{recursive:true,force:true});
   console.log(JSON.stringify({image,project:pid,output,captures:5,video:'product-tour.mp4'},null,2));
- }finally{if(context)await context.close();if(browser)await browser.close();try{docker('rm','-f',name)}catch{}try{docker('volume','rm',name)}catch{}}
+ }finally{if(context)await context.close();if(browser)await browser.close();try{docker('rm','-f',name+'-frontend',name)}catch{}try{docker('network','rm',name)}catch{}try{docker('volume','rm',name)}catch{}}
 })().catch(e=>{console.error(e);process.exitCode=1});

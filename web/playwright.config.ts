@@ -17,12 +17,19 @@ export default defineConfig({
   },
   webServer: process.env.E2E_BASE_URL
     ? undefined
-    : {
-        command:
-          "env -u GOROOT APP_ADDR=127.0.0.1:18080 APP_DATA_DIR=/tmp/noteapp-e2e-data go run ./cmd/noteapp",
-        cwd: "..",
-        url: "http://127.0.0.1:18080/api/v1/readyz",
-        reuseExistingServer: false,
-        timeout: 120000,
-      },
+    : [
+        {
+          command: "env -u GOROOT APP_ADDR=127.0.0.1:8080 APP_DATA_DIR=/tmp/noteapp-e2e-data go run ./cmd/noteapp",
+          cwd: "..",
+          url: "http://127.0.0.1:8080/api/v1/readyz",
+          reuseExistingServer: false,
+          timeout: 120000,
+        },
+        {
+          command: "npm run dev -- --host 127.0.0.1 --port 18080 --strictPort",
+          url: "http://127.0.0.1:18080",
+          reuseExistingServer: false,
+          timeout: 120000,
+        },
+      ],
 });

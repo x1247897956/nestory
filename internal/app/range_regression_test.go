@@ -86,7 +86,7 @@ func TestBoundedRangeAndMultipartHTTP(t *testing.T) {
 	if err = json.Unmarshal(data, &uploaded); err != nil || uploaded.URL == "" {
 		t.Fatalf("upload response: %s (%v)", data, err)
 	}
-	for _, path := range []string{"/", uploaded.URL} {
+	for _, path := range []string{uploaded.URL} {
 		t.Run(path, func(t *testing.T) {
 			status, _, whole := request("GET", path, "", "", nil)
 			if status != 200 || len(whole) < 10 {

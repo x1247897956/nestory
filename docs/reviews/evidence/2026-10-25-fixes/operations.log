@@ -1,8 +1,0 @@
-../opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/re/_parser.py:450: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x1067299a0>
-  return list(dict.fromkeys(items))
-ResourceWarning: Enable tracemalloc to get the object allocation traceback
-.......
-----------------------------------------------------------------------
-Ran 9 tests in 6.782s
-
-OK

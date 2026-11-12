@@ -1,49 +1,50 @@
-# 独立 V1 发布审计复现
+# 按需开发与发布验证
 
-脚本只操作独立临时数据。Python 脚本自动创建、清理自己 UUID 命名的容器和卷；镜像必须显式传入。
+这些工具操作自己创建的隔离容器和数据卷，不参与应用启动。常规 CI 执行 scripts/tests/ 和浏览器回归；下面的容量、故障和历史升级演练由开发者按需要运行。
 
-```sh
-python3 scripts/audit/release_probe.py --image noteapp:release-audit-20261025 --count 1000
-PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH='/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' python3 scripts/audit/release_probe.py --image noteapp:release-audit-20261025 --count 1000 --browser
-python3 scripts/audit/alpine_advisories.py --image noteapp:release-audit-20261025
-python3 scripts/audit/storage_faults.py --image noteapp:release-audit-20261025
-python3 scripts/audit/migration_rehearsal.py --image noteapp:release-audit-20261025
-PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH='/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' sh scripts/audit/run_browser.sh noteapp:release-audit-20261025
-```
+| 工具 | 覆盖范围 | 额外要求 |
+| --- | --- | --- |
+| backend_performance.py | 当前性能入口：每类 100/1000/5000 对象、原始样本、p50/p95、属性集合、gzip、并发保存和磁盘页统计 | Python、Docker、候选镜像 |
+| release_probe.py | 综合观测：附件上传/下载 SHA、并发重试、KILL 后持久性及可选浏览器容量测量 | Python、Docker；浏览器另需 Node/Chromium |
+| capacity_browser.mjs | 冷导航、DOM、heap、输入与保存测量，由 release_probe.py --browser 调用 | 锁定的前端依赖、Chromium |
+| storage_faults.py | 独立 2 MiB tmpfs 卷中的磁盘写满、附件目录不可写及释放后的恢复 | Python、Docker |
+| alpine_advisories.py | 读取镜像系统包，对照对应 Alpine 分支官方安全公告 | Python、Docker、网络 |
+| migration_rehearsal.py | 合成 schema6 数据，验证拒绝未准备升级、离线块准备、升级及关系/附件保留 | Python、Docker、Node、前端依赖 |
+| custom_properties_rehearsal.py | schema8 备份副本升级，核对原表与附件，写入四类属性后干净卷恢复 | Python、Docker、源/候选镜像和已校验 schema8 备份 |
+| search_index_rehearsal.py | schema9 副本升级到 schema10，验证 FTS 回填、同卷重建和干净卷恢复 | Python、Docker、源/候选镜像和已校验 schema9 备份 |
+| compare_backups.py | 比较相同 schema 的两份备份，逐表与附件核对，只允许最近访问时间前进 | Python、两份已校验备份 |
+| run_browser.sh | 创建隔离实例、等待就绪、运行 Playwright 并清理，CI 也使用它 | POSIX Shell、Docker、Node、Chromium |
 
-runner现执行常规业务用例和发布回归的完整套件，全部写入其独立临时卷。浏览器脚本需要空闲 18187 端口；冲突时不会测试或停止既有实例。测试文件在常规 E2E 中默认跳过，runner 启用并校验容器卷/端口。2026-10-25 修复后，浏览器测试已改为断言安全行为，包含 LAN HTTP、草稿恢复、克隆窗口、文件处理中恢复保护和固定块 schema。原始缺陷复现结果仍保存在独立审查报告中。runner只在自己的容器允许 `lan.noteapp.test`，未知 `audit.invalid` 必须返回403。
+## 性能与运行检查
 
-容量样本：每类 `count` 个对象，正文约 8KB；API 用 7 次串行请求统计端到端中位数和最大值，非 p95。浏览器样本只有单次冷导航，heap 是采样值，不是峰值。容量脚本另上传10个各1MiB随机附件并核对下载SHA，测8路搜索并发编辑；父子/关系使用另行完整旅程与恢复测试。5000 首轮连接中断时没有保存容器现场，不能据此归因产品；后续脚本对失败保留 state/logs，显式关闭 Python 系统代理。
+从仓库根目录执行，使用自己构建的测试镜像：
 
-磁盘测试使用 **2MiB 独立 named tmpfs volume** 触发 ENOSPC，不填满 Docker 主磁盘。迁移脚本创建自己的 schema6 数据，测试拒绝未准备的旧正文、准备复用、升级到8、三端关系和附件。
+~~~sh
+mkdir -p .local/reports
+python3 scripts/audit/backend_performance.py --image noteapp:test --properties --output .local/reports/capacity.json
+python3 scripts/audit/release_probe.py --image noteapp:test --count 1000 > .local/reports/release-probe.json
+python3 scripts/audit/alpine_advisories.py --image noteapp:test > .local/reports/alpine.json
+python3 scripts/audit/storage_faults.py --image noteapp:test > .local/reports/storage.json
+sh scripts/audit/run_browser.sh noteapp:test noteapp-web:test
+~~~
 
-Alpine脚本使用官方分支main secdb和镜像内原生apk版本比较，输出版本候选，不能代替运行路径/可利用性判定；不要求Docker Scout登录。
+release_probe.py 的部分字段仅记录状态，不等同于完整回归断言；其计时与 backend_performance.py 有重叠。性能比较以性能工具的原始样本和重复轮次为准。heap / Docker memory 是采样值，不是峰值或泄漏证明。Alpine 版本匹配是公告候选，不能直接认定应用可被利用。
 
-自定义属性升级演练（只恢复备份副本到本脚本新建的临时卷，不操作正式容器）：
+run_browser.sh 使用空闲的 18187 端口，失败时不会停止占用该端口的其他实例。它具有实际隔离编排和清理逻辑，因此保留；维护工具的纯命令转发 Shell 入口已移除。
 
-```sh
-python3 scripts/audit/custom_properties_rehearsal.py --image noteapp:search-collections-20261110 --source-image noteapp:object-menu-20261026 --backup backups/2026-10-26-after-object-menu
-```
+## 历史版本升级演练
 
-要求源清单是schema8且源镜像与清单一致。脚本升级副本到当前schema10、比较全部原有行和附件，写入独立演练项目的四种属性，再备份恢复到另一个干净卷核对；会在backups/留下验证备份，临时容器/卷自动清理。随机宿主端口在停启后重新发现，避免复用旧地址。已有schema6准备迁移脚本当前目标也为schema10。
+以下是参数格式。将源镜像与备份替换为同一来源且符合 schema 要求的实际值；工具只升级自己创建的副本：
 
-## 单人后端性能检查
+~~~sh
+python3 scripts/audit/migration_rehearsal.py --image noteapp:test
+python3 scripts/audit/custom_properties_rehearsal.py --image noteapp:test --source-image SOURCE_IMAGE --backup PATH_TO_SCHEMA8_BACKUP
+python3 scripts/audit/search_index_rehearsal.py --image noteapp:test --source-image SOURCE_IMAGE --backup PATH_TO_SCHEMA9_BACKUP
+python3 scripts/audit/compare_backups.py BEFORE_BUNDLE AFTER_BUNDLE
+~~~
 
-```sh
-python3 scripts/audit/backend_performance.py --image noteapp:architecture-20261110 --output /tmp/nestory-capacity.json
-env -u GOROOT go test -run '^$' -bench BenchmarkSearch -benchmem -count=6 ./internal/workspace
-```
+自定义属性演练在被忽略的 backups/ 中保留校验备份；临时容器/卷由工具清理。真实备份不提交 Git。报告放在 .local/；浏览器失败产物由 Playwright 放入被忽略的 web/test-results/、web/playwright-report/，CI 按工作流保存为限时 artifact。
 
-新容量脚本依次创建每类100、1000、5000个约8KiB正文对象的隔离容器/卷；三轮各20次暖请求，输出全部样本及nearest-rank p95。默认协商gzip，计时截至HTTP响应读取完成，JSON解压/解析不计入接口延迟，也不代表前端渲染耗时。内存为Docker采样值，不能称作峰值；8路搜索同时保存用于多标签页压力诊断，不模拟多人用户。清理仅针对本次新建资源，不能传入正式URL/卷。
+浏览器可用 Playwright 安装的 Chromium；如需指定已安装的浏览器，设置 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH。测量应串行进行，避免与其他基准、浏览器回归或构建争用资源，详见[性能检查](../../docs/performance.md)。
 
-Go基准使用真实临时SQLite，单独定位搜索服务，不等同于Docker端到端延迟；不要同时运行两类测量、构建或其他基准。
-
-
-搜索索引及集合优化复测（默认完整集合仍保留用于旧基线比较，--properties另测正式界面使用的属性集合）：
-
-```sh
-python3 scripts/audit/backend_performance.py --image noteapp:search-collections-20261110 --properties --output /tmp/search-collections.json
-python3 scripts/audit/search_index_rehearsal.py --backup backups/2026-11-10-before-search-collections --source-image noteapp:architecture-20261110 --image noteapp:search-collections-20261110
-```
-
-索引演练仅升级备份副本，检查schema9原表不变、索引回填完整性、非空三类正文搜索、同卷容器重建与干净卷恢复。搜索索引是派生数据，属于正常数据库备份的一部分。
+页面验证和素材工具需要分别构建的后端与前端镜像。`release_probe.py --browser` 额外要求 `--frontend-image noteapp-web:test`；纯 API/性能探针仅需后端镜像。

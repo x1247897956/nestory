@@ -17,6 +17,7 @@
 .setting-title { display:block; font-size:calc(13px * var(--interface-scale, 1)); font-weight:500; color:var(--settings-text); }
 .setting-copy p,.setting-description { display:block; margin:6px 0 0; color:var(--settings-muted); font-size:calc(12px * var(--interface-scale, 1)); line-height:1.7; }
 .setting-control { flex-shrink:0; }
+.setting-control:has(.settings-value) { min-width:0; flex-shrink:1; overflow-wrap:anywhere; }
 .setting-control select { min-width:170px; padding:8px 30px 8px 10px; font-size:calc(13px * var(--interface-scale, 1)); background-color:var(--settings-surface); }
 .settings-value { font-size:calc(13px * var(--interface-scale, 1)); color:var(--settings-muted); font-variant-numeric:tabular-nums; }
 .setting-actions { display:flex; gap:8px; flex-wrap:wrap; }

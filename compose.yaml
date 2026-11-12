@@ -7,15 +7,34 @@ services:
     image: ${APP_IMAGE:-noteapp:local}
     restart: unless-stopped
     stop_grace_period: 15s
-    ports:
-      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8080}:8080"
     environment:
-      APP_TIMEZONE: ${APP_TIMEZONE:?Run python3 scripts/local_deploy.py configure first}
+      APP_TIMEZONE: ${APP_TIMEZONE:?Set APP_TIMEZONE in .env to an IANA timezone such as Asia/Shanghai or UTC}
+      APP_DEV_ORIGIN: ${APP_DEV_ORIGIN:-}
       APP_DATA_DIR: /data
       APP_ALLOWED_HOSTS: ${APP_ALLOWED_HOSTS:-localhost,127.0.0.1,::1}
       APP_UPLOAD_LIMIT: ${APP_UPLOAD_LIMIT:-20971520}
     volumes:
       - noteapp-data:/data
+    healthcheck:
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+  frontend:
+    build:
+      context: ./web
+      args:
+        APP_VERSION: ${APP_FRONTEND_VERSION:-${APP_VERSION:-development}}
+    image: ${APP_FRONTEND_IMAGE:-noteapp-web:local}
+    restart: unless-stopped
+    ports:
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8080}:8080"
+    environment:
+      BACKEND_UPSTREAM: noteapp:8080
+      APP_ALLOWED_HOSTS: ${APP_ALLOWED_HOSTS:-localhost,127.0.0.1,::1}
+    depends_on:
+      noteapp:
+        condition: service_healthy
 volumes:
   noteapp-data:
     name: ${APP_VOLUME_NAME:-noteapp_noteapp-data}

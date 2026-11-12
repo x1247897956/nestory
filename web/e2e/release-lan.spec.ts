@@ -1,20 +1,15 @@
+import { assertReleaseFixture } from './release-fixture';
 import { test, expect, type Browser, type Playwright } from '@playwright/test';
-import { execFileSync } from 'node:child_process';
 
 const origin = 'http://lan.noteapp.test:18187';
 test.skip(process.env.NOTEAPP_RELEASE_AUDIT !== '1', 'Opt-in LAN regressions against the disposable audit container');
 test.beforeEach(async ({ baseURL }) => {
-  expect(new URL(baseURL!).port).toBe('18187');
-  const name = process.env.NOTEAPP_AUDIT_CONTAINER;
-  expect(name?.startsWith('noteapp-release-audit-')).toBe(true);
-  const info = JSON.parse(execFileSync('docker', ['inspect', name!], { encoding: 'utf8' }))[0];
-  expect(info.NetworkSettings.Ports['8080/tcp'][0].HostPort).toBe('18187');
-  expect(info.Mounts.some((mount: { Name: string; Destination: string }) => mount.Name === name && mount.Destination === '/data')).toBe(true);
+ assertReleaseFixture(baseURL);
 });
 async function lanBrowser(playwright: Playwright): Promise<Browser> {
   return playwright.chromium.launch({
     executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
-    args: ['--host-resolver-rules=MAP lan.noteapp.test 127.0.0.1', '--no-proxy-server'],
+    args: ['--host-resolver-rules=MAP lan.noteapp.test 127.0.0.1', '--proxy-server=direct://'],
   });
 }
 for (const kind of ['tasks', 'pages', 'events'] as const) {

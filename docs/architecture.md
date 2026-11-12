@@ -23,7 +23,7 @@ apperr                    不含HTTP状态码的应用错误
 platform/database         SQLite连接、迁移
 ```
 
-app.New只负责依赖组装；项目、内容、跨对象和工作台路由分别注册，server.go管理静态资源与Host/Origin/异常保护。objectquery通过构造函数接收读取函数，HTTP handler不再负责跨模块查询编排。无需通用Repository或DI框架。
+app.New只负责依赖组装；项目、内容、跨对象和工作台路由分别注册，server.go管理 API 状态与Host/Origin/异常保护。objectquery通过构造函数接收读取函数，HTTP handler不再负责跨模块查询编排。无需通用Repository或DI框架。
 
 业务服务继续直接使用database/sql。这里明确保留了业务校验和SQL的局部耦合，尚未引入完整的独立领域层、存储适配层。
 
@@ -78,14 +78,22 @@ HTTP Host/Origin校验后由httpx.CompressJSON处理GET JSON协商压缩，使�
 
 | 位置 | 语言 | 是否属于正式运行服务 |
 | --- | --- | --- |
-| cmd / internal | Go | 是：单一服务提供API与内嵌静态文件 |
-| web/src | TypeScript（.ts/.tsx）、CSS，入口为HTML | 浏览器代码；构建为JavaScript/CSS后由Go提供 |
+| cmd / internal | Go | 是：独立 Go API 服务 |
+| web/src | TypeScript（.ts/.tsx）、CSS，入口为HTML | 浏览器代码；独立构建为JavaScript/CSS，由 Nginx 提供 |
 | scripts/operations.py | Python标准库 | 否：主机按需执行备份、恢复、健康检查 |
 | scripts/audit / tests | Python、Node、Shell | 否：开发/发布验证 |
 | scripts/prepare-block-migration.mjs | JavaScript ES模块 | 否：只为旧库离线迁移调用BlockNote解析器 |
 | scripts/media | JavaScript与Shell | 否：README素材工具 |
 
-Docker只有构建阶段运行Node和Go工具链；最终运行层只包含Go二进制、系统证书、时区数据及基础系统组件，不包含Python/Node服务。生产启动无需安装Python，也不执行迁移准备脚本；需要备份/恢复脚本时在主机准备Python。
+后端 Docker 构建只使用 Go；前端构建只使用 Node。后端运行镜像包含 Go 二进制、证书与时区数据，前端运行镜像包含 Nginx 与静态资源；均不包含 Python/Node 服务。生产启动无需安装Python，也不执行迁移准备脚本；需要备份/恢复脚本时在主机准备Python。
+
+## 部署与构建边界
+
+同一 Compose 文件统一编排两个独立服务：`frontend` 是浏览器唯一入口，托管 SPA 并将 `/api` 转发给内部的 `noteapp:8080`；后端不映射宿主机端口，也不读取前端产物。数据库和附件仅挂载后端 `/data`，原有项目名和数据卷名继续使用。
+
+代理保留原始 Host（含对外端口）与 Origin。前端静态入口使用同一精确 Host 允许列表，后端仍校验 API Host 与写入来源，不信任客户端转发头。Nginx 通过 Docker DNS 动态解析后端，后端替换后可重新连接。API 请求与响应流式转发，大小限制由后端实施；深层页面链接由前端回退到 index.html，未知 API 与缺失资源各自返回 404。
+
+前后端可分别构建与更新，也可用 `docker compose up -d --build` 一次部署整套应用。两边单元检查独立；联调仍使用两个镜像验证真实代理路径，详见[CI](ci.md)。
 
 ## 前端边界
 
@@ -100,4 +108,4 @@ app负责应用级路由、项目上下文和任务交互编排；features按项
 
 任务/笔记/日程集合支持include_body=false，在SQL投影中不读取body_document，响应省略该字段；未指定参数继续返回完整对象以保持兼容。正式前端集合只请求属性，详情GET、创建、更新返回完整块正文。TypeScript使用Omit<完整对象,"body_document">区分集合类型，不能直接传给编辑器；属性缓存和完整详情缓存分别维护，拖动后也不会把完整正文写回集合缓存。
 
-实测规模、搜索/集合修复结果与限制见[性能验证记录](evidence/search-collections-20261110/README.md)。
+测量方法、复现命令与搜索/集合性能边界见[性能检查](performance.md)。

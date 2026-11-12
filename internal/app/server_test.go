@@ -1,6 +1,9 @@
 package app_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"noteapp/internal/platform/buildinfo"
@@ -26,5 +29,25 @@ func TestConfigReportsBuildVersion(t *testing.T) {
 				t.Fatalf("version = %v, want %q", got["version"], tc.version)
 			}
 		})
+	}
+}
+
+func TestBackendOnlyServesAPI(t *testing.T) {
+	h, closeDB := setup(t)
+	defer closeDB()
+	for _, path := range []string{"/", "/projects/example", "/assets/missing.js"} {
+		r := httptest.NewRequest("GET", path, nil)
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		if w.Code != http.StatusNotFound {
+			t.Fatalf("GET %s = %d; backend must not serve frontend", path, w.Code)
+		}
+	}
+	for _, method := range []string{"GET", "POST"} {
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, httptest.NewRequest(method, "/api/v1/missing", nil))
+		if w.Code != http.StatusNotFound || !strings.HasPrefix(w.Header().Get("Content-Type"), "application/json") {
+			t.Fatalf("%s unknown API = %d %s", method, w.Code, w.Header().Get("Content-Type"))
+		}
 	}
 }

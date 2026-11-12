@@ -1,0 +1,46 @@
+worker_processes auto;
+pid /tmp/nginx.pid;
+error_log /dev/stderr warn;
+events { worker_connections 1024; }
+http {
+ include /etc/nginx/mime.types;
+ default_type application/octet-stream;
+ access_log /dev/stdout;
+ client_body_temp_path /tmp/client_temp;
+ proxy_temp_path /tmp/proxy_temp;
+ fastcgi_temp_path /tmp/fastcgi_temp;
+ uwsgi_temp_path /tmp/uwsgi_temp;
+ scgi_temp_path /tmp/scgi_temp;
+ server_tokens off;
+ sendfile on;
+ map $host $request_host_allowed { default 0; include /tmp/allowed-hosts.conf; }
+ resolver 127.0.0.11 valid=1s ipv6=off;
+ upstream api { zone api 64k; server ${BACKEND_UPSTREAM} resolve; }
+ server {
+  listen 8080;
+  root /usr/share/nginx/html;
+  if ($request_host_allowed = 0) { return 403; }
+  add_header X-Content-Type-Options nosniff always;
+  add_header Referrer-Policy same-origin always;
+  client_max_body_size 0;
+  location ~ ^/api(?:/|$) {
+   proxy_pass http://api;
+   proxy_hide_header X-Content-Type-Options;
+   proxy_hide_header Referrer-Policy;
+   proxy_http_version 1.1;
+   proxy_set_header Host $http_host;
+   proxy_set_header Connection "";
+   proxy_set_header X-Forwarded-Host "";
+   proxy_set_header X-Forwarded-Proto "";
+   proxy_request_buffering off;
+   proxy_buffering off;
+   proxy_read_timeout 300s;
+   proxy_send_timeout 300s;
+  }
+  location = /index.html { add_header Cache-Control "no-cache"; add_header X-Content-Type-Options nosniff always; add_header Referrer-Policy same-origin always; }
+  location = /version.json { add_header Cache-Control "no-store"; add_header X-Content-Type-Options nosniff always; add_header Referrer-Policy same-origin always; }
+  location /assets/ { try_files $uri =404; expires 1y; }
+  location / { try_files $uri $uri/ /index.html; }
+ }
+ server { listen 127.0.0.1:8081; location = /healthz { access_log off; return 200 "ok\n"; } }
+}

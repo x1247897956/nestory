@@ -1,12 +1,3 @@
-FROM node:26.9.0-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070 AS frontend
-WORKDIR /src/web
-COPY web/package*.json ./
-RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --fetch-timeout=30000 --fetch-retries=1 --foreground-scripts --loglevel=verbose
-COPY web/index.html web/tsconfig.json web/vite.config.ts ./
-COPY web/src/ ./src/
-COPY web/public/ ./public/
-RUN npm run build
-
 FROM golang:1.27.3-alpine3.24@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c AS backend
 ARG APP_VERSION=development
 WORKDIR /src
@@ -15,8 +6,6 @@ RUN go mod download
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 COPY migrations/ ./migrations/
-COPY web/embed.go ./web/embed.go
-COPY --from=frontend /src/web/dist ./web/dist
 RUN test -n "$APP_VERSION" && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X noteapp/internal/platform/buildinfo.Version=${APP_VERSION}" -o /noteapp ./cmd/noteapp
 
 FROM alpine:3.22.7@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f

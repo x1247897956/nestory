@@ -25,10 +25,10 @@ def main():
  def start(name):
   run('docker','run','-d','--name',name,'-p','127.0.0.1::8080','-v',name+':/data',new)
   return address(name)
- def backup(name,out):run(str(ROOT/'scripts/backup.sh'),'--container',name,'--volume',name,'--image',new,'--app-version','custom-properties-rehearsal','--output',str(out))
+ def backup(name,out):run(sys.executable,str(ROOT/'scripts/operations.py'),'backup','--container',name,'--volume',name,'--image',new,'--app-version','custom-properties-rehearsal','--output',str(out))
  try:
   for name in [first,second]:run('docker','volume','create',name)
-  run(str(ROOT/'scripts/restore.sh'),'--volume',first,'--image',old,'--backup',str(source))
+  run(sys.executable,str(ROOT/'scripts/operations.py'),'restore','--volume',first,'--image',old,'--backup',str(source))
   base=start(first);backup(first,upgraded);base=address(first)
   ma,mb=validate_bundle(source),validate_bundle(upgraded)
   assert ma['schema_versions']==list(range(1,9));assert ma['assets']==mb['assets'];assert mb['schema_versions']==list(range(1,11))
@@ -50,7 +50,7 @@ def main():
    if 'select' in kind:d=request(base,'/property-definitions/'+d['id'],{'version':1,'options':[{'id':'x1','name':'第一项'},{'id':'x2','name':'第二项'}]},'PATCH')
    request(base,'/objects/pages/'+n['id']+'/custom-properties/'+d['id'],{'version':0,'definition_version':d['version'],'value':value},'PUT')
   expected=request(base,'/objects/pages/'+n['id']+'/custom-properties');backup(first,valued)
-  run(str(ROOT/'scripts/restore.sh'),'--volume',second,'--image',new,'--backup',str(valued))
+  run(sys.executable,str(ROOT/'scripts/operations.py'),'restore','--volume',second,'--image',new,'--backup',str(valued))
   restored=start(second)
   assert request(restored,'/objects/pages/'+n['id']+'/custom-properties')==expected
   assert request(restored,'/pages/'+n['id'])['body_document']==n['body_document']

@@ -77,7 +77,7 @@ Nestory 是一个可以自行部署的个人工作空间。围绕项目整理笔
 
 ## 自行部署
 
-通过 Docker Compose 部署 Nestory，在自己的设备上保存笔记、任务和日程。
+通过一条 Docker Compose 命令统一部署独立的前端和后端，在自己的设备上保存笔记、任务和日程。
 
 [查看部署指南 →](docs/operations.md)
 

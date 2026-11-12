@@ -1,6 +1,0 @@
---- FAIL: TestSearchIndexTracksSourceTransactions (0.01s)
-    search_test.go:33: indexed=0 want=1 err=SQL logic error: no such table: search_fts (1)
-FAIL
-FAIL	noteapp/internal/platform/database	1.323s
-ok  	noteapp/internal/workspace	0.929s
-FAIL

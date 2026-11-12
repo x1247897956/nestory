@@ -75,7 +75,7 @@ Your material, progress, and schedule each have a place—and remain connected.
 
 ## Self-hosting
 
-Deploy Nestory with Docker Compose and keep your notes, tasks, and events on your own device.
+Deploy the independent frontend and backend together with one Docker Compose command, and keep your notes, tasks, and events on your own device.
 
 [Read the deployment guide →](docs/operations.en.md)
 

@@ -63,7 +63,7 @@ func New(db *sql.DB, c config.Config) http.Handler {
 		v, e := properties.Fields(ctx, typ, id)
 		return v.Fields, e
 	}))
-	registerFrontend(mux)
+	registerAPIFallback(mux)
 	return protectRequests(httpx.CompressJSON(mux), c)
 }
 func respond(w http.ResponseWriter, status int, v any, err error) {

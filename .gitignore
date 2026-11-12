@@ -1,15 +1,49 @@
+# Local state and generated reports.
+/.local/
 /data/
+/backups/
+.DS_Store
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Dependencies, build output, and test reports.
+node_modules/
 /web/node_modules/
 /web/dist/*
 !/web/dist/.gitkeep
 /web/test-results/
 /web/playwright-report/
+test-results/
+playwright-report/
 *.tsbuildinfo
 .env
 .env.*
 !.env.example
-.local-deploy.lock
 __pycache__/
 *.py[cod]
 
-/backups/
+# Generated execution records and superseded design work.
+/docs/evidence/
+/docs/reviews/
+/docs/audits/
+/docs/implementation/
+/docs/superpowers/
+/docs/acceptance-v1.md
+/docs/dropdown-audit.md
+/docs/local-deployment.md
+/deploy/local.env.example
+/design/nestory/*
+!/design/nestory/final/
+/design/nestory/final/*.zip
+/docs/assets/.frames/
+*.log
+*.prof
+coverage/
+.coverage

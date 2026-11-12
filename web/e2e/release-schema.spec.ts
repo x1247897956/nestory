@@ -1,19 +1,14 @@
+import { assertReleaseFixture } from './release-fixture';
 import { archiveCurrentProject } from "./project-actions";
 // Schema regressions may write only to the disposable release audit instance.
 import { test, expect } from '@playwright/test';
-import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 const corpus = JSON.parse(readFileSync(new URL('../../internal/document/testdata/blocknote-0.56.0.json', import.meta.url), 'utf8'));
 
 test.skip(process.env.NOTEAPP_RELEASE_AUDIT !== '1', 'Opt-in release regressions; use the isolated audit runner');
 test.beforeEach(async ({ baseURL }) => {
-  expect(new URL(baseURL!).port).toBe('18187');
-  const name = process.env.NOTEAPP_AUDIT_CONTAINER;
-  expect(name?.startsWith('noteapp-release-audit-')).toBe(true);
-  const info = JSON.parse(execFileSync('docker', ['inspect', name!], { encoding: 'utf8' }))[0];
-  expect(info.NetworkSettings.Ports['8080/tcp'][0].HostPort).toBe('18187');
-  expect(info.Mounts.some((mount: { Name: string; Destination: string }) => mount.Name === name && mount.Destination === '/data')).toBe(true);
+ assertReleaseFixture(baseURL);
 });
 
 for (const kind of ['tasks', 'pages', 'events'] as const) {

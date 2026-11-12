@@ -117,25 +117,28 @@ for (const timezoneId of ["America/Los_Angeles", "Europe/London"]) {
       await expect(
         page.getByRole("link", { name: /讨论方案 ·/ }),
       ).toBeVisible();
-      await page
-        .getByRole("button", { name: "移除关联 实验方案", exact: true })
-        .click();
+      await Promise.all([
+        page.waitForResponse(response => response.request().method() === "DELETE" && response.url().includes("/api/v1/relations/") && response.status() === 200),
+        page.getByRole("button", { name: "移除关联 实验方案", exact: true }).click(),
+      ]);
       await page.goto("/projects/" + p.id + "/pages/" + pg.id);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("button", { name: "移除关联 执行实验", exact: true }),
       ).toHaveCount(0);
-      await page
-        .getByRole("button", { name: "移除关联 讨论方案", exact: true })
-        .click();
+      await Promise.all([
+        page.waitForResponse(response => response.request().method() === "DELETE" && response.url().includes("/api/v1/relations/") && response.status() === 200),
+        page.getByRole("button", { name: "移除关联 讨论方案", exact: true }).click(),
+      ]);
       await page.goto("/projects/" + p.id + "/events/" + eventId);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
         page.getByRole("button", { name: "移除关联 实验方案", exact: true }),
       ).toHaveCount(0);
-      await page
-        .getByRole("button", { name: "移除关联 执行实验", exact: true })
-        .click();
+      await Promise.all([
+        page.waitForResponse(response => response.request().method() === "DELETE" && response.url().includes("/api/v1/relations/") && response.status() === 200),
+        page.getByRole("button", { name: "移除关联 执行实验", exact: true }).click(),
+      ]);
       await page.goto("/projects/" + p.id + "/tasks/" + task.id);await expandProperties(page);
       if (!await page.locator(".relation-property").evaluate(el => (el as HTMLDetailsElement).open)) await page.locator(".relation-property > summary").click();
       await expect(
