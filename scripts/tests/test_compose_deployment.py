@@ -1,4 +1,5 @@
 """Explicit deployment checks against isolated Compose resources only."""
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -21,7 +22,21 @@ class ComposeDeployment(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
         self.name = 'nestory-deploy-test-' + uuid.uuid4().hex[:10]
-        (self.root / 'compose.yaml').write_bytes((SCRIPTS.parent / 'compose.yaml').read_bytes())
+        compose = (SCRIPTS.parent / 'compose.yaml').read_text()
+        # Static address reservation in the DNS replacement test requires an
+        # explicit subnet on Linux Engine; Desktop also permits automatic pools.
+        ids = subprocess.check_output(['docker', 'network', 'ls', '-q'], text=True).split()
+        networks = json.loads(subprocess.check_output(['docker', 'network', 'inspect', *ids], text=True))
+        used = [ipaddress.ip_network(config['Subnet']) for network in networks
+                for config in (network['IPAM'].get('Config') or []) if config.get('Subnet')]
+        candidates = list(ipaddress.ip_network('172.16.0.0/12').subnets(new_prefix=24))
+        offset = int(self.name.rsplit('-', 1)[1], 16) % len(candidates)
+        subnet = next((candidates[(offset + n) % len(candidates)] for n in range(len(candidates))
+                       if not any(candidates[(offset + n) % len(candidates)].overlaps(existing)
+                                  for existing in used if existing.version == 4)), None)
+        self.assertIsNotNone(subnet, 'No free isolated test subnet')
+        compose += f'\nnetworks:\n  default:\n    ipam:\n      config:\n        - subnet: {subnet}\n'
+        (self.root / 'compose.yaml').write_text(compose)
         (self.root / '.env').write_text(f'COMPOSE_PROJECT_NAME={self.name}\nAPP_IMAGE={IMAGE}\nAPP_FRONTEND_IMAGE={FRONTEND_IMAGE}\nAPP_PORT=0\nAPP_VOLUME_NAME={self.name}\nAPP_TIMEZONE=Asia/Shanghai\n')
         self.env = {key: value for key, value in os.environ.items()
                     if not key.startswith(('APP_', 'COMPOSE_'))}
@@ -214,8 +229,9 @@ class ComposeDeployment(unittest.TestCase):
         holder = self.name + '-old-ip'
         try:
             # Occupy the old address so this verifies DNS refresh, not address reuse.
-            subprocess.run(['docker', 'run', '-d', '--name', holder, '--network', network, '--ip', previous_ip,
-                            '--entrypoint', 'sleep', IMAGE, '60'], check=True, capture_output=True)
+            reserved = subprocess.run(['docker', 'run', '-d', '--name', holder, '--network', network, '--ip', previous_ip,
+                                       '--entrypoint', 'sleep', IMAGE, '60'], capture_output=True, text=True)
+            self.assertEqual(reserved.returncode, 0, reserved.stdout + reserved.stderr)
             self.compose('up', '-d', '--no-build', '--no-deps', 'noteapp')
             current = json.loads(subprocess.check_output(['docker', 'inspect', self.container()['id']], text=True))[0]
             self.assertNotEqual(current['NetworkSettings']['Networks'][network]['IPAddress'], previous_ip)
