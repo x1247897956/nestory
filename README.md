@@ -26,11 +26,11 @@ See plans across projects on the dashboard, then open a project to focus. No acc
 
 ## Preview
 
-![Nestory project overview with tasks, notes, and events](docs/assets/project-overview.png)
+![Nestory project overview with tasks, notes, and events](docs/assets/en/project-overview.png)
 
-[![Nestory in action: switching views, moving tasks, editing notes, and planning events](docs/assets/product-tour.gif)](docs/assets/product-tour.mp4)
+[![Nestory in action: switching views, moving tasks, editing notes, and planning events](docs/assets/en/product-tour.gif)](docs/assets/en/product-tour.mp4)
 
-[Watch the full demo · MP4](docs/assets/product-tour.mp4)
+[Watch the full demo · MP4](docs/assets/en/product-tour.mp4)
 
 ## One project, three ways to work
 
@@ -38,13 +38,13 @@ See plans across projects on the dashboard, then open a project to focus. No acc
 
 Use block notes to collect references, record discussions, and develop ideas. Type `/` to insert headings, checklists, tables, code, images, or files. Drag blocks to rearrange your content, or import and export Markdown.
 
-![Nestory block editor with checklists, relations, and custom properties](docs/assets/block-note.png)
+![Nestory block editor with checklists, relations, and custom properties](docs/assets/en/block-note.png)
 
 ### Move work forward
 
 Switch between lists and boards. Organize tasks by stage, priority, and due date, and break larger tasks into one level of subtasks. Filters, sorting, and collapsible groups help you focus on what matters now.
 
-![Nestory task board organized by stage](docs/assets/task-board.png)
+![Nestory task board organized by stage](docs/assets/en/task-board.png)
 
 ### Make time
 
@@ -53,9 +53,9 @@ Plan events in a weekly or monthly calendar, or use the timeline to see their du
 <details>
 <summary>See the task list and calendar</summary>
 
-![Nestory task list](docs/assets/task-list.png)
+![Nestory task list](docs/assets/en/task-list.png)
 
-![Nestory monthly calendar](docs/assets/calendar.png)
+![Nestory monthly calendar](docs/assets/en/calendar.png)
 
 </details>
 
@@ -65,6 +65,7 @@ Plan events in a weekly or monthly calendar, or use the timeline to see their du
 - **Custom properties** — Add text, URLs, single-select, or multi-select fields. Definitions are shared across the same object type in a project; each item has its own values.
 - **Consistent editing** — Open details in a centered dialog, collapse properties, and edit content with automatic saving.
 - **Dashboard and search** — See open tasks and events across projects, and search titles and content.
+- **Language and preferences** — Choose English or Simplified Chinese in **Settings → General → Language**. The choice is saved in this browser; your own titles and content stay as written.
 - **Archive and restore** — Archive finished projects and restore accidentally deleted content from the trash by deletion batch.
 
 ## For example: prepare a talk

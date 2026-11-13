@@ -3,7 +3,10 @@ import {test,expect} from '@playwright/test';
 test('all settings dropdowns use the shared picker, including keyboard commit and cancel',async({page},info)=>{
  await page.goto('/settings');
  const selects=page.locator('.settings-page select');
- await expect(selects).toHaveCount(10);
+ await expect(selects).toHaveCount(11);
+ const language=page.getByLabel('语言',{exact:true});
+ await expect(language).toHaveValue('zh-CN');
+ await expect(language.locator('option')).toHaveText(['简体中文','English']);
  for(const select of await selects.all()){
   await expect(select).toHaveCSS('appearance','base-select');
   const style=await select.evaluate(element=>{const picker=getComputedStyle(element,'::picker(select)');return {radius:picker.borderRadius,font:picker.fontFamily};});

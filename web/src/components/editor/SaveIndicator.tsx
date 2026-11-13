@@ -1,3 +1,4 @@
+import {useI18n} from "../../i18n";
 export function SaveIndicator({
   busy,
   dirty,
@@ -7,16 +8,17 @@ export function SaveIndicator({
   dirty: boolean;
   error?: string;
 }) {
+  const {t}=useI18n();
   return (
     <div className="save-bar autosave-indicator">
       <span role="status">
         {busy
-          ? "保存中…"
+          ? t("保存中…")
           : error
-            ? "保存失败，草稿已保留"
+            ? t("保存失败，草稿已保留")
             : dirty
-              ? "有未保存更改"
-              : "已保存"}
+              ? t("有未保存更改")
+              : t("已保存")}
       </span>
     </div>
   );

@@ -4,6 +4,7 @@ test("flat notes, source-position tasks, autosave failures and persistent safe a
   page,
   request,
 }) => {
+  const saveStatus = page.locator(".autosave-indicator").getByRole("status");
   const p = await (
     await request.post("/api/v1/projects", {
       data: { title: "笔记验收 " + Date.now() },
@@ -17,7 +18,7 @@ test("flat notes, source-position tasks, autosave failures and persistent safe a
     await expect(titleField).toHaveValue("无标题笔记");
     await expect(titleField).toBeFocused();
     await titleField.fill(title);
-    await expect(page.getByRole("status")).toHaveText("已保存");
+    await expect(saveStatus).toHaveText("已保存");
   }
   const nodes = await (
     await request.get("/api/v1/projects/" + p.id + "/pages")
@@ -29,7 +30,7 @@ test("flat notes, source-position tasks, autosave failures and persistent safe a
   await expect(page.getByRole("checkbox")).toHaveCount(2);
   await page.getByRole("checkbox").nth(1).check();
   await expect(page.locator(".bn-editor").getByRole("checkbox").nth(1)).toBeChecked();
-  await expect(page.getByRole("status")).toHaveText("已保存");
+  await expect(saveStatus).toHaveText("已保存");
   await page.reload();
   await expect(page.locator(".bn-editor").getByRole("checkbox").nth(1)).toBeChecked();
   await page.route("**/api/v1/pages/" + c.id, async (route) => {
@@ -51,7 +52,7 @@ test("flat notes, source-position tasks, autosave failures and persistent safe a
   await expect(page.getByLabel("Markdown 正文")).toHaveText("失败时全文保留");
   await page.unroute("**/api/v1/pages/" + c.id);
   await page.getByRole("button", { name: "重试保存" }).click();
-  await expect(page.getByRole("status")).toHaveText("已保存");
+  await expect(saveStatus).toHaveText("已保存");
   await page.route("**/api/v1/projects/" + p.id + "/assets", (r) =>
     r.fulfill({
       status: 413,
@@ -79,7 +80,7 @@ test("flat notes, source-position tasks, autosave failures and persistent safe a
       ),
     });
   await expect(page.locator(".bn-editor img")).toBeVisible();
-  await expect(page.getByRole("status")).toHaveText("已保存");
+  await expect(saveStatus).toHaveText("已保存");
   await expect(page.getByRole("img")).toBeVisible();
   const url = await page.getByRole("img").getAttribute("src");
   expect((await request.get(url!)).headers()["content-disposition"]).toContain(

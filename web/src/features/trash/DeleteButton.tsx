@@ -1,3 +1,4 @@
+import {t, useI18n, translateError} from "../../i18n";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +12,7 @@ type Preview = {
 };
 export function DeleteButton({
   disabled = false,
-  label = "移入回收站",
+  label = t("移入回收站"),
   type,
   id,
   projectId,
@@ -26,10 +27,15 @@ export function DeleteButton({
   icon?: ReactNode;
   onOpen?: () => void;
 }) {
+  useI18n();
   const qc = useQueryClient();
   const nav = useNavigate();
   const [preview, setPreview] = useState<Preview | null>(null);
   const [error, setError] = useState("");
+  const changedMessage = "内容或数量已变化，请检查新的预览并再次确认。";
+  const visibleError = error.startsWith(changedMessage)
+    ? t(changedMessage) + translateError(error.slice(changedMessage.length))
+    : translateError(error);
   const [busy, setBusy] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -73,21 +79,19 @@ export function DeleteButton({
         {icon}{label}
       </button>
       {preview && createPortal(
-        <dialog ref={dialog} className="delete-dialog" aria-label="确认删除" aria-describedby={descriptionId}
+        <dialog ref={dialog} className="delete-dialog" aria-label={t("确认删除")} aria-describedby={descriptionId}
           onCancel={(event) => { event.preventDefault(); dismiss(); }}>
-          <h2>移入回收站？</h2>
+          <h2>{t("移入回收站？")}</h2>
           <p id={descriptionId}>
-            将删除此对象及后代，共 {preview.count}{" "}
-            个对象。关联将保留，可从回收站恢复。
-          </p>
-          <ul className="delete-members" aria-label="将移入回收站的对象">
+            {t("将删除此对象及后代，共 {count} 个对象。关联将保留，可从回收站恢复。", {count: preview.count})}</p>
+          <ul className="delete-members" aria-label={t("将移入回收站的对象")}>
             {preview.members?.map((m) => (
               <li key={m.id} title={m.title}>{m.title}</li>
             ))}
           </ul>
-          {error && <p role="alert" className="delete-error">{error}</p>}
+          {error && <p role="alert" className="delete-error">{visibleError}</p>}
           <footer>
-          <button autoFocus disabled={busy} onClick={dismiss}>取消</button>
+          <button autoFocus disabled={busy} onClick={dismiss}>{t("取消")}</button>
           <button className="delete-confirm"
             disabled={busy || refreshFailed}
             onClick={async () => {
@@ -124,12 +128,12 @@ export function DeleteButton({
               }
             }}
           >
-            {busy ? "正在移入回收站…" : `确认删除 ${preview.count} 个对象`}
+            {busy ? t("正在移入回收站…") : t("确认删除 {count} 个对象", {count: preview.count})}
           </button>
           </footer>
         </dialog>, document.body
       )}
-      {error && !preview && <p role="alert">{error}</p>}
+      {error && !preview && <p role="alert">{visibleError}</p>}
     </div>
   );
 }

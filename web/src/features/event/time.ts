@@ -1,3 +1,4 @@
+import { getLanguage } from "../../i18n";
 import { DateTime } from "luxon";
 import { readSettings } from '../settings/preferences';
 export function toInput(iso: string, zone: string) {
@@ -12,5 +13,5 @@ export function fromInput(value: string, zone: string) {
   return d.toISO()!;
 }
 export function displayTime(iso: string, zone: string) {
-  return DateTime.fromISO(iso, { zone }).setLocale('zh-CN').toFormat(readSettings().hourCycle === '12' ? 'yyyy-MM-dd a hh:mm' : 'yyyy-MM-dd HH:mm');
+  return DateTime.fromISO(iso, { zone }).setLocale(getLanguage()).toFormat(readSettings().hourCycle === '12' ? 'yyyy-MM-dd a hh:mm' : 'yyyy-MM-dd HH:mm');
 }

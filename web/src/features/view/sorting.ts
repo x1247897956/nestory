@@ -1,3 +1,4 @@
+import {getLanguage} from '../../i18n';
 export type SortSpec = { field: string; direction: 'asc' | 'desc' };
 export type SortField = { value: string; label: string };
 export const taskSortFields: SortField[] = [
@@ -34,7 +35,7 @@ export function sortObjects<T extends {id:string; title:string}>(items: T[], sor
   const left = valueFor(a, sort.field), right = valueFor(b, sort.field);
   if (left === null && right !== null) return 1;
   if (right === null && left !== null) return -1;
-  const compared = left === null || right === null ? 0 : typeof left === 'number' && typeof right === 'number' ? left - right : String(left).localeCompare(String(right), 'zh-CN');
+  const compared = left === null || right === null ? 0 : typeof left === 'number' && typeof right === 'number' ? left - right : String(left).localeCompare(String(right), getLanguage());
   return (sort.direction === 'desc' ? -compared : compared) || a.id.localeCompare(b.id);
  });
 }

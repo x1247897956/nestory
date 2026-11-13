@@ -1,9 +1,12 @@
+import {setLanguage} from '../../i18n/language';
+import type {Language} from '../../i18n/types';
 import { useEffect, useSyncExternalStore } from 'react';
 
 export const SETTINGS_KEY = 'noteapp:settings:v1';
 const LAST_PATH_KEY = 'noteapp:last-location';
 const RESET_KEY = 'noteapp:preferences-reset';
 export type Settings = {
+  language: Language;
   startup: 'workspace' | 'last';
   theme: 'light' | 'dark' | 'system';
   fontSize: 13 | 14 | 16;
@@ -17,7 +20,7 @@ export type Settings = {
   spellCheck: boolean;
 };
 export const defaultSettings: Settings = {
-  startup:'workspace',theme:'system',fontSize:14,density:'comfortable',
+  language:'zh-CN',startup:'workspace',theme:'system',fontSize:14,density:'comfortable',
   firstDay:1,hourCycle:'24',calendarView:'dayGridMonth',eventDuration:60,
   editorFontSize:15,editorWidth:'standard',spellCheck:true,
 };
@@ -26,7 +29,7 @@ export function normalizeSettings(raw: unknown): Settings {
   const value = raw && typeof raw === 'object' ? raw as Record<string,unknown> : {};
   const next = {...defaultSettings};
   const choices: {[K in keyof Settings]: readonly Settings[K][]} = {
-    startup:['workspace','last'],theme:['light','dark','system'],fontSize:[13,14,16],density:['comfortable','compact'],
+    language:['zh-CN','en'],startup:['workspace','last'],theme:['light','dark','system'],fontSize:[13,14,16],density:['comfortable','compact'],
     firstDay:[0,1],hourCycle:['12','24'],calendarView:['dayGridMonth','timeGridWeek'],eventDuration:[15,30,60,90,120],
     editorFontSize:[14,15,17,19],editorWidth:['standard','wide'],spellCheck:[true,false],
   };
@@ -79,6 +82,7 @@ export function resolvedTheme(settings = readSettings()): 'light' | 'dark' {
   return settings.theme === 'system' ? (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : settings.theme;
 }
 export function applySettings(value = readSettings()) {
+  setLanguage(value.language);
   const root = document.documentElement;
   root.dataset.theme = resolvedTheme(value);
   root.dataset.density = value.density;

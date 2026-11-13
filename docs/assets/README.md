@@ -1,20 +1,39 @@
-# Nestory 产品素材
+# Nestory product media / 产品素材
 
-素材来自 `noteapp:nestory-20261106` 的真实界面，使用隔离容器与临时数据卷，内容为专门创建的中文演示项目，不包含用户日常数据。未修改产品CSS、按钮或功能显示。
+README media is captured from the real application in disposable containers with a temporary data volume. The fixtures are created specifically for the captures and contain no everyday user data. Product CSS, buttons, and feature visibility are not modified.
 
-- project-overview.png：任务、笔记和日程汇总。
-- task-list.png / task-board.png：同一组任务的两种视图。
-- block-note.png：块正文、清单、关联和自定义属性。
-- calendar.png：月日历。
-- product-tour.mp4 / product-tour.gif：视图切换、任务阶段拖动、打开笔记、展开属性、查看日历。无配音和音乐。
+- `docs/assets/` contains the Chinese UI and Chinese demo content used by `README.zh-CN.md`. The existing Chinese media is retained.
+- `docs/assets/en/` contains the English UI and English demo content used by `README.md`. Projects, task titles, note bodies, events, custom property names, and options all use an English fixture.
+- `project-overview.png`: project tasks, notes, and events together.
+- `task-list.png` / `task-board.png`: two views of the same tasks.
+- `block-note.png`: block content, checklists, relations, and custom properties.
+- `calendar.png`: monthly calendar.
+- `product-tour.mp4` / `product-tour.gif`: switching views, dragging a task to another stage, opening a note, showing properties, and viewing the calendar. No narration or music.
 
-截图画幅1680×1120；视频由真实操作时连续采集的浏览器帧编码，5fps，导出1440宽MP4和960宽GIF。没有增加不存在的功能或合成界面。浏览器帧录制用于保留浅色界面的色彩，非原速性能基准。
+Screenshots use a 1680×1120 viewport. The video is encoded from browser frames captured during actual interactions at 5 fps: 1440-pixel-wide MP4 and 960-pixel-wide GIF. Browser frame recording preserves the colors of the light UI; it is not a real-time performance benchmark.
 
-复现需要本机Docker、已构建镜像、web依赖、Chromium和ffmpeg：
+## Reproduce
+
+Run from the repository root with Docker, built backend and frontend images, installed `web` dependencies, Playwright Chromium, and ffmpeg available. Use a frontend image that includes both UI languages.
 
 ```sh
-node scripts/media/capture-product.cjs noteapp:test noteapp-web:test
-sh scripts/media/encode-product.sh
+# English: writes five PNGs and the MP4 to docs/assets/en/.
+node scripts/media/capture-product.cjs noteapp:test noteapp-web:test en
+sh scripts/media/encode-product.sh en
+
+# Chinese: writes to docs/assets/ (replaces the existing Chinese media).
+node scripts/media/capture-product.cjs noteapp:test noteapp-web:test zh-CN
+sh scripts/media/encode-product.sh zh-CN
 ```
 
-脚本只创建与清理自身 `noteapp-media-*` 容器/卷，不连接日常实例。默认使用 Playwright 安装的 Chromium，也可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定浏览器路径。当前示例日期为2026年11月；以后重拍时需更新示例日期或切换至对应月份。
+The capture command accepts `[backend-image] [frontend-image] [zh-CN|en]`; images default to `noteapp:test` and `noteapp-web:test`, and language defaults to `zh-CN` for compatibility. The encoder accepts `[zh-CN|en]` with the same language default. Both scripts support `--help`; output paths are resolved relative to the repository, regardless of the current working directory.
+
+Each screenshot and tour browser context seeds `noteapp:settings:v1` before the application loads. English captures set `language: "en"` and browser locale `en-US`; Chinese captures use `zh-CN`. Both keep the same independent calendar preferences: Asia/Shanghai browser time zone, Monday week start, 24-hour time, monthly view, and light theme. The browser date is fixed at November 6, 2026, while timers continue running, so the November 2026 sample events remain visible on later capture dates.
+
+The script only creates and cleans up its own `noteapp-media-*` containers, network, and volume. It does not connect to the everyday instance. Temporary browser frames are stored outside the asset directories and removed on completion or failure. By default, it uses Playwright's installed Chromium; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to use another Chromium executable. Inspect the resulting screenshots and video before publishing.
+
+## 中文说明
+
+素材来自真实产品界面，使用隔离容器、临时数据卷和专门创建的演示项目，不包含用户日常数据。中文素材保留在 `docs/assets/`，英文素材单独写入 `docs/assets/en/`，两个 README 分别引用对应语言的图片、GIF 和 MP4。
+
+复现时在原有两个镜像参数后追加 `en` 或 `zh-CN`；不传语言时保持中文默认行为。英文模式在首屏加载前写入 `noteapp:settings:v1` 的英文偏好，并使用 `en-US` 浏览器区域设置，演示内容本身也使用英文。脚本将浏览器日期固定在 2026 年 11 月 6 日以展示示例日程，时区、周起始日和小时制与界面语言分别设置。以上命令会覆盖所选语言目录下的同名素材，发布前应检查截图和视频的实际效果。

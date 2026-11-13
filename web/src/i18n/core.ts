@@ -1,0 +1,20 @@
+import type {Messages} from './types';
+export const coreMessages: Messages = {
+ '设置':'Settings', '简体中文':'简体中文', '语言':'Language',
+ '共 {count} 项':{one:'{count} item',other:'{count} items'},
+ '打开菜单':'Open menu','复制块':'Duplicate block','删除块':'Delete block',
+ '上传附件':'Upload attachment','插入图片或文件':'Insert an image or file','文件':'Files',
+ '导入 Markdown':'Import Markdown','在当前光标处插入 .md 文件':'Insert a .md file at the cursor',
+ '导出 Markdown':'Export Markdown','下载当前正文的 Markdown 副本':'Download this content as Markdown',
+ '正文.md':'content.md','Markdown 正文':'Rich text content',
+ '正在处理文件…':'Processing file…','复制草稿 JSON':'Copy draft JSON','关闭':'Close',
+ '编辑器加载失败，正文尚未改动。':'The editor could not load. Your content has not changed.',
+ '重新加载页面':'Reload page','正在加载编辑器…':'Loading editor…',
+ '保存中…':'Saving…','保存失败，草稿已保留':'Save failed. Draft retained.',
+ '有未保存更改':'Unsaved changes','已保存':'Saved',
+ '上传失败：{message}':'Upload failed: {message}',
+ '正文加载失败，原始内容未修改：{message}':'Content could not load. Original content retained: {message}',
+ '正文同步失败，草稿已保留：{message}':'Content could not sync. Draft retained: {message}',
+ '导入失败：{message}':'Import failed: {message}',
+ '复制失败，请重试':'Copy failed. Try again.',
+};

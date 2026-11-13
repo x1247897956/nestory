@@ -65,6 +65,22 @@ function createIntentKey(path: string, body: unknown) {
   const owner = getTabOwner();
   return "noteapp:create:v2:" + owner + ":" + canonical([path, body]);
 }
+// Recover the original payload after remounting, before generating localized
+// defaults. The existing durable intent remains the sole source of identity.
+export function recoverCreateInput<T extends object>(path:string,matches:(input:Record<string,unknown>)=>boolean):T|undefined {
+ try {
+  const prefix="noteapp:create:v2:"+getTabOwner()+":";
+  for(let index=0;index<window.localStorage.length;index++){
+   const key=window.localStorage.key(index);
+   if(!key?.startsWith(prefix)||!window.localStorage.getItem(key))continue;
+   let record:unknown;
+   try {record=JSON.parse(key.slice(prefix.length));}catch {continue;}
+   if(!Array.isArray(record)||record.length!==2||record[0]!==path)continue;
+   const input=record[1];
+   if(input&&typeof input==='object'&&!Array.isArray(input)&&matches(input))return input as T;
+  }
+ } catch {throw new Error("无法保存创建请求的恢复信息，请恢复浏览器存储后重试。");}
+}
 // Only call after the user explicitly abandons a creation; retries must keep the intent.
 export function abandonCreateIntent(path: string, body: unknown): void {
   try {

@@ -1,3 +1,4 @@
+import {useI18n, t as tr, translateError} from "../../i18n";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { api, type Project } from "../../app/api";
@@ -17,6 +18,7 @@ export function ProjectMenu({ project, onRename }: {
   project: Project;
   onRename: () => void;
 }) {
+  useI18n();
   const qc = useQueryClient();
   const panel = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -42,7 +44,7 @@ export function ProjectMenu({ project, onRename }: {
     <button
       ref={trigger}
       className="project-menu-trigger"
-      aria-label={`项目设置 ${project.title}`}
+      aria-label={tr("项目设置 {title}",{title:project.title})}
       popoverTarget={`project-menu-${project.id}`}
       onClick={() => {
         const box = trigger.current!.getBoundingClientRect();
@@ -52,13 +54,13 @@ export function ProjectMenu({ project, onRename }: {
         }
       }}
     >⋯</button>
-    <div ref={panel} id={`project-menu-${project.id}`} popover="auto" className="project-row-menu" aria-label={`${project.title}设置`}>
-      <button disabled={busy || !!project.archived_at} onClick={() => { panel.current?.hidePopover(); onRename(); }}><MenuIcon action="rename"/>重命名</button>
-      <button disabled={busy} onClick={() => void change({ archived: !project.archived_at })}><MenuIcon action="archive"/>{project.archived_at ? "取消归档" : "归档"}</button>
-      <button disabled={busy || !!project.archived_at} onClick={() => void change({ pinned: !project.pinned })}><MenuIcon action="pin"/>{project.pinned ? "取消置顶" : "置顶"}</button>
-      <DeleteButton type="projects" id={project.id} projectId={project.id} label="删除" icon={<MenuIcon action="delete"/>} disabled={busy || !!project.archived_at}
+    <div ref={panel} id={`project-menu-${project.id}`} popover="auto" className="project-row-menu" aria-label={tr("{title}设置",{title:project.title})}>
+      <button disabled={busy || !!project.archived_at} onClick={() => { panel.current?.hidePopover(); onRename(); }}><MenuIcon action="rename"/>{tr("重命名")}</button>
+      <button disabled={busy} onClick={() => void change({ archived: !project.archived_at })}><MenuIcon action="archive"/>{project.archived_at ? tr("取消归档") : tr("归档")}</button>
+      <button disabled={busy || !!project.archived_at} onClick={() => void change({ pinned: !project.pinned })}><MenuIcon action="pin"/>{project.pinned ? tr("取消置顶") : tr("置顶")}</button>
+      <DeleteButton type="projects" id={project.id} projectId={project.id} label={tr("删除")} icon={<MenuIcon action="delete"/>} disabled={busy || !!project.archived_at}
         onOpen={() => { panel.current?.hidePopover(); trigger.current?.focus(); }}/>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{translateError(error)}</p>}
     </div>
   </>;
 }

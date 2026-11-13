@@ -1,3 +1,4 @@
+import {useI18n, t as tr, translateError} from "../../i18n";
 import { ObjectMenu } from "../../components/object/ObjectMenu";
 import type { BodyDocument } from "../../app/document";
 import { ObjectProperties } from "../../components/object/ObjectProperties";
@@ -40,6 +41,7 @@ export function TaskEditor({
   onSave: (draft: TaskDraft, version: number) => Promise<void>;
   onReload: (beforeReset?: () => void) => void | Promise<void>;
 }) {
+  useI18n();
   const {
     draft,
     setDraft,
@@ -75,7 +77,7 @@ export function TaskEditor({
     <section
       className="editor"
       data-dirty={dirty || busy || moving || bodyPending}
-      aria-label="任务详情"
+      aria-label={tr("任务详情")}
     >
       <ObjectEditorHeader title={draft.title} menu={<ObjectMenu type="tasks" id={task.id} projectId={task.project_id} archived={archived}/>} properties={<ObjectProperties
           projectId={task.project_id}
@@ -87,35 +89,35 @@ export function TaskEditor({
           <label className="task-property stage-property" data-property="stage">
             <i className={"stage-dot " + draft.stage} aria-hidden="true" />
             <select
-              aria-label="阶段"
+              aria-label={tr("阶段")}
               value={draft.stage}
               onChange={(e) => change("stage", e.target.value)}
               disabled={locked}
             >
               {stages.map(([id, name]) => (
                 <option key={id} value={id}>
-                  {name}
+                  {tr(name)}
                 </option>
               ))}
             </select>
           </label>
           <label className="task-property" data-property="priority">
             <select
-              aria-label="优先级"
+              aria-label={tr("优先级")}
               value={draft.priority}
               onChange={(e) => change("priority", e.target.value)}
               disabled={locked}
             >
               {priorities.map(([id, name]) => (
                 <option key={id} value={id}>
-                  {name}
+                  {tr(name)}
                 </option>
               ))}
             </select>
           </label>
           <label className="task-property" data-property="due_date">
             <input
-              aria-label="截止日期"
+              aria-label={tr("截止日期")}
               type="date"
               value={draft.due_date}
               onChange={(e) => change("due_date", e.target.value)}
@@ -127,16 +129,16 @@ export function TaskEditor({
             data-property="parent_id"
           >
             <select
-              aria-label="父任务"
+              aria-label={tr("父任务")}
               value={task.parent_id ?? ""}
               disabled={
                 locked || dirty || busy || bodyPending || hasChildren || !onParentChange
               }
               title={
                 hasChildren
-                  ? "含子任务的任务不能设置父任务"
+                  ? tr("含子任务的任务不能设置父任务")
                   : dirty || busy || bodyPending
-                    ? "正在保存正文，请稍候"
+                    ? tr("正在保存正文，请稍候")
                     : undefined
               }
               onChange={async (event) => {
@@ -153,7 +155,7 @@ export function TaskEditor({
                 }
               }}
             >
-              <option value="">无父任务</option>
+              <option value="">{tr("无父任务")}</option>
               {choices.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.title}
@@ -164,11 +166,11 @@ export function TaskEditor({
         </ObjectProperties>}>
           <input
             className="task-inline-title"
-            aria-label="任务标题"
+            aria-label={tr("任务标题")}
             value={draft.title}
             onChange={(e) => change("title", e.target.value)}
             disabled={locked}
-            placeholder="任务标题"
+            placeholder={tr("任务标题")}
           />
       </ObjectEditorHeader>
       <ObjectEditorBody>
@@ -185,15 +187,15 @@ export function TaskEditor({
       <ObjectEditorFooter
         busy={busy || moving}
         dirty={dirty}
-        error={error || saveError}
+        error={translateError(error || saveError)}
       >
       {(error || saveError) && (
         <div className="error" role="alert">
-          {error || saveError}
-          <p>本地草稿已保留。可先复制正文，再重新载入。</p>
-          {canRecover && <button disabled={bodyPending || busy || moving} onClick={() => { if (!bodyPending && !busy && !moving) recover(); }}>恢复本机草稿</button>}
+          {translateError(error || saveError)}
+          <p>{tr("本地草稿已保留。可先复制正文，再重新载入。")}</p>
+          {canRecover && <button disabled={bodyPending || busy || moving} onClick={() => { if (!bodyPending && !busy && !moving) recover(); }}>{tr("恢复本机草稿")}</button>}
           <button onClick={save} disabled={busy}>
-            重试保存
+            {tr("重试保存")}
           </button>
           <button
             onClick={() =>
@@ -202,13 +204,13 @@ export function TaskEditor({
                 .catch(() => setError("复制失败，请手动选择正文复制"))
             }
           >
-            复制草稿
+            {tr("复制草稿")}
           </button>{" "}
           <button
             disabled={bodyPending || busy || moving}
             onClick={async () => {
               if (bodyPending || busy || moving) return;
-              if (window.confirm("重新载入会丢弃本地未保存更改，是否继续？"))
+              if (window.confirm(tr("重新载入会丢弃本地未保存更改，是否继续？")))
                 try {
                   await onReload(discardRecovery);
                 } catch (e) {
@@ -216,7 +218,7 @@ export function TaskEditor({
                 }
             }}
           >
-            重新载入
+            {tr("重新载入")}
           </button>
         </div>
       )}

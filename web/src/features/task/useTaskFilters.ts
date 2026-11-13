@@ -1,3 +1,4 @@
+import {useI18n} from '../../i18n';
 import {DateTime} from 'luxon';
 import {useMemo,useState,useEffect} from 'react';
 import {useQuery} from '@tanstack/react-query';
@@ -5,6 +6,7 @@ import {api} from '../../app/api';
 import {filterFields,matchesFilters,readFilters,validFilters,type TaskFilter,type PropertySnapshot,type FilterObject} from './filterEngine';
 const storageKey=(id:string,type:'tasks'|'pages')=>`noteapp:${type==='tasks'?'task':'page'}-filters:v1:${id}`;
 export function useTaskFilters(projectId:string|undefined,tasks:FilterObject[],enabled:boolean,type:'tasks'|'pages'='tasks'){
+ const {language}=useI18n();
  const [choices,setChoices]=useState<Record<string,TaskFilter[]>>({});
  const [preferenceEpoch,setPreferenceEpoch]=useState(0);
  useEffect(()=>{const reset=()=>{setChoices({});setPreferenceEpoch(value=>value+1);};window.addEventListener('noteapp:preferences-reset',reset);return()=>window.removeEventListener('noteapp:preferences-reset',reset);},[]);
@@ -26,7 +28,7 @@ export function useTaskFilters(projectId:string|undefined,tasks:FilterObject[],e
   window.addEventListener('focus',tick);
   return ()=>{clearTimeout(timer);window.removeEventListener('focus',tick);};
  },[enabled,config.data?.timezone,clock]);
- const fields=useMemo(()=>filterFields(properties.data?.definitions??[],type),[properties.data,type]);
+ const fields=useMemo(()=>filterFields(properties.data?.definitions??[],type),[properties.data,type,language]);
  const builtin=filterFields([],type);
  const custom=filters.some(f=>!builtin.some(field=>field.id===f.field));
  const relative=filters.some(f=>['today','week'].includes(f.op));

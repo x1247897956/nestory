@@ -1,6 +1,6 @@
 import { useObjectPortal } from "../object/ObjectDialog";
 import { useSettings, useResolvedTheme } from '../../features/settings/preferences';
-import { useCallback, useEffect, useRef, useState, useId, memo } from "react";
+import { useCallback, useEffect, useRef, useState, useId, memo, useMemo } from "react";
 import {
   BlockNoteEditor,
   filterSuggestionItems,
@@ -8,10 +8,16 @@ import {
   type PartialBlock,
 } from "@blocknote/core";
 import { SideMenuExtension } from "@blocknote/core/extensions";
-import { zh } from "@blocknote/core/locales";
+import {useI18n, t, translateError} from "../../i18n";
+import {refreshLocale} from "./refreshLocale";
+import {editorDictionary, placeholderRules} from "./editorLocale";
 import { BlockNoteView } from "@blocknote/ariakit";
 import {
   SideMenuController,
+  FormattingToolbarController,
+  FormattingToolbar,
+  blockTypeSelectItems,
+  type FormattingToolbarProps,
   AddBlockButton,
   useBlockNoteEditor,
   useExtensionState,
@@ -57,6 +63,7 @@ function duplicateContent(block: Block): PartialBlock {
 }
 // Native top-layer menu keeps focus/scroll changes from dismissing block actions.
 function ObjectSideMenu() {
+  useI18n();
   const editor = useBlockNoteEditor();
   const components = useComponentsContext()!;
   const side = editor.getExtension(SideMenuExtension)!;
@@ -74,7 +81,7 @@ function ObjectSideMenu() {
       <button
         type="button"
         className="block-handle"
-        aria-label="打开菜单"
+        aria-label={t("打开菜单")}
         aria-haspopup="menu"
         aria-controls={id}
         draggable
@@ -117,7 +124,7 @@ function ObjectSideMenu() {
             close();
           }}
         >
-          复制块
+          {t("复制块")}
         </button>
         <button
           type="button"
@@ -128,11 +135,17 @@ function ObjectSideMenu() {
             close();
           }}
         >
-          删除块
+          {t("删除块")}
         </button>
       </div>
     </components.SideMenu.Root>
   );
+}
+function LocalizedFormattingToolbar(props:FormattingToolbarProps) {
+  const editor=useBlockNoteEditor();
+  const {language}=useI18n();
+  const items=useMemo(()=>blockTypeSelectItems(editor),[editor,language]);
+  return <FormattingToolbar {...props} blockTypeSelectItems={items}/>;
 }
 const EditorCanvas = memo(function EditorCanvas({
   editor,
@@ -149,6 +162,9 @@ const EditorCanvas = memo(function EditorCanvas({
 }) {
   const portal = useObjectPortal();
   const theme = useResolvedTheme();
+  const {language} = useI18n();
+  // Dictionary is per editor; update presentation without replacing its document.
+  Object.assign(editor.dictionary, editorDictionary(language));
   return (
     <BlockNoteView
       editor={editor}
@@ -156,9 +172,11 @@ const EditorCanvas = memo(function EditorCanvas({
       editable={!disabled}
       theme={theme}
       onChange={emit}
+      formattingToolbar={false}
       slashMenu={false}
       sideMenu={false}
     >
+      {!disabled && <FormattingToolbarController portalElement={portal} formattingToolbar={LocalizedFormattingToolbar}/>}
       {!disabled && <SideMenuController portalElement={portal} sideMenu={ObjectSideMenu} floatingUIOptions={{
         // BlockNote renders closing menus as inert HTML snapshots. Remove them
         // immediately so a fast pointer cannot click a handle without handlers.
@@ -174,31 +192,31 @@ const EditorCanvas = memo(function EditorCanvas({
               [
                 ...getDefaultReactSlashMenuItems(editor),
                 {
-                  title: "上传附件",
+                  title: t("上传附件"),
                   icon: <FileCommandIcon action="upload" />,
-                  subtext: "插入图片或文件",
+                  subtext: t("插入图片或文件"),
                   aliases: ["attachment", "upload", "附件"],
-                  group: "文件",
+                  group: t("文件"),
                   onItemClick: () => attachmentInput.current?.click(),
                 },
                 {
-                  title: "导入 Markdown",
+                  title: t("导入 Markdown"),
                   icon: <FileCommandIcon action="import" />,
-                  subtext: "在当前光标处插入 .md 文件",
+                  subtext: t("在当前光标处插入 .md 文件"),
                   aliases: ["import", "markdown"],
-                  group: "文件",
+                  group: t("文件"),
                   onItemClick: () => importInput.current?.click(),
                 },
                 {
-                  title: "导出 Markdown",
+                  title: t("导出 Markdown"),
                   icon: <FileCommandIcon action="export" />,
-                  subtext: "下载当前正文的 Markdown 副本",
+                  subtext: t("下载当前正文的 Markdown 副本"),
                   aliases: ["export", "markdown"],
-                  group: "文件",
+                  group: t("文件"),
                   onItemClick: () =>
                     download(
                       editor.blocksToMarkdownLossy(editor.document),
-                      "正文.md",
+                      t("正文.md"),
                     ),
                 },
               ],
@@ -218,6 +236,7 @@ export function BlockEditor({
   onPendingChange,
 }: Props) {
   const settings = useSettings();
+  const {language} = useI18n();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(0);
   useEffect(() => { onPendingChange?.(pending > 0); }, [pending, onPendingChange]);
@@ -237,16 +256,10 @@ export function BlockEditor({
   const [loaded] = useState(() => {
     try {
       const instance = BlockNoteEditor.create({
-        dictionary: {
-          ...zh,
-          placeholders: {
-            ...zh.placeholders,
-            default: "输入文字，或按 / 插入内容",
-          },
-        },
+        dictionary: editorDictionary(language),
         domAttributes: {
           editor: {
-            "aria-label": "Markdown 正文",
+            "aria-label": t("Markdown 正文"),
             role: "textbox",
             "aria-multiline": "true",
           },
@@ -285,7 +298,16 @@ export function BlockEditor({
     }
   });
   const editor = loaded.editor;
-  useEffect(() => { editor?.domElement?.setAttribute('spellcheck',String(settings.spellCheck)); },[editor,settings.spellCheck]);
+  const previousLanguage=useRef(language);
+  useEffect(()=>{
+    if(!editor||previousLanguage.current===language)return;
+    previousLanguage.current=language;
+    if(editor.prosemirrorView)return refreshLocale(editor.prosemirrorView);
+  },[editor,language]);
+  useEffect(() => {
+    editor?.domElement?.setAttribute('spellcheck',String(settings.spellCheck));
+    editor?.domElement?.setAttribute('aria-label',t('Markdown 正文'));
+  },[editor,settings.spellCheck,language]);
   useEffect(() => {
     if (!editor) return;
     if (body_document && acknowledgedDocuments.current.has(body_document)) return;
@@ -324,12 +346,13 @@ export function BlockEditor({
   if (!editor)
     return (
       <div role="alert">
-        {error || loaded.error}
-        <button onClick={() => navigator.clipboard.writeText(JSON.stringify(body_document, null, 2)).catch(() => setError("复制失败，请重试"))}>复制草稿 JSON</button>
+        {translateError(error || loaded.error)}
+        <button onClick={() => navigator.clipboard.writeText(JSON.stringify(body_document, null, 2)).catch(() => setError("复制失败，请重试"))}>{t("复制草稿 JSON")}</button>
       </div>
     );
   return (
-    <div className="block-editor" data-dirty={pending > 0}>
+    <div className="block-editor" data-language={language} data-dirty={pending > 0}>
+      <style>{placeholderRules(language)}</style>
       <EditorCanvas
         editor={editor}
         disabled={disabled}
@@ -342,7 +365,7 @@ export function BlockEditor({
         ref={importInput}
         type="file"
         accept=".md,.markdown,text/markdown,text/plain"
-        aria-label="导入 Markdown"
+        aria-label={t("导入 Markdown")}
         onChange={async (e) => {
           const file = e.target.files?.[0];
           e.target.value = "";
@@ -371,7 +394,7 @@ export function BlockEditor({
           hidden
           ref={attachmentInput}
           type="file"
-          aria-label="上传附件"
+          aria-label={t("上传附件")}
           onChange={async (e) => {
             const file = e.target.files?.[0];
             e.target.value = "";
@@ -402,13 +425,13 @@ export function BlockEditor({
       )}
       {pending > 0 && (
         <p className="block-operation-status" aria-live="polite">
-          正在处理文件…
+          {t("正在处理文件…")}
         </p>
       )}
       {error && (
         <p role="alert">
-          {error}
-          <button onClick={() => setError("")}>关闭</button>
+          {translateError(error)}
+          <button onClick={() => setError("")}>{t("关闭")}</button>
         </p>
       )}
     </div>

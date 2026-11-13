@@ -1,3 +1,4 @@
+import {useI18n, t as tr, translateError} from "../../i18n";
 import { useRef, useState } from "react";
 import { abandonCreateIntent } from "../../app/api";
 import type { Project } from "../../app/api";
@@ -14,6 +15,7 @@ export function ProjectForm({
   ) => Promise<void>;
   onClose: () => void;
 }) {
+  useI18n();
   const [initial] = useState({
     title: project?.title ?? "",
     description: project?.description ?? "",
@@ -30,9 +32,9 @@ export function ProjectForm({
         className="modal project-form"
         role="dialog"
         aria-modal="true"
-        aria-label={project ? "修改项目" : "新建项目"}
+        aria-label={project ? tr("修改项目") : tr("新建项目")}
       >
-        <h2>{project ? "修改项目" : "新建项目"}</h2>
+        <h2>{project ? tr("修改项目") : tr("新建项目")}</h2>
         <form
           data-dirty={
             title !== initial.title ||
@@ -55,7 +57,7 @@ export function ProjectForm({
           }}
         >
           <label>
-            项目名称
+            {tr("项目名称")}
             <input
               autoFocus
               disabled={busy}
@@ -65,7 +67,7 @@ export function ProjectForm({
             />
           </label>
           <label>
-            项目说明
+            {tr("项目说明")}
             <textarea
               disabled={busy}
               value={description}
@@ -74,7 +76,7 @@ export function ProjectForm({
           </label>
           {error && (
             <p role="alert" className="error">
-              {error}
+              {translateError(error)}
             </p>
           )}
           <footer>
@@ -84,7 +86,7 @@ export function ProjectForm({
                 if (
                   (title === initial.title &&
                     description === initial.description) ||
-                  confirm("放弃未保存的项目草稿？")
+                  confirm(tr("放弃未保存的项目草稿？"))
                 ) {
                   try {
                     for (const input of attempts.current) abandonCreateIntent("/projects", input);
@@ -95,10 +97,10 @@ export function ProjectForm({
               }}
               disabled={busy}
             >
-              取消
+              {tr("取消")}
             </button>
             <button className="primary" disabled={busy || !title.trim()}>
-              {busy ? "保存中…" : "保存项目"}
+              {busy ? tr("保存中…") : tr("保存项目")}
             </button>
           </footer>
         </form>

@@ -1,3 +1,4 @@
+import {t, useI18n, translateError} from "../../i18n";
 import { CollectionHeader } from "../view/CollectionHeader";
 import { EventTimeline } from "./EventTimeline";
 import { timelineRange, type TimelineSpan } from "./timeline";
@@ -48,7 +49,7 @@ function normalizePreferences(raw: unknown): EventPreferences {
 }
 export function Events({
   projectId,
-  projectTitle = "项目",
+  projectTitle = t("项目"),
   eventId,
   archived,
 }: {
@@ -57,6 +58,7 @@ export function Events({
   eventId?: string;
   archived: boolean;
 }) {
+  const {language} = useI18n();
   const nav = useNavigate();
   const settings = useSettings();
   const [preferences,setPreferences] = useProjectPreferences(projectId,"events",{...defaultPreferences,calendarView:settings.calendarView},normalizePreferences);
@@ -261,9 +263,9 @@ export function Events({
   if (!zone)
     return (
       <p role={config.isError ? "alert" : undefined}>
-        {config.isError ? "部署时区加载失败" : "加载日历…"}
+        {config.isError ? t("部署时区加载失败") : t("加载日历…")}
         {config.isError && (
-          <button onClick={() => void config.refetch()}>重试</button>
+          <button onClick={() => void config.refetch()}>{t("重试")}</button>
         )}
       </p>
     );
@@ -279,15 +281,15 @@ export function Events({
       data-dirty={busy}
     >
       {!overviewBackground && (
-        <section aria-label="项目日历" aria-hidden={eventId?true:undefined} inert={!!eventId}>
-          <CollectionHeader title="日程" count={events.isPending?"…":events.data?.length??0}
-            actions={!archived&&<button className="calendar-new" disabled={busy} onClick={()=>{const start=DateTime.now().setZone(zone).startOf("day").set({hour:9});choose(start.toISO()!,start.plus({minutes:settings.eventDuration}).toISO()!);}}>新建日程</button>}
-            views={<div className="collection-view-switch" role="group" aria-label="日程视图">
-              <button aria-pressed={preferences.view==='calendar'} onClick={()=>setPreferences(old=>({...old,view:'calendar'}))}>日历</button>
-              <button aria-pressed={preferences.view==='timeline'} onClick={()=>setPreferences(old=>({...old,view:'timeline'}))}>时间轴</button>
+        <section aria-label={t("项目日历")} aria-hidden={eventId?true:undefined} inert={!!eventId}>
+          <CollectionHeader title={t("日程")} count={events.isPending?"…":events.data?.length??0}
+            actions={!archived&&<button className="calendar-new" disabled={busy} onClick={()=>{const start=DateTime.now().setZone(zone).startOf("day").set({hour:9});choose(start.toISO()!,start.plus({minutes:settings.eventDuration}).toISO()!);}}>{t("新建日程")}</button>}
+            views={<div className="collection-view-switch" role="group" aria-label={t("日程视图")}>
+              <button aria-pressed={preferences.view==='calendar'} onClick={()=>setPreferences(old=>({...old,view:'calendar'}))}>{t("日历")}</button>
+              <button aria-pressed={preferences.view==='timeline'} onClick={()=>setPreferences(old=>({...old,view:'timeline'}))}>{t("时间轴")}</button>
             </div>}
             tools={preferences.view==='timeline'?<SortControl key={projectId} value={preferences.sort} fields={eventSortFields} onChange={sort=>setPreferences(old=>({...old,sort}))}/>:undefined}/>
-          {archived && <p className="timeline-readonly">项目已归档，日程只读</p>}
+          {archived && <p className="timeline-readonly">{t("项目已归档，日程只读")}</p>}
           {preferences.view==='timeline' ? <EventTimeline events={sortObjects(events.data??[],preferences.sort)} date={selectedDate} span={preferences.span} zone={zone} onDateChange={date=>setPreferences(old=>({...old,date}))} onSpanChange={span=>setPreferences(old=>({...old,span}))} onOpen={id=>nav("/projects/"+projectId+"/events/"+id)} loading={events.isPending} error={events.isError} onRetry={()=>void events.refetch()}/> : <FullCalendar
             key={projectId}
             plugins={[
@@ -296,7 +298,7 @@ export function Events({
               interactionPlugin,
               luxonPlugin,
             ]}
-            locale={zhCN}
+            locale={language === "zh-CN" ? zhCN : "en"}
             timeZone={zone}
             initialView={preferences.calendarView}
             firstDay={settings.firstDay}
@@ -307,7 +309,7 @@ export function Events({
               center: "title",
               right: "timeGridWeek,dayGridMonth",
             }}
-            buttonText={{ today: "今天", week: "周", month: "月" }}
+            buttonText={{ today: t("今天"), week: t("周"), month: t("月") }}
             height="min(720px, calc(100vh - 220px))"
             allDaySlot={false}
             scrollTime="08:00:00"
@@ -356,18 +358,17 @@ export function Events({
           />}
           {preferences.view==='calendar' && events.isError && (
             <p role="alert">
-              日程加载失败
-              <button onClick={() => void events.refetch()}>重试</button>
+              {t("日程加载失败")}<button onClick={() => void events.refetch()}>{t("重试")}</button>
             </p>
           )}
           {selection && !archived && (
             <dialog
               ref={dialog}
               className="event-create-dialog"
-              aria-label="新建日程"
+              aria-label={t("新建日程")}
               onCancel={(e) => {
                 e.preventDefault();
-                if (!busy && (!dirty || confirm("日程尚未保存，是否关闭？"))) {
+                if (!busy && (!dirty || confirm(t("日程尚未保存，是否关闭？")))) {
                   try { abandonCreation(); } catch(e) { setError((e as Error).message); return; }
                   setSelection(undefined);
                   setTitle("");
@@ -376,18 +377,18 @@ export function Events({
               }}
             >
               <form
-                aria-label="新建日程"
+                aria-label={t("新建日程")}
                 data-dirty={dirty || busy}
                 onSubmit={(e) => e.preventDefault()}
               >
                 <header>
-                  <h2>新建日程</h2>
+                  <h2>{t("新建日程")}</h2>
                   <button
                     type="button"
-                    aria-label="关闭新建日程"
+                    aria-label={t("关闭新建日程")}
                     disabled={busy}
                     onClick={() => {
-                      if (!dirty || confirm("日程尚未保存，是否关闭？")) {
+                      if (!dirty || confirm(t("日程尚未保存，是否关闭？"))) {
                         try { abandonCreation(); } catch(e) { setError((e as Error).message); return; }
                         setSelection(undefined);
                         setTitle("");
@@ -400,8 +401,8 @@ export function Events({
                 </header>
                 <input
                   autoFocus
-                  aria-label="新日程标题"
-                  placeholder="日程标题"
+                  aria-label={t("新日程标题")}
+                  placeholder={t("日程标题")}
                   disabled={busy}
                   value={title}
                   onChange={(e) => {
@@ -412,10 +413,10 @@ export function Events({
                 <div className="event-create-times">
                   {(["start", "end"] as const).map((key) => (
                     <label key={key}>
-                      {key === "start" ? "开始" : "结束"}
+                      {key === "start" ? t("开始") : t("结束")}
                       <input
                         aria-label={
-                          key === "start" ? "新日程开始" : "新日程结束"
+                          key === "start" ? t("新日程开始") : t("新日程结束")
                         }
                         type="datetime-local"
                         disabled={busy}
@@ -429,39 +430,38 @@ export function Events({
                   ))}
                 </div>
                 {!validTimes(selection.start, selection.end, zone) && (
-                  <p role="alert">结束时间必须晚于开始时间</p>
+                  <p role="alert">{t("结束时间必须晚于开始时间")}</p>
                 )}
                 {!dirty && !busy && !error ? (
-                  <div className="autosave-hint">输入标题后自动保存</div>
+                  <div className="autosave-hint">{t("输入标题后自动保存")}</div>
                 ) : (
-                  <SaveIndicator busy={busy} dirty={dirty} error={error} />
+                  <SaveIndicator busy={busy} dirty={dirty} error={translateError(error)} />
                 )}
                 {error && (
                   <div role="alert">
-                    {error}
+                    {translateError(error)}
                     <button
                       type="button"
                       disabled={busy}
                       onClick={() => void createEvent()}
                     >
-                      重试保存
-                    </button>
+                      {t("重试保存")}</button>
                   </div>
                 )}
               </form>
             </dialog>
           )}
-          {error && !selection && <p role="alert">{error}</p>}
+          {error && !selection && <p role="alert">{translateError(error)}</p>}
           {unresolved && <button disabled={busy} onClick={async () => {
             setBusy(true);
             try { await reconcile(unresolved, projectId); setError(""); }
             catch { setError("同步失败，保存结果仍未确认，请重试同步。"); }
             finally { setBusy(false); }
-          }}>同步日程</button>}
+          }}>{t("同步日程")}</button>}
         </section>
       )}
       {eventId && (
-        <ObjectDialog projectId={projectId} projectTitle={projectTitle} type="events" title={detail.data?.title ?? "加载中…"}>
+        <ObjectDialog projectId={projectId} projectTitle={projectTitle} type="events" title={detail.data?.title ?? t("加载中…")}>
         <aside className="detail-pane">
           {detail.data?.project_id === projectId ? (
             <>
@@ -488,11 +488,10 @@ export function Events({
             </>
           ) : detail.isError ? (
             <p role="alert">
-              日程加载失败
-              <button onClick={() => void detail.refetch()}>重试</button>
+              {t("日程加载失败")}<button onClick={() => void detail.refetch()}>{t("重试")}</button>
             </p>
           ) : (
-            <p>加载日程…</p>
+            <p>{t("加载日程…")}</p>
           )}
         </aside>
         </ObjectDialog>

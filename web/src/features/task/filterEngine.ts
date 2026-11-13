@@ -1,3 +1,4 @@
+import {t as tr} from '../../i18n';
 import {DateTime} from 'luxon';
 import {stages,priorities} from '../../app/api';
 import type {PropertyDefinition,PropertyValue} from '../../components/object/propertyTypes';
@@ -14,12 +15,12 @@ export const operators:Record<FilterField['kind'],[string,string][]>= {
 };
 export const noValue=(op:string)=>['empty','not_empty','today','week'].includes(op);
 export function filterFields(definitions:PropertyDefinition[],type:'tasks'|'pages'='tasks'):FilterField[] {return [
- {id:'title',name:'标题',kind:'text'},
+ {id:'title',name:tr('标题'),kind:'text'},
  ...(type==='tasks'?[
-  {id:'stage',name:'阶段',kind:'single_select',options:stages.map(([id,name])=>({id,name}))},
-  {id:'priority',name:'优先级',kind:'single_select',options:priorities.map(([id,name])=>({id,name}))},
-  {id:'due_date',name:'截止日期',kind:'date'},
- ]:[{id:'created_at',name:'创建时间',kind:'date'},{id:'updated_at',name:'更新时间',kind:'date'}]) as FilterField[],
+  {id:'stage',name:tr('阶段'),kind:'single_select',options:stages.map(([id,name])=>({id,name:tr(name)}))},
+  {id:'priority',name:tr('优先级'),kind:'single_select',options:priorities.map(([id,name])=>({id,name:tr(name)}))},
+  {id:'due_date',name:tr('截止日期'),kind:'date'},
+ ]:[{id:'created_at',name:tr('创建时间'),kind:'date'},{id:'updated_at',name:tr('更新时间'),kind:'date'}]) as FilterField[],
  ...definitions.map(d=>({id:d.id,name:d.name,kind:d.kind,options:d.options})),
 ];}
 const dateValid=(value:string)=>/^\d{4}-\d{2}-\d{2}$/.test(value)&&DateTime.fromISO(value).isValid;

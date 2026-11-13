@@ -1,3 +1,4 @@
+import {useI18n, t as tr} from "../../i18n";
 import {useState,useEffect} from 'react';
 import './task-views.css';
 export type TaskView='list'|'board';
@@ -15,8 +16,9 @@ export function useProjectTaskView(projectId?:string):[TaskView,(view:TaskView)=
  }];
 }
 export function TaskViewSwitcher({view,onChange}:{view:TaskView;onChange:(view:TaskView)=>void}) {
- return <div className="task-view-switcher" role="group" aria-label="任务视图">
-  <button type="button" aria-pressed={view==='list'} onClick={()=>onChange('list')}><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 5h1M3 10h1M3 15h1"/></svg>列表</button>
-  <button type="button" aria-pressed={view==='board'} onClick={()=>onChange('board')}><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M3 4h4v12H3ZM9 4h3v8H9ZM14 4h3v10h-3Z"/></svg>看板</button>
+  useI18n();
+ return <div className="task-view-switcher" role="group" aria-label={tr("任务视图")}>
+  <button type="button" aria-pressed={view==='list'} onClick={()=>onChange('list')}><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 5h1M3 10h1M3 15h1"/></svg>{tr("列表")}</button>
+  <button type="button" aria-pressed={view==='board'} onClick={()=>onChange('board')}><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M3 4h4v12H3ZM9 4h3v8H9ZM14 4h3v10h-3Z"/></svg>{tr("看板")}</button>
  </div>;
 }

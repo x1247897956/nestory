@@ -1,3 +1,4 @@
+import {t, useI18n, translateError} from "../../i18n";
 import {TaskFilters} from "../task/TaskFilters";
 import {useTaskFilters} from "../task/useTaskFilters";
 import { CollectionHeader } from "../view/CollectionHeader";
@@ -13,7 +14,7 @@ import "./pages.css";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, abandonCreateIntent } from "../../app/api";
+import { api, abandonCreateIntent, recoverCreateInput } from "../../app/api";
 import { LazyBlockEditor } from "../../components/editor/LazyBlockEditor";
 import { useAutosave } from "../../components/editor/useAutosave";
 export type Page = {
@@ -30,7 +31,7 @@ export type Page = {
 export type PageProperties = Omit<Page, "body_document">;
 export function Pages({
   projectId,
-  projectTitle = "项目",
+  projectTitle = t("项目"),
   pageId,
   archived,
 }: {
@@ -39,6 +40,7 @@ export function Pages({
   pageId?: string;
   archived: boolean;
 }) {
+  useI18n();
   const [sort, setSort] = useProjectPreferences<SortSpec>(projectId, "pages:sort", {field:"position",direction:"asc"}, raw => normalizeSort(raw, noteSortFields, {field:"position",direction:"asc"}));
   const [params] = useSearchParams();
   const qc = useQueryClient();
@@ -55,6 +57,7 @@ export function Pages({
     };
   }, []);
   const attempted = useRef("");
+  const creationTitles = useRef<Record<string, string>>({});
   const createdId = useRef("");
   const context = useRef({ projectId, pageId });
   context.current = { projectId, pageId };
@@ -85,14 +88,21 @@ export function Pages({
     setError("");
     const originProject = projectId;
     try {
+      const path="/projects/"+originProject+"/pages";
+      const original=recoverCreateInput<{title:string;parent_id:null}>(path,input=>
+        input.parent_id===null && ["无标题笔记","Untitled note"].includes(String(input.title)) &&
+        Object.keys(input).every(key=>key==='title'||key==='parent_id'));
+      const defaultTitle=creationTitles.current[projectId] ?? original?.title ?? t("无标题笔记");
+      creationTitles.current[projectId]=defaultTitle;
       const next = await api<Page>(
         "/projects/" + originProject + "/pages",
         "POST",
         {
-          title: "无标题笔记",
+          title: defaultTitle,
           parent_id: null,
         },
       );
+      delete creationTitles.current[originProject];
       qc.setQueryData(["page", next.id], next);
       void refresh();
       if (
@@ -127,30 +137,30 @@ export function Pages({
       }
     >
       {!overviewBackground && (
-        <section className="page-tree" aria-label="笔记列表" aria-hidden={pageId?true:undefined} inert={!!pageId}>
-          <CollectionHeader title="笔记" count={list.isPending?"…":nodes.length}
-            actions={!archived&&<button disabled={creating||!!error} onClick={()=>void createPage()}>新建笔记</button>}
-            views={<div className="collection-view-switch"><span className="collection-current-view">列表</span></div>}
-            tools={<><TaskFilters key={projectId} state={filterState} label="笔记"/><SortControl key={projectId} value={sort} onChange={setSort} fields={noteSortFields} label="笔记排序"/></>}/>
+        <section className="page-tree" aria-label={t("笔记列表")} aria-hidden={pageId?true:undefined} inert={!!pageId}>
+          <CollectionHeader title={t("笔记")} count={list.isPending?"…":nodes.length}
+            actions={!archived&&<button disabled={creating||!!error} onClick={()=>void createPage()}>{t("新建笔记")}</button>}
+            views={<div className="collection-view-switch"><span className="collection-current-view">{t("列表")}</span></div>}
+            tools={<><TaskFilters key={projectId} state={filterState} label={t("笔记")}/><SortControl key={projectId} value={sort} onChange={setSort} fields={noteSortFields} label={t("笔记排序")}/></>}/>
           {error && (
             <p role="alert">
-              {error}{" "}
+              {translateError(error)}{" "}
               <button
                 disabled={creating}
                 onClick={() => void createPage()}
               >
-                重试新建
-              </button>
+                {t("重试新建")}</button>
               <button disabled={creating} onClick={() => {
-                if (!confirm("上次新建可能已经完成。放弃此次重试并允许另建笔记？")) return;
+                if (!confirm(t("上次新建可能已经完成。放弃此次重试并允许另建笔记？"))) return;
                 try {
-                  abandonCreateIntent("/projects/" + projectId + "/pages", {title:"无标题笔记",parent_id:null});
+                  abandonCreateIntent("/projects/" + projectId + "/pages", {title:creationTitles.current[projectId] ?? t("无标题笔记"),parent_id:null});
+                  delete creationTitles.current[projectId];
                   setError("");
                 } catch(e) { setError((e as Error).message); }
-              }}>放弃此次新建</button>
+              }}>{t("放弃此次新建")}</button>
             </p>
           )}
-          {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{flat.length} / {nodes.length} 篇笔记符合条件</p>}
+          {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{t("{count} / {total} 篇笔记符合条件", {count: flat.length, total: nodes.length})}</p>}
           <div className="page-list">
             {flat.map((page) => (
               <div
@@ -164,22 +174,22 @@ export function Pages({
 
               </div>
             ))}
-            {list.isLoading && <p className="page-list-empty">加载笔记…</p>}
+            {list.isLoading && <p className="page-list-empty">{t("加载笔记…")}</p>}
             {!list.isLoading && !list.isError && !filterState.blocked && !flat.length && (
               <p className="page-list-empty">
-                {filterState.filters.length?<>没有符合条件的笔记<button onClick={()=>filterState.setFilters([])}>清除筛选</button></>:"还没有笔记，创建第一篇笔记开始记录。"}
+                {filterState.filters.length?<>{t("没有符合条件的笔记")}<button onClick={()=>filterState.setFilters([])}>{t("清除筛选")}</button></>:t("还没有笔记，创建第一篇笔记开始记录。")}
               </p>
             )}
           </div>
           {list.isError && (
             <p role="alert">
-              笔记加载失败<button onClick={() => list.refetch()}>重试</button>
+              {t("笔记加载失败")}<button onClick={() => list.refetch()}>{t("重试")}</button>
             </p>
           )}
         </section>
       )}
       {pageId && (
-        <ObjectDialog projectId={projectId} projectTitle={projectTitle} type="pages" title={detail.data?.title ?? "加载中…"}>
+        <ObjectDialog projectId={projectId} projectTitle={projectTitle} type="pages" title={detail.data?.title ?? t("加载中…")}>
         <section>
           {pageId ? (
             detail.data && detail.data.project_id === projectId ? (
@@ -206,14 +216,13 @@ export function Pages({
               </>
             ) : detail.isError ? (
               <p role="alert">
-                笔记加载失败
-                <button onClick={() => detail.refetch()}>重试</button>
+                {t("笔记加载失败")}<button onClick={() => detail.refetch()}>{t("重试")}</button>
               </p>
             ) : (
-              <p>加载笔记…</p>
+              <p>{t("加载笔记…")}</p>
             )
           ) : (
-            <p>选择或新建笔记，开始记录。</p>
+            <p>{t("选择或新建笔记，开始记录。")}</p>
           )}
         </section>
         </ObjectDialog>
@@ -237,6 +246,7 @@ export function PageEditor({
   ) => Promise<void>;
   onReload: (beforeReset?: () => void) => Promise<void>;
 }) {
+  useI18n();
   const a = useAutosave(
     {
       title: page.title,
@@ -260,7 +270,7 @@ export function PageEditor({
   return (
     <article
       className="editor"
-      aria-label="笔记详情"
+      aria-label={t("笔记详情")}
       data-dirty={a.dirty || a.busy || bodyPending}
     >
       <ObjectEditorHeader title={a.draft.title} menu={<ObjectMenu type="pages" id={page.id} projectId={page.project_id} archived={archived}/>} properties={      <ObjectProperties
@@ -273,7 +283,7 @@ export function PageEditor({
           <input
             ref={titleInput}
             className="task-inline-title"
-            aria-label="笔记标题"
+            aria-label={t("笔记标题")}
             disabled={archived}
             value={a.draft.title}
             onChange={(e) =>
@@ -293,13 +303,13 @@ export function PageEditor({
         }
       />
       </ObjectEditorBody>
-      <ObjectEditorFooter busy={a.busy} dirty={a.dirty} error={a.error || error} >
+      <ObjectEditorFooter busy={a.busy} dirty={a.dirty} error={translateError(a.error || error)} >
       {(a.error || error) && (
         <div role="alert">
-          {a.error || error}
-          <p>本地草稿已保留。</p>
-          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>恢复本机草稿</button>}
-          <button onClick={() => a.save()}>重试保存</button>
+          {translateError(a.error || error)}
+          <p>{t("本地草稿已保留。")}</p>
+          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>{t("恢复本机草稿")}</button>}
+          <button onClick={() => a.save()}>{t("重试保存")}</button>
           <button
             onClick={() =>
               navigator.clipboard
@@ -307,13 +317,12 @@ export function PageEditor({
                 .catch(() => setError("复制失败，请手动复制"))
             }
           >
-            复制草稿
-          </button>
+            {t("复制草稿")}</button>
           <button
             disabled={bodyPending || a.busy}
             onClick={async () => {
               if (bodyPending || a.busy) return;
-              if (confirm("重新载入会丢弃本地草稿，是否继续？"))
+              if (confirm(t("重新载入会丢弃本地草稿，是否继续？")))
                 try {
                   await onReload(a.discardRecovery);
                 } catch (e) {
@@ -321,8 +330,7 @@ export function PageEditor({
                 }
             }}
           >
-            重新载入
-          </button>
+            {t("重新载入")}</button>
         </div>
       )}
       </ObjectEditorFooter>

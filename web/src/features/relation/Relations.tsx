@@ -1,3 +1,4 @@
+import {useI18n,translateError} from "../../i18n";
 import {PropertyIcon} from "../../components/object/PropertyIcon";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -28,6 +29,7 @@ export function Relations({
   id: string;
   archived: boolean;
 }) {
+  const {t}=useI18n();
   const popover = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     const dismiss = (event: PointerEvent) => { if (!popover.current?.contains(event.target as Node) && popover.current) popover.current.open = false; };
@@ -53,7 +55,7 @@ export function Relations({
   const zone = config.data?.timezone;
   const label = (item: Item) =>
     item.deleted
-      ? "已删除 · " + item.title
+      ? t("已删除 · ") + item.title
       : item.type === "pages"
         ? (options.data?.find((x) => x.id === item.id)?.path ??
           item.path ??
@@ -61,14 +63,14 @@ export function Relations({
         : item.type === "tasks"
           ? item.title +
             " · " +
-            (stages.find((x) => x[0] === item.stage)?.[1] ?? item.stage)
+            t(stages.find((x) => x[0] === item.stage)?.[1] ?? item.stage ?? "")
           : item.title +
             " · " +
             (zone && item.start_at && item.end_at
               ? displayTime(item.start_at, zone) +
                 " — " +
                 displayTime(item.end_at, zone)
-              : "加载时间…");
+              : t("加载时间…"));
   const list = relations.data ?? [];
   const candidates = (options.data ?? []).filter(
     (x) =>
@@ -90,11 +92,11 @@ export function Relations({
   };
   return (
     <details ref={popover} className="relation-property" onKeyDown={event => { if (event.key === "Escape" && popover.current?.open) { event.preventDefault(); event.stopPropagation(); popover.current.open = false; popover.current.querySelector("summary")?.focus(); } }}>
-      <summary aria-label="关联对象"><span className="relation-property-name"><PropertyIcon name="relations"/>关联</span><span className="relation-property-value"><span className="relation-count">{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="m6 8 4 4 4-4"/></svg></span></summary>
-      <section className="relation-popover" aria-label="关联对象列表">
-      <header><h3>关联对象</h3></header>
-      {relations.isPending && <p role="status">正在加载关联…</p>}
-      {!relations.isPending && !relations.isError && !list.length && <p className="relation-empty">暂无关联</p>}
+      <summary aria-label={t("关联对象")}><span className="relation-property-name"><PropertyIcon name="relations"/>{t("关联")}</span><span className="relation-property-value"><span className="relation-count" aria-label={relations.isPending||relations.isError?undefined:t("{count} 个关联",{count:list.length})}>{relations.isPending ? "…" : relations.isError ? "!" : list.length}</span><svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="m6 8 4 4 4-4"/></svg></span></summary>
+      <section className="relation-popover" aria-label={t("关联对象列表")}>
+      <header><h3>{t("关联对象")}</h3></header>
+      {relations.isPending && <p role="status">{t("正在加载关联…")}</p>}
+      {!relations.isPending && !relations.isError && !list.length && <p className="relation-empty">{t("暂无关联")}</p>}
       {list.map((item) => (
         <div className="relation-row" key={item.type + item.id}>
           {item.deleted ? (
@@ -109,7 +111,7 @@ export function Relations({
           {!archived && !item.deleted && (
             <button
               disabled={busy}
-              aria-label={"移除关联 " + item.title}
+              aria-label={t("移除关联 ") + item.title}
               onClick={() =>
                 void change(
                   item.kind + "/" + item.left_id + "/" + item.right_id,
@@ -117,14 +119,14 @@ export function Relations({
                 )
               }
             >
-              移除关联
+              {t("移除关联")}
             </button>
           )}
         </div>
       ))}
       {(relations.isError || options.isError || config.isError) && (
         <p role="alert">
-          关联加载失败
+          {t("关联加载失败")}
           <button
             onClick={() => {
               void relations.refetch();
@@ -132,24 +134,24 @@ export function Relations({
               void config.refetch();
             }}
           >
-            重试
+            {t("重试")}
           </button>
         </p>
       )}
       {!archived && (
         <div className="relation-controls">
           <input
-            aria-label="搜索关联标题"
-            placeholder="搜索同项目对象"
+            aria-label={t("搜索关联标题")}
+            placeholder={t("搜索同项目对象")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          {options.isPending && <p role="status">正在加载…</p>}
-          {!options.isPending && !options.isError && !relations.isPending && !relations.isError && !candidates.length && <p className="relation-empty">{search ? "没有匹配的对象" : "没有可关联的对象"}</p>}
-          <div className="relation-candidates" aria-label="可关联对象">
+          {options.isPending && <p role="status">{t("正在加载…")}</p>}
+          {!options.isPending && !options.isError && !relations.isPending && !relations.isError && !candidates.length && <p className="relation-empty">{search ? t("没有匹配的对象") : t("没有可关联的对象")}</p>}
+          <div className="relation-candidates" aria-label={t("可关联对象")}>
             {!relations.isPending && !relations.isError && candidates.map(item => <button
               key={item.type + item.id} type="button" disabled={busy}
-              aria-label={"关联 " + label(item)}
+              aria-label={t("关联 ") + label(item)}
               onClick={() => {
                 const rank = { tasks: 0, pages: 1, events: 2 };
                 const left = rank[type] < rank[item.type as keyof typeof rank];
@@ -158,13 +160,13 @@ export function Relations({
                   ? `${names[type]}-${names[item.type]}/${id}/${item.id}`
                   : `${names[item.type]}-${names[type]}/${item.id}/${id}`, "PUT");
               }}>
-              <span><span className="relation-candidate-title">{item.title}</span><small>{item.type === "pages" ? "笔记" : item.type === "events" ? "日程" : "任务"}</small></span>
+              <span><span className="relation-candidate-title">{item.title}</span><small>{item.type === "pages" ? t("笔记") : item.type === "events" ? t("日程") : t("任务")}</small></span>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
             </button>)}
           </div>
         </div>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{translateError(error)}</p>}
     </section>
     </details>
   );

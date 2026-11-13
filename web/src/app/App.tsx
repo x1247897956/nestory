@@ -1,3 +1,4 @@
+import {useI18n, t as tr, translateError} from "../i18n";
 import { CollectionHeader } from "../features/view/CollectionHeader";
 import { useProjectPreferences } from "../features/view/preferences";
 import { sortObjects,taskSortFields } from "../features/view/sorting";
@@ -39,6 +40,7 @@ import { Pages } from "../features/page/Pages";
 import { SettingsPage } from '../features/settings/Settings';
 import { rememberLocation } from '../features/settings/preferences';
 export function App() {
+  const {language} = useI18n();
   const { projectId, taskId, pageId, eventId } = useParams();
   const nav = useNavigate();
   const [taskView,setTaskView]=useProjectTaskView(projectId);
@@ -70,7 +72,7 @@ export function App() {
   }, [createOpen]);
   const closeCreate = () => {
     if (creating) return;
-    if ((newTitle.trim() || newParent || newStage!==initialNewStage.current) && !confirm("放弃未保存的新任务吗？")) return;
+    if ((newTitle.trim() || newParent || newStage!==initialNewStage.current) && !confirm(tr("放弃未保存的新任务吗？"))) return;
     try { for (const input of createAttempts.current) abandonCreateIntent("/projects/" + projectId + "/tasks", input); }
     catch(e) { setError((e as Error).message); return; }
     createAttempts.current = [];
@@ -86,7 +88,7 @@ export function App() {
   );
   useEffect(() => {
     if (blocker.state === "blocked") {
-      if (confirm("有未保存更改，仍要离开吗？")) blocker.proceed();
+      if (confirm(tr("有未保存更改，仍要离开吗？"))) blocker.proceed();
       else blocker.reset();
     }
   }, [blocker]);
@@ -234,7 +236,7 @@ export function App() {
     }
   };
   const visible = (t: Task) => filterState.ids.has(t.id);
-  const orderedTasks = useMemo(()=>sortObjects(all,taskDisplay.sort),[all,taskDisplay.sort]);
+  const orderedTasks = useMemo(()=>sortObjects(all,taskDisplay.sort),[all,taskDisplay.sort,language]);
   const taskIndex = useMemo(() => {
     const byId = new Map(all.map(task => [task.id, task]));
     const byParent = new Map<string, Task[]>();
@@ -257,8 +259,8 @@ export function App() {
         (taskId === t.id ? "selected" : "")
       }
     >
-      {group && !readOnly && <button className="task-drag-handle" aria-label={"拖动任务 " + t.title}
-        title="拖到另一个阶段" disabled={stageBusy} draggable={!stageBusy}
+      {group && !readOnly && <button className="task-drag-handle" aria-label={tr("拖动任务 ") + t.title}
+        title={tr("拖到另一个阶段")} disabled={stageBusy} draggable={!stageBusy}
         onDragStart={event => {
           draggedTask.current = t.id;
           event.dataTransfer.effectAllowed = "move";
@@ -267,11 +269,11 @@ export function App() {
         onDragEnd={() => { draggedTask.current = null; clearDropTarget(); }}>
         <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" fill="currentColor">{[5,9,13].map(y=><g key={y}><circle cx="5" cy={y} r="1"/><circle cx="9" cy={y} r="1"/></g>)}</svg>
       </button>}
-      <label className="task-stage-control" title="更改阶段">
+      <label className="task-stage-control" title={tr("更改阶段")}>
         <span className={"stage-dot " + t.stage} />
-        <select aria-label={"更改阶段 " + t.title} value={t.stage} disabled={readOnly || stageBusy}
+        <select aria-label={tr("更改阶段 ") + t.title} value={t.stage} disabled={readOnly || stageBusy}
           onChange={event => void changeStage(t.id, event.target.value)}>
-          {stages.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          {stages.map(([value, label]) => <option key={value} value={value}>{tr(label)}</option>)}
         </select>
       </label>
       <button className="task-title" onClick={() => openTask(t)}>
@@ -280,13 +282,13 @@ export function App() {
       {t.due_date && <time>{t.due_date}</time>}
       {t.priority !== "none" && (
         <span className={"priority " + t.priority}>
-          {priorities.find(([id]) => id === t.priority)?.[1]}
+          {tr(priorities.find(([id]) => id === t.priority)?.[1] ?? "")}
         </span>
       )}
       {!child && groupedChildren(t).length > 0 && (
         <button
           className="expand"
-          aria-label={"展开 " + t.title}
+          aria-label={tr("展开 ") + t.title}
           onClick={() =>
             setExpanded((old) => {
               const n = new Set(old);
@@ -320,25 +322,25 @@ export function App() {
           </span>
         </Link>
         <Link className="nav-item" to="/" aria-current={path === "/" ? "page" : undefined}>
-          工作台
+          {tr("工作台")}
         </Link>
         <Link className="nav-item" to="/search" aria-current={path === "/search" ? "page" : undefined}>
-          搜索
+          {tr("搜索")}
         </Link>
         <Link className="nav-item" to="/trash" aria-current={path === "/trash" ? "page" : undefined}>
-          回收站
+          {tr("回收站")}
         </Link>
         <div className="sidebar-heading">
-          <span>{archived ? "已归档" : "项目"} <span className="project-count">{projects.data?.length ?? 0}</span></span>
+          <span>{archived ? tr("已归档") : tr("项目")} <span className="project-count">{projects.data?.length ?? 0}</span></span>
           <div className="project-heading-actions">
             <details ref={projectOptions} className="project-options">
-              <summary aria-label="项目选项">⋯</summary>
-              <div><button onClick={event => { setArchived(!archived); event.currentTarget.closest("details")!.open = false; }}>{archived ? "返回项目列表" : "查看已归档项目"}</button></div>
+              <summary aria-label={tr("项目选项")}>⋯</summary>
+              <div><button onClick={event => { setArchived(!archived); event.currentTarget.closest("details")!.open = false; }}>{archived ? tr("返回项目列表") : tr("查看已归档项目")}</button></div>
             </details>
-            <button aria-label="新建项目" onClick={() => setProjectForm("new")}>＋</button>
+            <button aria-label={tr("新建项目")} onClick={() => setProjectForm("new")}>＋</button>
           </div>
         </div>
-        <nav aria-label="项目列表">
+        <nav aria-label={tr("项目列表")}>
           {navigationProjects.map(project => <div className="sidebar-project" key={project.id}>
             <div className="sidebar-project-row" ref={project.id === projectId ? activeProjectHeading : undefined}>
               <Link className={"project-link " + (project.id === projectId ? "active" : "")} to={"/projects/" + project.id}>
@@ -350,28 +352,28 @@ export function App() {
         </nav>
         {projects.isError && (
           <p role="alert">
-            项目加载失败{" "}
-            <button onClick={() => projects.refetch()}>重试</button>
+            {tr("项目加载失败")}{" "}
+            <button onClick={() => projects.refetch()}>{tr("重试")}</button>
           </p>
         )}
         <button className="new-project" onClick={() => setProjectForm("new")}>
-          ＋ 新建项目
+          {tr("＋ 新建项目")}
         </button>
 
         <Link className={'nav-item settings-entry' + (path === '/settings' ? ' active' : '')} to="/settings" aria-current={path === '/settings' ? 'page' : undefined}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m9.5 3-.7 2.4-2.2 1.3-2.5-.6-2.5 4.3 1.8 1.8v2.5l-1.8 1.8 2.5 4.3 2.5-.6 2.2 1.3.7 2.4h5l.7-2.4 2.2-1.3 2.5.6 2.5-4.3-1.8-1.8v-2.5l1.8-1.8-2.5-4.3-2.5.6-2.2-1.3L14.5 3Z" transform="translate(1 -1) scale(.92)"/><circle cx="12" cy="12" r="3"/></svg>
-          设置
+          {tr("设置")}
         </Link>
       </aside>
       <main>
         <div aria-hidden={taskId||pageId||eventId?true:undefined} inert={!!(taskId||pageId||eventId)} className={"topbar" + (projectId && (overview || overviewBackground) ? " project-overview-topbar" : "")}>
           <div className="topbar-identity">
-          <nav className="breadcrumbs" aria-label="面包屑">
+          <nav className="breadcrumbs" aria-label={tr("面包屑")}>
             {projectId ? <>
-              {(overview || overviewBackground) ? <h1 aria-label={p?.title ?? "项目"}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总" aria-current="page">{p?.title ?? "项目"}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label="汇总">{p?.title ?? "项目"}</Link>}
-              {!overview && !overviewBackground && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? "笔记" : calendar ? "日程" : "任务"}</span></>}
+              {(overview || overviewBackground) ? <h1 aria-label={p?.title ?? tr("项目")}><Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label={tr("汇总")} aria-current="page">{p?.title ?? tr("项目")}</Link></h1> : <Link className="project-breadcrumb" to={"/projects/" + projectId} aria-label={tr("汇总")}>{p?.title ?? tr("项目")}</Link>}
+              {!overview && !overviewBackground && <><span className="slash" aria-hidden="true">/</span><span aria-current="page">{notes ? tr("笔记") : calendar ? tr("日程") : tr("任务")}</span></>}
 
-            </> : <span aria-current="page">{path === '/settings' ? '设置' : path === "/search" ? "搜索" : path === "/trash" ? "回收站" : "工作台"}</span>}
+            </> : <span aria-current="page">{path === '/settings' ? tr("设置") : path === "/search" ? tr("搜索") : path === "/trash" ? tr("回收站") : tr("工作台")}</span>}
           </nav>
           {projectId && (overview || overviewBackground) && p?.description && <p className="overview-description">{p.description}</p>}
           </div>
@@ -389,26 +391,26 @@ export function App() {
 
           </>
         ) : current.isPending ? (
-          <p className="loading">正在打开项目…</p>
+          <p className="loading">{tr("正在打开项目…")}</p>
         ) : current.isError && !current.data ? (
           <div className="error" role="alert">
-            项目加载失败<button onClick={() => current.refetch()}>重试</button>
+            {tr("项目加载失败")}<button onClick={() => current.refetch()}>{tr("重试")}</button>
           </div>
         ) : (
           <>
             {(current.isError || detail.isError) && (
               <p className="error" role="alert">
-                刷新失败，当前草稿仍保留。请检查网络后重试。
+                {tr("刷新失败，当前草稿仍保留。请检查网络后重试。")}
               </p>
             )}
             {readOnly && (
               <div className="archive-banner">
-                此项目已归档，内容只读。取消归档后可继续编辑。
+                {tr("此项目已归档，内容只读。取消归档后可继续编辑。")}
               </div>
             )}
             {error && (
               <p className="error" role="alert">
-                {error}
+                {translateError(error)}
               </p>
             )}
             {(overview || overviewBackground) && <div aria-hidden={overviewBackground?true:undefined} inert={overviewBackground} className="overview-background">
@@ -417,30 +419,30 @@ export function App() {
             {overview ? null : calendar ? (
               <Events
                 projectId={projectId}
-                projectTitle={p?.title ?? "项目"}
+                projectTitle={p?.title ?? tr("项目")}
                 eventId={eventId}
                 archived={readOnly}
               />
             ) : notes ? (
               <Pages
                 projectId={projectId}
-                projectTitle={p?.title ?? "项目"}
+                projectTitle={p?.title ?? tr("项目")}
                 pageId={pageId}
                 archived={readOnly}
               />
             ) : (
               <div className="workspace task-views-workspace collection-workspace">
                 {!overviewBackground && <section className="task-list" aria-hidden={taskId?true:undefined} inert={!!taskId}>
-                  <CollectionHeader title="任务" count={all.length} status={stageBusy?"正在更新阶段…":undefined}
-                    actions={!readOnly&&<button className="primary" onClick={()=>openCreate()}>添加任务</button>}
+                  <CollectionHeader title={tr("任务")} count={all.length} status={stageBusy?tr("正在更新阶段…"):undefined}
+                    actions={!readOnly&&<button className="primary" onClick={()=>openCreate()}>{tr("添加任务")}</button>}
                     views={<TaskViewSwitcher view={taskView} onChange={setTaskView}/>}
-                    tools={<><TaskFilters key={projectId} state={filterState}/><SortControl key={projectId} value={taskDisplay.sort} onChange={sort=>setTaskDisplay(old=>({...old,sort}))} fields={taskSortFields} label="任务排序"/>{taskView==="list"&&<TaskDisplaySettings value={taskDisplay} onChange={setTaskDisplay}/>}</>}/>
-                  {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{filterState.ids.size} / {all.length} 个任务符合条件</p>}
-                  {!filterState.blocked&&filterState.filters.length>0&&filterState.ids.size===0&&<div className="task-filter-empty"><p>没有符合条件的任务</p><button onClick={()=>filterState.setFilters([])}>清除筛选</button></div>}
-                  {tasks.isPending ? <p role="status">正在加载任务…</p> : tasks.isError ? (
+                    tools={<><TaskFilters key={projectId} state={filterState}/><SortControl key={projectId} value={taskDisplay.sort} onChange={sort=>setTaskDisplay(old=>({...old,sort}))} fields={taskSortFields} label={tr("任务排序")}/>{taskView==="list"&&<TaskDisplaySettings value={taskDisplay} onChange={setTaskDisplay}/>}</>}/>
+                  {filterState.filters.length>0&&!filterState.blocked&&<p className="task-filter-message">{tr("{count} / {total} 个任务符合条件",{count:filterState.ids.size,total:all.length})}</p>}
+                  {!filterState.blocked&&filterState.filters.length>0&&filterState.ids.size===0&&<div className="task-filter-empty"><p>{tr("没有符合条件的任务")}</p><button onClick={()=>filterState.setFilters([])}>{tr("清除筛选")}</button></div>}
+                  {tasks.isPending ? <p role="status">{tr("正在加载任务…")}</p> : tasks.isError ? (
                     <div role="alert">
-                      任务加载失败
-                      <button onClick={() => tasks.refetch()}>重试</button>
+                      {tr("任务加载失败")}
+                      <button onClick={() => tasks.refetch()}>{tr("重试")}</button>
                     </div>
                   ) : (filterState.blocked || (filterState.filters.length>0&&filterState.ids.size===0)) ? null : taskView==="board" ? <TaskBoard key={projectId} projectId={projectId} tasks={orderedTasks.filter(visible)} allTasks={all} readOnly={readOnly} busy={stageBusy} onOpen={openTask} onStageChange={changeStage} onCreate={stage=>openCreate("",stage)}/> : group ? (
                     stages.map(([id, name]) => {
@@ -458,7 +460,7 @@ export function App() {
                         );
                         return (
                           <div className="task-group" key={id}
-                            role="region" aria-label={name + "阶段"} data-stage={id}
+                            role="region" aria-label={tr("{title}阶段",{title:tr(name)})} data-stage={id}
                             onDragOver={event => {
                               if (!readOnly && !stageMutation.current && draggedTask.current) {
                                 event.preventDefault(); event.dataTransfer.dropEffect = "move"; if (dropTarget.current !== event.currentTarget) { clearDropTarget(); dropTarget.current = event.currentTarget; event.currentTarget.classList.add("drop-target"); }
@@ -474,9 +476,9 @@ export function App() {
                                 void changeStage(task, id);
                               }
                             }}>
-                            <h3><button type="button" className="task-stage-toggle" aria-label={`${taskDisplay.collapsed.includes(id)?"展开":"收起"}${name}阶段`} aria-expanded={!taskDisplay.collapsed.includes(id)} onClick={()=>toggleStage(id)}>
+                            <h3><button type="button" className="task-stage-toggle" aria-label={tr(taskDisplay.collapsed.includes(id)?"展开{title}阶段":"收起{title}阶段",{title:tr(name)})} aria-expanded={!taskDisplay.collapsed.includes(id)} onClick={()=>toggleStage(id)}>
                               <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d={taskDisplay.collapsed.includes(id)?"m8 5 5 5-5 5":"m5 8 5 5 5-5"}/></svg>
-                              <span className={"stage-dot " + id}/>{name}<span>{items.length+orphanChildren.length}</span>
+                              <span className={"stage-dot " + id}/>{tr(name)}<span>{items.length+orphanChildren.length}</span>
                             </button></h3>
                             <div className="task-group-content" hidden={taskDisplay.collapsed.includes(id)}>
                             {items.map(renderRoot)}
@@ -490,7 +492,7 @@ export function App() {
                               </div>
                             ))}
                             {!items.length && !orphanChildren.length && (
-                              <div className="empty-group">暂无任务</div>
+                              <div className="empty-group">{tr("暂无任务")}</div>
                             )}
                             </div>
                           </div>
@@ -504,14 +506,14 @@ export function App() {
 
                 </section>}
                 {taskId && (
-                  <ObjectDialog projectId={projectId} projectTitle={p?.title ?? "项目"} type="tasks" title={detail.data?.title ?? "加载中…"}>
+                  <ObjectDialog projectId={projectId} projectTitle={p?.title ?? tr("项目")} type="tasks" title={detail.data?.title ?? tr("加载中…")}>
                   <div className="task-summary-page">
                     {detail.isPending ? (
-                      <p>加载任务…</p>
+                      <p>{tr("加载任务…")}</p>
                     ) : detail.isError && !detail.data ? (
                       <p role="alert">
-                        任务加载失败
-                        <button onClick={() => detail.refetch()}>重试</button>
+                        {tr("任务加载失败")}
+                        <button onClick={() => detail.refetch()}>{tr("重试")}</button>
                       </p>
                     ) : detail.data && detail.data.project_id === projectId ? (
                       <TaskSummary task={detail.data} archived={readOnly} onCreate={openCreate}>
@@ -537,7 +539,7 @@ export function App() {
                         />
                       </TaskSummary>
                     ) : (
-                      <p>任务不属于此项目</p>
+                      <p>{tr("任务不属于此项目")}</p>
                     )}
                   </div>
                   </ObjectDialog>
@@ -547,7 +549,7 @@ export function App() {
           </>
         )}
       </main>
-      {createOpen && !readOnly && <dialog ref={createDialog} className="create-task-dialog" aria-label="添加任务" onCancel={e => { e.preventDefault(); closeCreate(); }}>
+      {createOpen && !readOnly && <dialog ref={createDialog} className="create-task-dialog" aria-label={tr("添加任务")} onCancel={e => { e.preventDefault(); closeCreate(); }}>
                     <form
                       className="create-task-form"
                       data-dirty={!!newTitle.trim() || !!newParent || newStage!==initialNewStage.current || creating}
@@ -587,33 +589,33 @@ export function App() {
                         }
                       }}
                     >
-                      <h2>添加任务</h2>
-                      {error && <p role="alert" className="error">{error}</p>}
-                      <label>任务标题<input
+                      <h2>{tr("添加任务")}</h2>
+                      {error && <p role="alert" className="error">{translateError(error)}</p>}
+                      <label>{tr("任务标题")}<input
                         disabled={creating}
-                        aria-label="新任务标题"
-                        placeholder="＋ 添加一个新任务…"
+                        aria-label={tr("新任务标题")}
+                        placeholder={tr("＋ 添加一个新任务…")}
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
                         required
                         autoFocus
                       /></label>
-                      <label>阶段<select aria-label="新任务阶段" disabled={creating} value={newStage} onChange={event=>setNewStage(event.target.value)}>{stages.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
-                      <label>父任务<select
+                      <label>{tr("阶段")}<select aria-label={tr("新任务阶段")} disabled={creating} value={newStage} onChange={event=>setNewStage(event.target.value)}>{stages.map(([value,label])=><option key={value} value={value}>{tr(label)}</option>)}</select></label>
+                      <label>{tr("父任务")}<select
                         disabled={creating}
-                        aria-label="父任务"
+                        aria-label={tr("父任务")}
                         value={newParent}
                         onChange={(e) => setNewParent(e.target.value)}
                       >
-                        <option value="">顶层任务</option>
+                        <option value="">{tr("顶层任务")}</option>
                         {roots.map((t) => (
                           <option key={t.id} value={t.id}>
-                            {t.title} 的子任务
+                            {tr("{title} 的子任务",{title:t.title})}
                           </option>
                         ))}
                       </select></label>
-                      <div className="create-task-actions"><button type="button" onClick={closeCreate} disabled={creating}>取消</button><button className="primary" disabled={creating || !newTitle.trim()}>
-                        {creating ? "添加中…" : "创建任务"}
+                      <div className="create-task-actions"><button type="button" onClick={closeCreate} disabled={creating}>{tr("取消")}</button><button className="primary" disabled={creating || !newTitle.trim()}>
+                        {creating ? tr("添加中…") : tr("创建任务")}
                       </button></div>
                     </form>
       </dialog>}

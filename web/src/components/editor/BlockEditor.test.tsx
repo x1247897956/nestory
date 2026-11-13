@@ -6,11 +6,11 @@ const native = vi.hoisted(() => ({ editor: {} as any, emit: () => {} }));
 vi.mock('@blocknote/core', () => ({ BlockNoteEditor: {create: () => native.editor}, filterSuggestionItems: vi.fn() }));
 vi.mock('@blocknote/core/extensions', () => ({SideMenuExtension:{}}));
 vi.mock('@blocknote/ariakit', () => ({BlockNoteView: ({onChange,children}:{onChange:()=>void;children:ReactNode}) => {native.emit=onChange;return <div>{children}</div>;}}));
-vi.mock('@blocknote/react', () => ({SideMenuController:()=>null, SuggestionMenuController:()=>null, AddBlockButton:()=>null, useBlockNoteEditor:vi.fn(), useExtensionState:vi.fn(), useComponentsContext:vi.fn(), getDefaultReactSlashMenuItems:vi.fn()}));
+vi.mock('@blocknote/react', () => ({SideMenuController:()=>null, FormattingToolbarController:()=>null, SuggestionMenuController:()=>null, AddBlockButton:()=>null, useBlockNoteEditor:vi.fn(), useExtensionState:vi.fn(), useComponentsContext:vi.fn(), getDefaultReactSlashMenuItems:vi.fn()}));
 import { BlockEditor } from './BlockEditor';
 const doc = (text:string):BodyDocument => ({version:1,blocks:[{id:text,type:'paragraph',props:{backgroundColor:'default',textColor:'default',textAlignment:'left'},children:[],content:[{type:'text',text,styles:{}}]}]});
 beforeEach(() => {
-  native.editor = {document:[],replaceBlocks:vi.fn((_old:unknown,blocks:unknown[]) => {native.editor.document=blocks;})};
+  native.editor = {dictionary:{},document:[],replaceBlocks:vi.fn((_old:unknown,blocks:unknown[]) => {native.editor.document=blocks;})};
 });
 it('a delayed local document echo cannot replace newer native edits or uploaded blocks', () => {
   const publish = vi.fn();

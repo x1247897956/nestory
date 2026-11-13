@@ -4,6 +4,8 @@ const reply = (ok = true, status = 200) => ({ ok, status, json: async () => ({ i
 function memoryStorage() {
   const data = new Map<string, string>();
   return {
+    get length() {return data.size;},
+    key: (index:number) => [...data.keys()][index] ?? null,
     getItem: (key: string) => data.get(key) ?? null,
     setItem: (key: string, value: string) => { data.set(key, value); },
     removeItem: (key: string) => { data.delete(key); },
@@ -13,6 +15,8 @@ beforeEach(() => {
   vi.stubGlobal("sessionStorage", memoryStorage());
   const data = new Map<string, string>();
   vi.stubGlobal("localStorage", {
+    get length() {return data.size;},
+    key: (index:number) => [...data.keys()][index] ?? null,
     getItem: (key: string) => data.get(key) ?? null,
     setItem: (key: string, value: string) => { data.set(key, value); },
     removeItem: (key: string) => { data.delete(key); },
@@ -92,4 +96,19 @@ it("blocks creates when the tab identity cannot be persisted", async () => {
   vi.spyOn(window.sessionStorage, "setItem").mockImplementation(() => { throw new Error("disabled"); });
   await expect(api("/projects", "POST", { title: "x" })).rejects.toThrow("恢复信息");
   expect(fetcher).not.toHaveBeenCalled();
+});
+
+it("recovers only matching durable create input owned by the current tab across reload", async () => {
+ const fetcher=vi.fn().mockRejectedValue(new Error('lost response'));vi.stubGlobal('fetch',fetcher);
+ const path='/projects/p/pages';
+ await api(path,'POST',{title:'无标题笔记',parent_id:null}).catch(()=>{});
+ vi.resetModules();const fresh=await import('./api');
+ const recovered=fresh.recoverCreateInput<{title:string;parent_id:null}>(path,input=>input.parent_id===null);
+ expect(recovered).toEqual({title:'无标题笔记',parent_id:null});
+ expect(fresh.recoverCreateInput('/projects/other/pages',()=>true)).toBeUndefined();
+ expect(fresh.recoverCreateInput(path,()=>false)).toBeUndefined();
+ await fresh.api(path,'POST',recovered).catch(()=>{});
+ expect(JSON.parse(fetcher.mock.calls[1][1].body).request_id).toBe(JSON.parse(fetcher.mock.calls[0][1].body).request_id);
+ vi.stubGlobal('sessionStorage',memoryStorage());window.name='';
+ expect(fresh.recoverCreateInput(path,()=>true)).toBeUndefined();
 });

@@ -1,3 +1,4 @@
+import {t, useI18n, translateError} from "../../i18n";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../app/api";
@@ -18,6 +19,7 @@ const names: Record<string, string> = {
   events: "日程",
 };
 export function Trash() {
+  const {language} = useI18n();
   const settings=useSettings();
   const qc = useQueryClient();
   const [error, setError] = useState("");
@@ -28,26 +30,25 @@ export function Trash() {
     queryFn: () => api<Batch[]>("/trash"),
   });
   return (
-    <section className="global-view trash-view" aria-label="回收站">
+    <section className="global-view trash-view" aria-label={t("回收站")}>
       <header className="trash-heading">
-        <h1>回收站</h1>
-        {r.data && <span>{r.data.length} 条记录</span>}
+        <h1>{t("回收站")}</h1>
+        {r.data && <span>{t("{count} 条记录", {count: r.data.length})}</span>}
       </header>
       {r.isPending && (
         <p role="status" className="trash-message">
-          正在加载…
-        </p>
+          {t("正在加载…")}</p>
       )}
       {r.isError && (
         <p role="alert" className="trash-message">
-          回收站加载失败 <button onClick={() => r.refetch()}>重试</button>
+          {t("回收站加载失败")}<button onClick={() => r.refetch()}>{t("重试")}</button>
         </p>
       )}
       {r.isSuccess && !r.data.length && (
-        <p className="trash-message">回收站为空</p>
+        <p className="trash-message">{t("回收站为空")}</p>
       )}
       {!!r.data?.length && (
-        <ul className="trash-list" aria-label="已删除的对象">
+        <ul className="trash-list" aria-label={t("已删除的对象")}>
           {r.data.map((x) => (
             <li key={x.id} className="trash-item">
               <div className="trash-row">
@@ -73,13 +74,13 @@ export function Trash() {
                   </svg>
                   <span>{x.title}</span>
                 </button>
-                <span className="trash-kind">{names[x.type] ?? x.type}</span>
-                <span className="trash-count">{x.count} 个对象</span>
+                <span className="trash-kind">{names[x.type] ? t(names[x.type]) : x.type}</span>
+                <span className="trash-count">{t("{count} 个对象", {count: x.count})}</span>
                 <time
                   dateTime={new Date(x.deleted_at).toISOString()}
-                  title={new Date(x.deleted_at).toLocaleString("zh-CN")}
+                  title={new Date(x.deleted_at).toLocaleString(language, {hour12: settings.hourCycle === "12"})}
                 >
-                  {new Date(x.deleted_at).toLocaleString("zh-CN", {
+                  {new Date(x.deleted_at).toLocaleString(language, {
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
@@ -90,7 +91,7 @@ export function Trash() {
                 </time>
                 <button
                   className="trash-restore"
-                  aria-label={"恢复 " + x.title}
+                  aria-label={t("恢复 {title}", {title: x.title})}
                   disabled={!!busy || x.archived}
                   onClick={async () => {
                     setBusy(x.id);
@@ -105,19 +106,18 @@ export function Trash() {
                     }
                   }}
                 >
-                  {busy === x.id ? "恢复中…" : "恢复"}
+                  {busy === x.id ? t("恢复中…") : t("恢复")}
                 </button>
               </div>
               {x.archived && (
                 <p className="trash-blocked">
-                  项目已归档，请先取消归档再恢复。
-                </p>
+                  {t("项目已归档，请先取消归档再恢复。")}</p>
               )}
               {expanded === x.id && (
                 <ul
                   className="trash-members"
                   id={"trash-members-" + x.id}
-                  aria-label="删除批次明细"
+                  aria-label={t("删除批次明细")}
                 >
                   {x.members.map((m) => (
                     <li key={m.id}>{m.title}</li>
@@ -130,7 +130,7 @@ export function Trash() {
       )}
       {error && (
         <p role="alert" className="trash-message">
-          {error}
+          {translateError(error)}
         </p>
       )}
     </section>

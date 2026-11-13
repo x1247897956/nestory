@@ -1,3 +1,4 @@
+import {useI18n,translateError} from "../../i18n";
 import {useRef,useState} from "react";
 import {api,ApiError} from "../../app/api";
 import {useAutosave} from "../editor/useAutosave";
@@ -7,6 +8,7 @@ import type {PropertyDefinition,PropertyOption} from "./propertyTypes";
 
 type Draft={name:string;options:PropertyOption[];pendingOption:string};
 export function PropertySettings({definition:d,archived,onSaved,onReload,onDeleted,focusName}:{definition:PropertyDefinition;archived:boolean;onSaved:(d:PropertyDefinition)=>void;onReload:(discard:()=>void)=>Promise<void>;onDeleted:(id:string)=>void;focusName:boolean}) {
+ const {t}=useI18n();
  const originalOptions=useRef(JSON.stringify(d.options));
  const [deleting,setDeleting]=useState(false),[error,setError]=useState("");
  // Keep the previous draft shape/key so existing local recovery records remain visible.
@@ -17,7 +19,7 @@ export function PropertySettings({definition:d,archived,onSaved,onReload,onDelet
  },archived||deleting,draft=>!!draft.name.trim()&&draft.name.length<=80,`property-definition:${d.project_id}:${d.object_type}:${d.id}`);
  const remove=async()=>{
   if(archived||a.dirty||a.busy||deleting)return;
-  if(!confirm(`删除属性“${d.name}”？当前项目该类型所有对象（包括回收站）上的这个属性及其值将永久删除，无法撤销。`))return;
+  if(!confirm(t("删除属性“{title}”？当前项目该类型所有对象（包括回收站）上的这个属性及其值将永久删除，无法撤销。",{title:d.name})))return;
   setDeleting(true);setError("");
   try {
    try {await api(`/property-definitions/${d.id}`,"DELETE",{version:a.version});}
@@ -26,10 +28,10 @@ export function PropertySettings({definition:d,archived,onSaved,onReload,onDelet
   }catch(e){setError((e as Error).message);setDeleting(false);}
  };
  return <div data-dirty={a.dirty||a.busy||deleting}>
-  <div className="property-settings-caption">编辑属性</div>
-  <label>名称<input aria-label="属性名称" value={a.draft.name} maxLength={80} disabled={archived||deleting} autoFocus={focusName} onFocus={e=>{if(focusName)e.target.select();}} onChange={e=>{setError("");a.setDraft(old=>({...old,name:e.target.value}));}}/></label>
+  <div className="property-settings-caption">{t("编辑属性")}</div>
+  <label>{t("名称")}<input aria-label={t("属性名称")} value={a.draft.name} maxLength={80} disabled={archived||deleting} autoFocus={focusName} onFocus={e=>{if(focusName)e.target.select();}} onChange={e=>{setError("");a.setDraft(old=>({...old,name:e.target.value}));}}/></label>
   <PropertyDraftStatus state={a} onReload={onReload}/>
-  {error&&<p role="alert">{error} <button disabled={a.dirty||a.busy||deleting} onClick={()=>void onReload(a.discardRecovery).catch(e=>setError((e as Error).message))}>重新载入属性</button></p>}
-  <button className="property-danger" disabled={archived||a.dirty||a.busy||deleting} onClick={()=>void remove()}>{deleting?"删除中…":"删除属性"}</button>
+  {error&&<p role="alert">{translateError(error)} <button disabled={a.dirty||a.busy||deleting} onClick={()=>void onReload(a.discardRecovery).catch(e=>setError((e as Error).message))}>{t("重新载入属性")}</button></p>}
+  <button className="property-danger" disabled={archived||a.dirty||a.busy||deleting} onClick={()=>void remove()}>{deleting?t("删除中…"):t("删除属性")}</button>
  </div>;
 }

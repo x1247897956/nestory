@@ -1,3 +1,4 @@
+import {useI18n, t as tr} from "../../i18n";
 import { useRef, useMemo, type DragEvent } from 'react';
 import { type TaskProperties as Task, stages, priorities } from '../../app/api';
 import './task-board.css';
@@ -17,6 +18,7 @@ const dragType = 'application/x-noteapp-task';
 const knownStage = (stage: string) => stages.some(([value]) => value === stage);
 
 export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, onStageChange, onCreate }: TaskBoardProps) {
+  useI18n();
   const dragging = useRef<{ id: string; projectId: string } | null>(null);
   const overTarget = useRef<HTMLElement | null>(null);
   const clearOver = () => { overTarget.current?.classList.remove('is-drag-over'); overTarget.current = null; };
@@ -44,12 +46,12 @@ export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, 
     } catch { /* Ignore external or malformed drag data. */ }
   };
 
-  return <section className="task-board" role="region" aria-label="任务看板" tabIndex={0}>
+  return <section className="task-board" role="region" aria-label={tr("任务看板")} tabIndex={0}>
     <div className="task-board-track">
       {stages.map(([stage, label]) => {
         const columnTasks = tasks.filter(task => task.stage === stage || (stage === 'todo' && !knownStage(task.stage)));
         return <section key={stage} className="task-board-column"
-          role="region" aria-label={`${label}看板列`} data-stage={stage}
+          role="region" aria-label={tr("{title}看板列",{title:tr(label)})} data-stage={stage}
           onDragOver={event => {
             if (!canDrop()) return;
             event.preventDefault();
@@ -61,14 +63,14 @@ export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, 
           }}
           onDrop={event => drop(event, stage)}>
           <header className="task-board-column-header">
-            <h3>{label}<span className="task-board-count">{columnTasks.length}</span></h3>
-            {!readOnly && <button type="button" className="task-board-create" aria-label={`在${label}新增任务`}
+            <h3>{tr(label)}<span className="task-board-count">{columnTasks.length}</span></h3>
+            {!readOnly && <button type="button" className="task-board-create" aria-label={tr("在{title}新增任务",{title:tr(label)})}
               disabled={busy} onClick={() => onCreate(stage)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             </button>}
           </header>
           <div className="task-board-cards">
-            {columnTasks.length === 0 && <p className="task-board-empty">暂无任务</p>}
+            {columnTasks.length === 0 && <p className="task-board-empty">{tr("暂无任务")}</p>}
             {columnTasks.map(task => {
               const parent = task.parent_id ? parents.get(task.parent_id) : undefined;
               const priority = priorities.find(([value]) => value === task.priority)?.[1] ?? task.priority;
@@ -80,15 +82,15 @@ export function TaskBoard({ projectId, tasks, allTasks, readOnly, busy, onOpen, 
                   event.dataTransfer.setData(dragType, JSON.stringify(dragging.current));
                 }}
                 onDragEnd={() => { dragging.current = null; clearOver(); }}>
-                <button type="button" className="task-board-open" aria-label={`打开任务 ${task.title}`} onClick={() => onOpen(task)}>
-                  {task.parent_id && <span className="task-board-parent">父任务 · {parent?.title ?? '未找到父任务'}</span>}
+                <button type="button" className="task-board-open" aria-label={tr("打开任务 {title}",{title:task.title})} onClick={() => onOpen(task)}>
+                  {task.parent_id && <span className="task-board-parent">{tr("父任务 ·")} {parent?.title ?? tr("未找到父任务")}</span>}
                   <span className="task-board-title">{task.title}</span>
-                  <span className="task-board-meta"><span>优先级 · {priority}</span>{task.due_date && <time dateTime={task.due_date}>截止 {task.due_date}</time>}</span>
+                  <span className="task-board-meta"><span>{tr("优先级 ·")} {tr(priority)}</span>{task.due_date && <time dateTime={task.due_date}>{tr("截止")} {task.due_date}</time>}</span>
                 </button>
                 <div className="task-board-stage-control">
-                  <select aria-label={`更改看板阶段 ${task.title}`} value={knownStage(task.stage) ? task.stage : 'todo'}
+                  <select aria-label={tr("更改看板阶段 {title}",{title:task.title})} value={knownStage(task.stage) ? task.stage : 'todo'}
                     disabled={disabled} onChange={event => changeStage(task, event.target.value)}>
-                    {stages.map(([value, text]) => <option key={value} value={value}>{text}</option>)}
+                    {stages.map(([value, text]) => <option key={value} value={value}>{tr(text)}</option>)}
                   </select>
                 </div>
               </article>;

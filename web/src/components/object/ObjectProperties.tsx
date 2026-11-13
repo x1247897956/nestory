@@ -1,3 +1,4 @@
+import {useI18n} from "../../i18n";
 import { positionPropertyPopover } from "./propertyTypes";
 import { PropertyIcon } from "./PropertyIcon";
 import { CustomProperties } from "./CustomProperties";
@@ -15,6 +16,7 @@ type ObjectView = { read_only: boolean; properties: Record<string, unknown> };
 export function ObjectProperties({ projectId, type, id, version, archived, children }: {
   projectId: string; type: "tasks" | "pages" | "events"; id: string; version: number; archived: boolean; children?: ReactNode;
 }) {
+  const {t}=useI18n();
   const disclosureKey=`${projectId}:${type}:${id}`;
   const [expanded,setExpanded]=useState(()=>expandedObjects.get(disclosureKey)??false);
   useEffect(()=>{expandedObjects.set(disclosureKey,expanded);},[disclosureKey,expanded]);
@@ -47,12 +49,12 @@ export function ObjectProperties({ projectId, type, id, version, archived, child
   const object = useQuery({ queryKey: ["object", type, id, version, archived], queryFn: () => api<ObjectView>(`/objects/${type}/${id}`) });
   const fields = new Map(Children.toArray(children).filter(isValidElement).map(child => [(child.props as Record<string, unknown>)["data-property"], child]));
   const readonly = archived || !!object.data?.read_only;
-  return <section className="object-property-section" aria-label="对象属性栏">
-    <button className="property-disclosure" aria-expanded={expanded} aria-controls={contentId} onClick={toggleProperties}><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d={expanded?"m5 12 5-5 5 5":"m5 8 5 5 5-5"}/></svg>{expanded?"收起属性":"展开属性"}</button>
+  return <section className="object-property-section" aria-label={t("对象属性栏")}>
+    <button className="property-disclosure" aria-expanded={expanded} aria-controls={contentId} onClick={toggleProperties}><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d={expanded?"m5 12 5-5 5 5":"m5 8 5 5 5-5"}/></svg>{expanded?t("收起属性"):t("展开属性")}</button>
     <div ref={content} id={contentId} hidden={!expanded} className="property-layout">
-    {(schema.isError || object.isError) && <p className="property-error" role="alert">属性刷新失败，当前编辑内容仍保留。<button onClick={() => { void schema.refetch(); void object.refetch(); }}>重试</button></p>}
-    <div className="object-properties task-properties" role="group" aria-label="对象属性">
-      {schema.data ? schema.data.properties.filter(property => type !== "pages" || property.key === "relations").map(property => property.kind === "relations" ? <div className="object-property-cell" key={property.key} data-property={property.key}><Relations key={type + id} projectId={projectId} type={type} id={id} archived={readonly}/></div> : <div className="object-property-cell" key={property.key} data-property={property.key}><span className="object-property-label"><PropertyIcon name={property.key}/>{property.label}</span>{fields.get(property.key) ?? <span className="object-property-value">{object.isPending ? "加载中…" : object.data?.properties[property.key] == null ? "未设置" : String(object.data.properties[property.key])}</span>}</div>) : <>{schema.isPending && <span role="status">正在加载属性定义…</span>}{children}</>}
+    {(schema.isError || object.isError) && <p className="property-error" role="alert">{t("属性刷新失败，当前编辑内容仍保留。")}<button onClick={() => { void schema.refetch(); void object.refetch(); }}>{t("重试")}</button></p>}
+    <div className="object-properties task-properties" role="group" aria-label={t("对象属性")}>
+      {schema.data ? schema.data.properties.filter(property => type !== "pages" || property.key === "relations").map(property => property.kind === "relations" ? <div className="object-property-cell" key={property.key} data-property={property.key}><Relations key={type + id} projectId={projectId} type={type} id={id} archived={readonly}/></div> : <div className="object-property-cell" key={property.key} data-property={property.key}><span className="object-property-label"><PropertyIcon name={property.key}/>{t(property.label)}</span>{fields.get(property.key) ?? <span className="object-property-value">{object.isPending ? t("加载中…") : object.data?.properties[property.key] == null ? t("未设置") : String(object.data.properties[property.key])}</span>}</div>) : <>{schema.isPending && <span role="status">{t("正在加载属性定义…")}</span>}{children}</>}
     </div>
     <CustomProperties key={type+id} projectId={projectId} type={type} id={id} archived={readonly}/>
     </div>

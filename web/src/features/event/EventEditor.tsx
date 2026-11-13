@@ -1,3 +1,4 @@
+import {t, useI18n, translateError} from "../../i18n";
 import {useState} from "react";
 import {DateTime} from "luxon";
 import type {BodyDocument} from "../../app/document";
@@ -23,6 +24,7 @@ export function EventEditor({
   onSave: (d: Draft, v: number) => Promise<unknown>;
   onReload: (beforeReset?: () => void) => Promise<void>;
 }) {
+  useI18n();
   const a = useAutosave(
     {
       title: event.title,
@@ -55,7 +57,7 @@ export function EventEditor({
   return (
     <article
       className="editor"
-      aria-label="日程详情"
+      aria-label={t("日程详情")}
       data-dirty={a.dirty || a.busy || bodyPending}
     >
       <ObjectEditorHeader title={a.draft.title} menu={<ObjectMenu type="events" id={event.id} projectId={event.project_id} archived={archived}/>} properties={<ObjectProperties
@@ -68,7 +70,7 @@ export function EventEditor({
           {(["start_at", "end_at"] as const).map((key) => (
             <label key={key} className="task-property" data-property={key}>
               <input
-                aria-label={key === "start_at" ? "开始时间" : "结束时间"}
+                aria-label={key === "start_at" ? t("开始时间") : t("结束时间")}
                 type="datetime-local"
                 disabled={archived}
                 value={a.draft[key]}
@@ -81,7 +83,7 @@ export function EventEditor({
         </ObjectProperties>}>
           <input
             className="task-inline-title"
-            aria-label="日程标题"
+            aria-label={t("日程标题")}
             disabled={archived}
             value={a.draft.title}
             onChange={(e) =>
@@ -100,18 +102,18 @@ export function EventEditor({
         }
       />
       </ObjectEditorBody>
-      <ObjectEditorFooter busy={a.busy} dirty={a.dirty} error={a.error || error} >
-      {!a.draft.title.trim() && <p role="alert">请输入日程标题</p>}
+      <ObjectEditorFooter busy={a.busy} dirty={a.dirty} error={translateError(a.error || error)} >
+      {!a.draft.title.trim() && <p role="alert">{t("请输入日程标题")}</p>}
       {!validTimes(a.draft.start_at, a.draft.end_at, zone) && (
-        <p role="alert">结束时间必须晚于开始时间</p>
+        <p role="alert">{t("结束时间必须晚于开始时间")}</p>
       )}
 
       {(a.error || error) && (
         <div role="alert">
-          {a.error || error}
-          <p>请保留此页面；可复制草稿备份。</p>
-          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>恢复本机草稿</button>}
-          <button onClick={() => void a.save()}>重试保存</button>
+          {translateError(a.error || error)}
+          <p>{t("请保留此页面；可复制草稿备份。")}</p>
+          {a.canRecover && <button disabled={bodyPending || a.busy} onClick={() => { if (!bodyPending && !a.busy) a.recover(); }}>{t("恢复本机草稿")}</button>}
+          <button onClick={() => void a.save()}>{t("重试保存")}</button>
           <button
             onClick={() =>
               void navigator.clipboard
@@ -119,13 +121,12 @@ export function EventEditor({
                 .catch(() => setError("复制失败，请手动复制"))
             }
           >
-            复制草稿
-          </button>
+            {t("复制草稿")}</button>
           <button
             disabled={bodyPending || a.busy}
             onClick={async () => {
               if (bodyPending || a.busy) return;
-              if (confirm("重新载入会丢弃本地草稿，是否继续？"))
+              if (confirm(t("重新载入会丢弃本地草稿，是否继续？")))
                 try {
                   await onReload(a.discardRecovery);
                 } catch (e) {
@@ -133,8 +134,7 @@ export function EventEditor({
                 }
             }}
           >
-            重新载入
-          </button>
+            {t("重新载入")}</button>
         </div>
       )}
       </ObjectEditorFooter>

@@ -1,3 +1,4 @@
+import {getLanguage,t} from "../../i18n";
 export type PropertyKind = "text" | "single_select" | "multi_select" | "url";
 export type PropertyOption = {id:string;name:string;color?:string};
 export type PropertyDefinition = {id:string;project_id:string;object_type:"tasks"|"pages"|"events";name:string;kind:PropertyKind;options:PropertyOption[];version:number};
@@ -37,3 +38,14 @@ export const propertyColors = [
  {id:"purple",name:"紫色"},{id:"pink",name:"粉色"},{id:"red",name:"红色"},
 ];
 export const optionColor=(color?:string)=>propertyColors.some(c=>c.id===color)?color:"gray";
+
+// Only newly generated names follow the UI language. Existing definitions and
+// names copied from another object type remain user data.
+export function newPropertyInput(kind:PropertyKind,existingNames:string[]):{kind:PropertyKind;name?:string} {
+ if(getLanguage()!=="en")return {kind};
+ const base=t(propertyKinds.find(item=>item.kind===kind)!.name);
+ const names=new Set(existingNames.map(name=>name.toLocaleLowerCase()));
+ let name=base;
+ for(let suffix=2;names.has(name.toLocaleLowerCase());suffix++)name=`${base} ${suffix}`;
+ return {kind,name};
+}
